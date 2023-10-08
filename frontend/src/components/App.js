@@ -16,6 +16,9 @@ export default class App extends Component{
 			<div>
 				<NavBar />
 			</div>
+			<div>
+				<PinterestLayout />
+			</div>
 			
 			</ChakraProvider>
 		);
