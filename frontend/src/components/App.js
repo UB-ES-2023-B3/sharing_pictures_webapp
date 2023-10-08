@@ -1,7 +1,10 @@
 import PinterestLayout from './PinterestLayout.js';
 import '../../static/css/styles.css';
-import React, {Component} from 'react';
+import * as React from 'react'
+import {Component} from 'react';
 import {render} from "react-dom";
+import { ChakraProvider } from '@chakra-ui/react'
+import NavBar from './NavBar.js';
 
 export default class App extends Component{
 	constructor(props){
@@ -9,9 +12,12 @@ export default class App extends Component{
 	}
 	render(){
 		return (
+			<ChakraProvider>
 			<div>
-				<PinterestLayout />
+				<NavBar />
 			</div>
+			
+			</ChakraProvider>
 		);
 
 	}	
