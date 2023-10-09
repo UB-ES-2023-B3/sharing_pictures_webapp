@@ -28,6 +28,9 @@ function NavBar() {
     const [inicio, setinicio] = useState(true);
     const [isLoggedIn, setisLoggedIn] = useState(false);
     const [explorar, setexplorar] = useState(false);
+    const navigateToLogin= () => {
+    window.location.href="/login"
+  };
     //useEffect(() => onChangeValue({alarm }), [alarm])
 
     return (
@@ -62,7 +65,7 @@ function NavBar() {
                 ) : (
                     // Si el usuario no está autenticado, mostrar los botones de Iniciar Sesión y Registrarse
                     <>
-                        <Button borderRadius={30} variant='ghost'>
+                        <Button borderRadius={30} variant='ghost' onClick={navigateToLogin}>
                             Iniciar Sesión
                         </Button>
                         <Button borderRadius={30} variant='ghost'>
