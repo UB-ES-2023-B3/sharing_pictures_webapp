@@ -1,4 +1,4 @@
-import PinterestLayout from './PinterestLayout.js';
+import UploadFloating from './UploadFloating.js';
 import '../../static/css/styles.css';
 import React, {Component} from 'react';
 import {render} from "react-dom";
@@ -10,7 +10,8 @@ export default class App extends Component{
 	render(){
 		return (
 			<div>
-				<PinterestLayout />
+				<UploadFloating />
+				
 			</div>
 		);
 
