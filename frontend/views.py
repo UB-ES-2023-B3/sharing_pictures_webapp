@@ -4,6 +4,5 @@ from django.shortcuts import render
 def index(request,*args,**kwargs):
     return render(request,'frontend/index.html')
 
-def login(request,*args,**kwargs):
-    
-    return render(request,'frontend/login.html')
+def register(request,*args,**kwargs):
+    return render(request,'frontend/register.html')

@@ -5,7 +5,7 @@ import {Component} from 'react';
 import {render} from "react-dom";
 import { ChakraProvider } from '@chakra-ui/react'
 import NavBar from './NavBar.js';
-import Login from './Login.js';
+import Register from './Register.js';
 
 export default class App extends Component{
 	constructor(props){
