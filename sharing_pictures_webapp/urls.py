@@ -22,7 +22,10 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("api/", include("main_app.urls")),
+<<<<<<< HEAD
+=======
     path('',include ('frontend.urls'))
+>>>>>>> US3.1---FRONTEND
 ]
 
 urlpatterns = urlpatterns+static(settings.MEDIA_URL,
