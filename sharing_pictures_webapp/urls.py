@@ -16,11 +16,8 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-import django.contrib.auth.urls
+
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path("accounts/", include("django.contrib.auth.urls")), #US2.1   #auth urls include: login, logout,
-    # password_change, password_change_done, password_reset, password_reset_done, password_reset_confirm,
-    # password_reset_complete
-    #path('accounts/', include('allauth.urls')), #US2.1
+    path('',include('users.urls')) #US1.1, US2.1
 ]
