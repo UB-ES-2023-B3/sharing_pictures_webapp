@@ -1,37 +1,61 @@
-import React from 'react';
+
 
 import Card from './Card.js';
+import React, { useState, useEffect } from 'react';
 
 function PinterestLayout() {
+    const [posts, setPosts] = useState([]);
+
+    const fetchPostData = () => {
+        fetch("api/load_pictures/")
+            .then(response => {
+                return response.json()
+            })
+            .then(data => {
+                const shuffledPosts = data.pictures.sort(() => Math.random() - 0.5);
+                setPosts(shuffledPosts);
+            })
+    }
+
+    useEffect(() => {
+        fetchPostData()
+    }, [])
+    
     return (
         <div style={styles.pin_container}>
-            <Card size="small" />
-            <Card size="medium" />
-            <Card size="large" />
-            <Card size="small" />
-            <Card size="medium" />
-            <Card size="large" />
-            <Card size="medium" />
-            <Card size="large" />
-            <Card size="small" />
-            <Card size="small" />
-            <Card size="medium" />
-            <Card size="large" />
-            <Card size="medium" />
-            <Card size="large" />
-            <Card size="medium" />
-            <Card size="large" />
-            <Card size="small" />
-            <Card size="small" />
-            <Card size="medium" />
-            <Card size="medium" />
-            <Card size="large" />
-            <Card size="small" />
-            <Card size="small" />
-            <Card size="medium" />
-        </div>
+        {posts.map((post, index) => (
+            <Card
+                key={index}
+                size={post.image_size}
+                image={post.image_url}
+                description = {post.description}
+            />
+        ))}
+    </div>
+
     )
 }
+/*
+<div style={styles.pin_container}>
+        {posts.map((post, index) => (
+            <Card
+                key={index}
+                size={post.image_size}
+                image={post.image_url}
+            />
+        ))}
+    </div>
+
+    <div style={styles.pin_container}>
+            {posts.length > 0 && (
+                <ul>{posts.map((posts => (
+                    <li>{posts.image_url}</li>
+                )))}</ul>
+
+            )}
+        </div>
+*/
+
 
 const styles = {
     pin_container: {
@@ -45,7 +69,7 @@ const styles = {
         left: '50%',
         transform: 'translateX(-50%)',
         justifyContent: 'center',
-        
+
     }
 }
 

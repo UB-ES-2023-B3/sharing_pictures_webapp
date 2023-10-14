@@ -16,4 +16,3 @@ def load_pictures(request):
             })
 
     return JsonResponse({'pictures': picture_data}, safe=False)
-

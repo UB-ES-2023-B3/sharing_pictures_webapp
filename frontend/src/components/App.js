@@ -1,7 +1,9 @@
 import PinterestLayout from './PinterestLayout.js';
 import '../../static/css/styles.css';
 import React, {Component} from 'react';
-import {render} from "react-dom";
+
+import { createRoot } from 'react-dom/client';
+
 export default class App extends Component{
 	constructor(props){
 		super(props);
@@ -15,5 +17,5 @@ export default class App extends Component{
 	}	
 }
 
-const appDiv = document.getElementById("app");
-render(<App/>, appDiv);
+const root = createRoot(document.getElementById('app'));
+root.render(<App />);
