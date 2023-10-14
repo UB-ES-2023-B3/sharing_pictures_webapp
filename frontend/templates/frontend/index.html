@@ -45,9 +45,13 @@
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="main">
-        <div id="app">
-          
-        </div>
+      {% if user.is_authenticated %} 
+      <!-- SI SE QUIERE PROBAR SIN ESTAR AUTENTICADO JUGAR CON ESTE IF -->
+      <div id="app"></div>
+      {% else %}
+        <div id="app-no-auth"> </div>
+      {% endif %}
+    </div>
     <!--
       This HTML file is a template.
       If you open it directly in the browser, you will see an empty page.
@@ -60,8 +64,5 @@
     -->
 </div>
     <script src="{%static 'frontend/main.js' %}"></script>
-    <script>
-      const csrfToken = '{{ csrf_token|escapejs }}';
-    </script>
   </body>
 </html>
