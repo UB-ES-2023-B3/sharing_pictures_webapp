@@ -6,6 +6,7 @@ from django.contrib import messages
 
 
 def load_pictures(request):
+    
     posts = Post.objects.all()
     picture_data = []
 

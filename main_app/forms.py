@@ -11,6 +11,8 @@ class UploadPostForm(forms.ModelForm):
         model = Post
         fields = ['image', 'description']
 
+    description = forms.CharField(required=False, widget=forms.Textarea)
+                                  
     #Mètode que s'executa automàticament per netejar i validar el camp image del teu formulari.
     def clean_image(self):
         image = self.cleaned_data.get('image')
