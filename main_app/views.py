@@ -1,14 +1,13 @@
 from django.shortcuts import render, redirect
+from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
-from django.contrib.auth import get_user_model, login, authenticate, logout
-from .forms import LoginForm, UserRegistrationForm
-from validate_email import validate_email
+from django.contrib.auth.decorators import login_required
+from .forms import UserRegistrationForm, UserLoginForm
+from .decorators import user_not_authenticated
 
 #US1.1
+@user_not_authenticated
 def register(request):
-    if request.user.is_authenticated:
-        return redirect('/')
-
     if request.method == 'POST':
         form = UserRegistrationForm(request.POST)
         if form.is_valid():
@@ -16,43 +15,41 @@ def register(request):
             messages.success(request, 'You have singed up successfully.')
             login(request, user)
             return redirect('/')
+
         else:
             for error in list(form.errors.values()):
                 print(request, error)
-
-    if request.method == 'GET':
+    else:
         form = UserRegistrationForm()
-        return render(request, 'main_app/register.html', {'form': form})
-
     return render(request, 'main_app/register.html', {'form': form})
 
 #US2.1
-def sign_in(request):
-    if request.method == 'GET':
-        if request.user.is_authenticated:
-            return redirect('posts')
-
-        form = LoginForm()
-        return render(request, 'main_app/login.html', {'form': form})
-
-    elif request.method == 'POST':
-        form = LoginForm(request.POST)
-
+@user_not_authenticated
+def login(request):
+    if request.method == "POST":
+        form = UserLoginForm(request=request, data=request.POST)
         if form.is_valid():
-            username = form.cleaned_data['username']
-            password = form.cleaned_data['password']
-            user = authenticate(request, username=username, password=password)
-            if user:
+            user = authenticate(
+                username=form.cleaned_data["username"],
+                password=form.cleaned_data["password"],
+            )
+            if user is not None:
                 login(request, user)
-                messages.success(request, f'Hi {username.title()}, welcome back!')
-                return redirect('posts')
+                messages.success(request, f"Hello <b>{user.username}</b>! You have been logged in")
+                return redirect("homepage")
 
-        # either form not valid or user is not authenticated
-        messages.error(request, f'Invalid username or password')
-        return render(request, 'main_app/login.html', {'form': form})
+        else:
+            for error in list(form.errors.values()):
+                messages.error(request, error)
+
+    form = UserLoginForm()
+
+
+    return render(request, 'main_app/login.html', {'form': form})
 
 #USX.X (logout)
-def sign_out(request):
+@login_required
+def logout(request):
     logout(request)
-    messages.success(request,f'You have been logged out.')
-    return redirect('login')
+    messages.info(request, "Logged out successfully!")
+    return redirect("/")
