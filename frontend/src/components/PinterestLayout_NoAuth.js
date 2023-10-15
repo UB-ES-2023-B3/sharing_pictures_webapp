@@ -2,14 +2,19 @@ import React, { useState, useEffect, useRef } from 'react';
 import Card from './Card.js';
 import Swal from 'sweetalert2';
 
-function PinterestLayout() {
+function PinterestLayout_NoAuth() {
   const [posts, setPosts] = useState([]);
   const sentinelRef = useRef(null);
-  const maxLoadCount = 10000; // Maximum number of pictures to load
+  const maxLoadCount = 50; // Maximum number of pictures to load
   let loadCount = 0; // Counter to keep track of loaded pictures
 
   const fetchPostData = () => {
-    
+    if (loadCount >= maxLoadCount) {
+      // When the maximum count is reached, display the SweetAlert dialog
+      showMaxPostsAlert();
+      return;
+    }
+
     // Fetch more posts from the API and append them to the existing posts
     fetch("api/load_pictures/")
       .then((response) => response.json())
@@ -30,7 +35,31 @@ function PinterestLayout() {
       });
   };
 
-  
+  const showMaxPostsAlert = () => {
+    // Display SweetAlert dialog when the maximum count is reached
+    Swal.fire({
+      icon: 'info',
+      title: 'Maximum Pictures Reached',
+      text: 'To see more pictures, please log in or register.',
+      showCancelButton: true,
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+      allowEnterKey: false,
+      stopKeydownPropagation: false,
+      confirmButtonText: 'Login',
+      confirmButtonColor: '#dc3545',
+      confirmButtonTextColor: '#fff',
+      cancelButtonColor: '#dc3545',
+      cancelButtonTextColor: '#fff',
+      cancelButtonText: 'Register',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        window.location.href = "/login";
+      } else if (result.dismiss === Swal.DismissReason.cancel) {
+        window.location.href = "/register";
+      }
+    });
+  };
 
   const handleIntersect = (entries) => {
     if (entries[0].isIntersecting) {
@@ -92,4 +121,4 @@ const styles = {
   },
 };
 
-export default PinterestLayout;
+export default PinterestLayout_NoAuth;
