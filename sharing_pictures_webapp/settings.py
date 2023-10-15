@@ -38,11 +38,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_advanced_password_validation', #US1.1
-    'main_app', #US1.1, US2.1
+    'users', #US1.1, US2.1
 
 ]
 
-AUTH_USER_MODEL = 'main_app.CustomUser'
+AUTH_USER_MODEL = 'users.CustomUser'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

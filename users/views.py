@@ -22,9 +22,9 @@ def register(request):
 
     if request.method == 'GET':
         form = UserRegistrationForm()
-        return render(request, 'users/register.html', {'form': form})
+        return render(request, 'main_app/register.html', {'form': form})
 
-    return render(request, 'users/register.html', {'form': form})
+    return render(request, 'main_app/register.html', {'form': form})
 
 #US2.1
 def sign_in(request):
@@ -33,7 +33,7 @@ def sign_in(request):
             return redirect('posts')
 
         form = LoginForm()
-        return render(request, 'users/login.html', {'form': form})
+        return render(request, 'main_app/login.html', {'form': form})
 
     elif request.method == 'POST':
         form = LoginForm(request.POST)
@@ -49,7 +49,7 @@ def sign_in(request):
 
         # either form not valid or user is not authenticated
         messages.error(request, f'Invalid username or password')
-        return render(request, 'users/login.html', {'form': form})
+        return render(request, 'main_app/login.html', {'form': form})
 
 #USX.X (logout)
 def sign_out(request):
