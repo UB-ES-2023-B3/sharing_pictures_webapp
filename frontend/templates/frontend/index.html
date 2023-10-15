@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    
     <meta charset="utf-8" />
     <!--<link rel="icon"  sizes="64x64 32x32 24x24 16x16" href="/favicon.ico" />-->
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -15,6 +16,15 @@
       user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
     -->
     {%load static %}
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.15/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Incluye SweetAlert2 CSS (hoja de estilos) en la sección head -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
+    <!-- Incluye SweetAlert2 JS (archivo JavaScript) antes de tu propio código JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
     <!--<link rel="manifest" href="{% static 'manifest.json' %}" />-->
     <!--
       Notice the use of %PUBLIC_URL% in the tags above.
@@ -28,14 +38,20 @@
     <title>React App 2</title>
 
     {%load static %}
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    
     <link rel="stylesheet" type="text/css" href ="{% static 'css/styles.css' %}"
     />
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="main">
-        <div id="app"></div>
+      {% if user.is_authenticated %} 
+      <!-- SI SE QUIERE PROBAR SIN ESTAR AUTENTICADO JUGAR CON ESTE IF -->
+      <div id="app"></div>
+      {% else %}
+        <div id="app-no-auth"> </div>
+      {% endif %}
+    </div>
     <!--
       This HTML file is a template.
       If you open it directly in the browser, you will see an empty page.
@@ -48,6 +64,5 @@
     -->
 </div>
     <script src="{%static 'frontend/main.js' %}"></script>
-    
   </body>
 </html>

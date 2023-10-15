@@ -1,5 +1,8 @@
 from .models import Post
-from django.http import JsonResponse
+from .forms import UploadPostForm
+from django.http import JsonResponse, HttpResponseBadRequest
+from django.shortcuts import render, redirect
+from django.contrib import messages
 
 
 def load_pictures(request):
@@ -20,3 +23,16 @@ def load_pictures(request):
                 })
 
     return JsonResponse({'pictures': picture_data}, safe=False)
+
+def upload_picture(request):
+    if request.method == 'POST':
+        form = UploadPostForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return load_pictures(request) 
+        else:
+            return HttpResponseBadRequest("Form validation failed")
+    else:
+        load_pictures(request) 
+
+

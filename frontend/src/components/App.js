@@ -1,38 +1,23 @@
-import PinterestLayout_NoAuth from './PinterestLayout_NoAuth.js';
-import PinterestLayout from './PinterestLayout.js';
+import UploadFloating from './UploadFloating.js';
 import '../../static/css/styles.css';
-import React, { Component } from 'react';
+import React, {Component} from 'react';
+import PinterestLayout from './PinterestLayout.js';
 
-import { createRoot } from 'react-dom/client';
-
-export default class App extends Component {
-	constructor(props) {
+export default class App extends Component{
+	constructor(props){
 		super(props);
-		this.state = {
-			isAuthenticated: false, // Cambia esto según tu lógica de autenticación
-		  };
-	  
-		
 	}
-	render() {
-		if (this.state.isAuthenticated) {
-			return (
-				<div>
-					<PinterestLayout />
-				</div>
-			);
-		}else {
-			
-			return (
-				<div>
-					<PinterestLayout_NoAuth />
-				</div>
-			);
-			
-		}
-		
-	}
+	render(){
+		return (
+			<div>
+				<PinterestLayout />
+				<UploadFloating />
+
+			</div>
+		);
+
+	}	
 }
 
-const root = createRoot(document.getElementById('app'));
-root.render(<App />);
+
+
