@@ -1,0 +1,3 @@
+django
+validate_email
+django-advanced_password_validation
