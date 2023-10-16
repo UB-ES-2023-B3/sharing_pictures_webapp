@@ -1,5 +1,7 @@
 
 import * as React from 'react'
+import Swal from 'sweetalert2';
+import axios from 'axios';
 import { Component } from 'react';
 import { render } from "react-dom";
 import App from './App.js';
@@ -31,6 +33,8 @@ import {
   } from '@chakra-ui/react'
 import '../../static/css/styles.css';
 import ErrorMessage from './ErrorMessage.js';
+axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
+axios.defaults.xsrfCookieName = "csrftoken";
 
 export default class Register extends Component {
 	constructor(props) {
@@ -40,8 +44,11 @@ export default class Register extends Component {
 			email: '',
 			emailError: false,
 			password: '',
+			password2: '',
 			passwordError: false,
+			password2Error: false,
 			name : '',
+			lastName: '',
 			nameError: false,
 			userName: '',
 			userError: false,
@@ -49,14 +56,16 @@ export default class Register extends Component {
 			isSubmitting: false,
 			emailErrorMessage: '',
 			passwordErrorMessage: '',
+			password2ErrorMessage: '',
 			nameErrorMessage:'',
 			userErrorMessage:'',
 			onOpenAlert:false,
 			onCloseAlert:false,
 			alertText:'',
-			successfulSubmit:false
+			
 		};
 		this.noErrors = true; //Controls errors in params format
+		this.successfulSubmit = false;
 	}
 	handleClick = () => {
 		this.setState((prevState) => ({
@@ -72,6 +81,11 @@ export default class Register extends Component {
 	setName = (value) =>{
 		this.setState({
 			name: value,
+		});
+	}
+	setLastName = (value) =>{
+		this.setState({
+			lastName: value,
 		});
 	}
 	setNameErrorMessage = (value) => {
@@ -102,11 +116,7 @@ export default class Register extends Component {
 			show: !this.state.show,
 		});
 	};
-	setSuccessfulSubmit = (value)=>{
-		this.setState({
-			successfulSubmit: value 
-		})
-	}
+
 
 	setEmailErrorMessage = (value) => {
 		this.setState({
@@ -123,13 +133,26 @@ export default class Register extends Component {
 			passwordErrorMessage: value,
 		});
 	};
+	setPassword2ErrorMessages = (value) => {
+		this.setState({
+			password2ErrorMessage: value,
+		});
+	}
 	setPasswordError = (value) => {
 
 		this.setState({passwordError:value})
 	};
+	setPassword2Error = (value) => {
+		this.setState({password2Error:value})
+	};
 	setPassword = (value) => {
 		this.setState({
 			password: value,
+		});
+	};
+	setPassword2 = (value) => {
+		this.setState({
+			password2: value,
 		});
 	};
 	performSubmit=()=>{
@@ -140,23 +163,75 @@ export default class Register extends Component {
 	else{ 
 		
 
-		// TODO: Backend send
-		return true; 
+		//  Backend send
+		this.handleSubmit();
+
+		
 	}
 		
 	}
-	handleSubmit = async (event) => {
+	
+	handleSubmit =async() => {
 		// Tu lógica de envío del formulario aquí
+		const formData = new FormData();
+		formData.append('email', this.state.email);
+		formData.append('password1', this.state.password);
+		formData.append('first_name', this.state.name);
+		formData.append('last_name', this.state.lastName);
+		formData.append('username', this.state.userName);
+		formData.append('password2', this.state.password2);
 		
-		return true;
+
+		axios.post('/api/register/', formData)
+		.then((response) => { // Registre exitós (status code 201)
+		  	console.log(response);
+		  	Swal.fire({ //Llencem notificació
+			icon: 'success',
+			title:  'Registration Successful',
+		});
+		this.navigateToMainPage();
+		})
+		.catch((error) => { //Registre no exitós (status code 400)
+		  if (error.response) {
+			console.log(error.response);
+			const errorMessages = error.response.data.errors;
+			let errorMessage = 'This happened:<br>';
+			if ('username' in errorMessages) {
+
+			}
+			if('email' in errorMessages){
+				this.setEmailErrorMessage(errorMessages['email']);
+				this.setEmailError(true);
+			}
+			if('username' in errorMessages){
+				this.setUserNameErrorMessage(errorMessages['username']);
+				this.setUserNameError(true);
+			}
+      for (const key in errorMessages) {
+        errorMessage += `${errorMessages[key]}<br>`;
+      }
+      
+      Swal.fire({
+        icon: 'error',
+        title: 'Registration Failed',
+        html: errorMessage,
+      });
+			
+		  }
+		});
+	  
+	
 
 		
 	};
-
+	
 	navigateToLogin = () => {
-		// Tu lógica para ir a la página de registro aquí
+		//TODO: Navigate to login page
 	};
-
+	navigateToMainPage = () => {
+		//TODO: Navigate to main page
+	};
+	
 	// Validaciones
 	validateName = () =>{
 		const {name} = this.state;
@@ -221,40 +296,46 @@ export default class Register extends Component {
 			
 			
 			if (hasError){
-        this.setPasswordErrorMessages("Password too weak");
+        this.setPasswordErrorMessages("Password doesn't meet requirements");
 		this.noErrors = false;
         this.setPasswordError(true);
       }
 		else {
-			this.setPasswordErrorMessages(''); // Accede a setEmailErrorMessage a través de this
-			this.setPasswordError(false); // Accede a setEmailError a través de this
+			this.setPasswordErrorMessages(''); 
+			this.setPasswordError(false);
 		}}
 	};
-	
+	validatePassword2 = () => {
+		const { password, password2 } = this.state;
+		if (password !== password2) {
+			this.setPassword2ErrorMessages('Passwords do not match');
+			this.setPassword2Error(true);
+			this.noErrors = false;
+		} else {
+			this.setPassword2ErrorMessages(''); 
+			this.setPassword2Error(false);
+		}
+	  };
 	navigateToHouse= () => {
 		if(!this.state.emailError && !this.state.passwordError){
 			window.location.href=""
 		}
 		
 	  };
-	validateParameters = () => {
+
+	  validateParameters = () => {
 		
 		this.validateEmail();
 		this.validatePassword();
 		this.validateName();
 		this.validateUserName();
-		
-		if(this.performSubmit()){
-			this.state.alertText='Registration Successful';
-			this.setSuccessfulSubmit(true);
+		this.validatePassword2();
 
-		}else{
-			this.state.alertText = 'Registration Failed';
-			this.setSuccessfulSubmit(false);
-		}
-		this.state.onOpenAlert = true;
+		this.performSubmit(); // If no errors, submit form
+		
+		
+		
 	};
-	
 
 
 	render() {
@@ -263,8 +344,11 @@ export default class Register extends Component {
       email,
       emailError,
       password,
+	  password2,
       passwordError,
+	  password2Error,
       name,
+	  lastName,
       nameError,
       userName,
       userError,
@@ -280,33 +364,7 @@ export default class Register extends Component {
     } = this.state;
 		return (
       <ChakraProvider>
-        {/* POST SUBMIT DIALOG */}
-        <AlertDialog
-          motionPreset="slideInBottom"
-          isOpen={this.state.onOpenAlert}
-          onClose={() => this.setState({ onOpenAlert: false })} // Use setState to close the dialog
-        >
-          <AlertDialogOverlay />
-          <AlertDialogContent>
-            <AlertDialogHeader
-              fontSize="50px"
-              color={successfulSubmit ? "green" : "red"}
-              textAlign="center"
-            >
-              {this.state.alertText}
-            </AlertDialogHeader>
-            <Button
-              colorScheme="#98A8F8"
-              variant="link"
-              onClick={() => {
-                this.setState({ onOpenAlert: false });
-              }}
-            >
-              Close
-            </Button>
-            <AlertDialogFooter />
-          </AlertDialogContent>
-        </AlertDialog>
+       
 
         {/* MAIN FORM */}
         <div className="register-form">
@@ -329,14 +387,27 @@ export default class Register extends Component {
               </Box>
               <Box my={4} textAlign="left">
                 <FormControl className="form" isInvalid={this.state.nameError}>
-                  <FormLabel>Full name</FormLabel>
+                  <FormLabel>First name</FormLabel>
                   <Input
                     type="name"
-                    placeholder="John Doe"
+                    placeholder="John"
                     value={name}
                     onChange={(e) => this.setName(e.target.value)}
                     onClick={() => this.setNameError(false)}
 					onBeforeInput={() => this.setNameError(false)}
+                  />
+                  <FormErrorMessage>
+                    {!this.state.nameError ? " " : this.state.nameErrorMessage}
+                  </FormErrorMessage>
+                </FormControl>
+				<FormControl className="form" >
+                  <FormLabel>Last name</FormLabel>
+                  <Input
+                    type="lastName"
+                    placeholder="Doe"
+                    value={lastName}
+                    onChange={(e) => this.setLastName(e.target.value)}
+
                   />
                   <FormErrorMessage>
                     {!this.state.nameError ? " " : this.state.nameErrorMessage}
@@ -403,7 +474,32 @@ export default class Register extends Component {
                     </FormErrorMessage>
                   )}
                 </FormControl>
+				<FormControl
+                  isInvalid={this.state.passwordError||this.state.password2Error}
+                  className="form"
+                >
+                  <FormLabel>Repeat password</FormLabel>
 
+                    <InputGroup>
+                      <Input
+                        type={this.state.show ? "text" : "password"}
+                        value={password2}
+                        placeholder="*************"
+                        size="lg"
+                        onClick={() => this.setPassword2Error(false)}
+                        onChange={(e) => {
+                          this.setPassword2(e.target.value);
+                        }}
+						onBlur={() => this.setPassword2Error(false)}
+                      />
+                    </InputGroup>
+                  
+                  {!this.state.password2Error ? null : (
+                    <FormErrorMessage>
+                      {this.state.password2ErrorMessage}
+                    </FormErrorMessage>
+                  )}
+                </FormControl>
                 <Box textAlign="center">
                   <Button
                     mt={4}

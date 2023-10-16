@@ -1,7 +1,60 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.contrib.auth import login, logout, authenticate
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse, HttpResponse
+from .forms import RegistrationForm, LoginForm
+from .decorators import user_not_authenticated
 from .models import Post
-from django.http import JsonResponse
 
+#US1.1
+@user_not_authenticated
+def register(request):
+    if request.method == 'POST':
+        form = RegistrationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            messages.success(request, 'You have singed up successfully.')
+            login(request, user)
+            return HttpResponse('You have singed up successfully.', status=201)
+
+        else:
+            errors = [str(error) for error in form.errors.keys()]
+            return JsonResponse({'errors':form.errors}, status=400)
+    else:
+        form = RegistrationForm()
+        return render(request, 'main_app/register.html', {'form': form})
+
+#US2.1
+@user_not_authenticated
+def log_in(request):
+    if request.method == "POST":
+        form = LoginForm(request=request, data=request.POST)
+        if form.is_valid():
+            user = authenticate(
+                username=form.cleaned_data["username"],
+                password=form.cleaned_data["password"],
+            )
+            if user is not None:
+                login(request, user)
+                messages.success(request, f"Hello <b>{user.username}</b>! You have been logged in")
+                return redirect("/")
+
+        else:
+            for error in list(form.errors.values()):
+                messages.error(request, error)
+
+    form = LoginForm()
+
+
+    return render(request, 'main_app/login.html', {'form': form})
+
+#USX.X (logout)
+@login_required
+def log_out(request):
+    logout(request)
+    messages.info(request, "Logged out successfully")
+    return redirect("/")
 
 def index(request):
     posts = list(Post.objects.all())
@@ -12,7 +65,6 @@ def index(request):
         extended_posts.extend(posts)
 
     return render(request, 'index.html', {'posts': extended_posts})
-
 
 def load_more_pictures(request):
 
