@@ -3,5 +3,3 @@ django-advanced_password_validation
 node
 Pillow
 validate_email
-
-npm sweetalert2

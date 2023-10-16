@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from .forms import RegistrationForm, LoginForm
 from .decorators import user_not_authenticated
 from .models import Post
@@ -16,14 +16,14 @@ def register(request):
             user = form.save()
             messages.success(request, 'You have singed up successfully.')
             login(request, user)
-            return redirect('/')
+            return HttpResponse('You have singed up successfully.', status=201)
 
         else:
-            for error in list(form.errors.values()):
-                print(request, error)
+            errors = [str(error) for error in form.errors.keys()]
+            return JsonResponse({'errors':form.errors}, status=400)
     else:
         form = RegistrationForm()
-    return render(request, 'main_app/register.html', {'form': form})
+        return render(request, 'main_app/register.html', {'form': form})
 
 #US2.1
 @user_not_authenticated
