@@ -1,5 +1,6 @@
 
 import * as React from 'react'
+import Swal from 'sweetalert2';
 import axios from 'axios';
 import { Component } from 'react';
 import { render } from "react-dom";
@@ -40,16 +41,16 @@ export default class Register extends Component {
 		super(props);
 		this.state = {
 			show: false,
-			email: 'fa@d.com',
+			email: '',
 			emailError: false,
-			password: '1234Qwer@',
-			password2: '1234Qwer@',
+			password: '',
+			password2: '',
 			passwordError: false,
 			password2Error: false,
-			name : 's',
-			lastName: 's',
+			name : '',
+			lastName: '',
 			nameError: false,
-			userName: 's',
+			userName: '',
 			userError: false,
 			errorMessages: '',
 			isSubmitting: false,
@@ -61,9 +62,10 @@ export default class Register extends Component {
 			onOpenAlert:false,
 			onCloseAlert:false,
 			alertText:'',
-			successfulSubmit:false
+			
 		};
 		this.noErrors = true; //Controls errors in params format
+		this.successfulSubmit = false;
 	}
 	handleClick = () => {
 		this.setState((prevState) => ({
@@ -114,11 +116,7 @@ export default class Register extends Component {
 			show: !this.state.show,
 		});
 	};
-	setSuccessfulSubmit = (value)=>{
-		this.setState({
-			successfulSubmit: value 
-		})
-	}
+
 
 	setEmailErrorMessage = (value) => {
 		this.setState({
@@ -155,7 +153,8 @@ export default class Register extends Component {
 	setPassword2 = (value) => {
 		this.setState({
 			password2: value,
-		});}
+		});
+	};
 	performSubmit=()=>{
 		
 		if(!this.noErrors){
@@ -167,11 +166,12 @@ export default class Register extends Component {
 		//  Backend send
 		this.handleSubmit();
 
-		return true; 
+		
 	}
 		
 	}
-	handleSubmit =() => {
+	
+	handleSubmit =async() => {
 		// Tu lógica de envío del formulario aquí
 		const formData = new FormData();
 		formData.append('email', this.state.email);
@@ -183,24 +183,55 @@ export default class Register extends Component {
 		
 
 		axios.post('/api/register/', formData)
-		.then((response) => {
-		  console.log(response);
+		.then((response) => { // Registre exitós (status code 201)
+		  	console.log(response);
+		  	Swal.fire({ //Llencem notificació
+			icon: 'success',
+			title:  'Registration Successful',
+		});
+		this.navigateToMainPage();
 		})
-		.catch((error) => {
+		.catch((error) => { //Registre no exitós (status code 400)
 		  if (error.response) {
-			showErrorResponse(error.response);
+			console.log(error.response);
+			const errorMessages = error.response.data.errors;
+			let errorMessage = 'This happened:<br>';
+			if ('username' in errorMessages) {
+
+			}
+			if('email' in errorMessages){
+				this.setEmailErrorMessage(errorMessages['email']);
+				this.setEmailError(true);
+			}
+			if('username' in errorMessages){
+				this.setUserNameErrorMessage(errorMessages['username']);
+				this.setUserNameError(true);
+			}
+      for (const key in errorMessages) {
+        errorMessage += `${errorMessages[key]}<br>`;
+      }
+      
+      Swal.fire({
+        icon: 'error',
+        title: 'Registration Failed',
+        html: errorMessage,
+      });
+			
 		  }
 		});
 	  
-		return true;
+	
 
 		
 	};
-
+	
 	navigateToLogin = () => {
-		// Tu lógica para ir a la página de registro aquí
+		//TODO: Navigate to login page
 	};
-
+	navigateToMainPage = () => {
+		//TODO: Navigate to main page
+	};
+	
 	// Validaciones
 	validateName = () =>{
 		const {name} = this.state;
@@ -299,15 +330,11 @@ export default class Register extends Component {
 		this.validateName();
 		this.validateUserName();
 		this.validatePassword2();
-		if(this.performSubmit()){
-			this.state.alertText='Registration Successful';
-			this.setSuccessfulSubmit(true);
 
-		}else{
-			this.state.alertText = 'Registration Failed';
-			this.setSuccessfulSubmit(false);
-		}
-		this.state.onOpenAlert = true;
+		this.performSubmit(); // If no errors, submit form
+		
+		
+		
 	};
 
 
@@ -337,33 +364,7 @@ export default class Register extends Component {
     } = this.state;
 		return (
       <ChakraProvider>
-        {/* POST SUBMIT DIALOG */}
-        <AlertDialog
-          motionPreset="slideInBottom"
-          isOpen={this.state.onOpenAlert}
-          onClose={() => this.setState({ onOpenAlert: false })} // Use setState to close the dialog
-        >
-          <AlertDialogOverlay />
-          <AlertDialogContent>
-            <AlertDialogHeader
-              fontSize="50px"
-              color={successfulSubmit ? "green" : "red"}
-              textAlign="center"
-            >
-              {this.state.alertText}
-            </AlertDialogHeader>
-            <Button
-              colorScheme="#98A8F8"
-              variant="link"
-              onClick={() => {
-                this.setState({ onOpenAlert: false });
-              }}
-            >
-              Close
-            </Button>
-            <AlertDialogFooter />
-          </AlertDialogContent>
-        </AlertDialog>
+       
 
         {/* MAIN FORM */}
         <div className="register-form">
@@ -474,7 +475,7 @@ export default class Register extends Component {
                   )}
                 </FormControl>
 				<FormControl
-                  isInvalid={this.state.passwordError&&this.state.password2Error}
+                  isInvalid={this.state.passwordError||this.state.password2Error}
                   className="form"
                 >
                   <FormLabel>Repeat password</FormLabel>
