@@ -2,8 +2,10 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
 from .forms import UserRegistrationForm, UserLoginForm
 from .decorators import user_not_authenticated
+from .models import Post
 
 #US1.1
 @user_not_authenticated
@@ -53,3 +55,29 @@ def logout(request):
     logout(request)
     messages.info(request, "Logged out successfully!")
     return redirect("/")
+
+def index(request):
+    posts = list(Post.objects.all())
+
+    extended_posts = []
+
+    for i in range(12):
+        extended_posts.extend(posts)
+
+    return render(request, 'index.html', {'posts': extended_posts})
+
+def load_more_pictures(request):
+
+    more_pictures = Post.objects.all()
+    picture_data = []
+
+    for post in more_pictures:
+        # Convert each Post object to a dictionary
+        for i in range(12):
+            picture_data.append({
+                'image_url': post.image.url,
+                'description': post.description,
+                'created_at': post.created_at.strftime('%F %d, %Y'),
+            })
+
+    return JsonResponse({'pictures': picture_data}, safe=False)
