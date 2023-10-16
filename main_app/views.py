@@ -14,16 +14,17 @@ def register(request):
         form = RegistrationForm(request.POST)
         if form.is_valid():
             user = form.save()
-            messages.success(request, 'You have singed up successfully.')
-            login(request, user)
-            return HttpResponse('You have singed up successfully.', status=201)
+            #messages.success(request, 'You have singed up successfully.')
+            #login(request)
+            return  HttpResponse('You have singed up successfully.',status=201)
 
         else:
+            #for error in list(form.errors.values()):
             errors = [str(error) for error in form.errors.keys()]
             return JsonResponse({'errors':form.errors}, status=400)
     else:
         form = RegistrationForm()
-        return render(request, 'main_app/register.html', {'form': form})
+        return render(request, 'register', {'form': form})
 
 #US2.1
 @user_not_authenticated
