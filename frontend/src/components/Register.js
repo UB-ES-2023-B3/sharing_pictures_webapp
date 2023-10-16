@@ -40,8 +40,11 @@ export default class Register extends Component {
 			email: '',
 			emailError: false,
 			password: '',
+			password2: '',
 			passwordError: false,
+			password2Error: false,
 			name : '',
+			lastName: '',
 			nameError: false,
 			userName: '',
 			userError: false,
@@ -49,6 +52,7 @@ export default class Register extends Component {
 			isSubmitting: false,
 			emailErrorMessage: '',
 			passwordErrorMessage: '',
+			password2ErrorMessage: '',
 			nameErrorMessage:'',
 			userErrorMessage:'',
 			onOpenAlert:false,
@@ -72,6 +76,11 @@ export default class Register extends Component {
 	setName = (value) =>{
 		this.setState({
 			name: value,
+		});
+	}
+	setLastName = (value) =>{
+		this.setState({
+			lastName: value,
 		});
 	}
 	setNameErrorMessage = (value) => {
@@ -123,15 +132,27 @@ export default class Register extends Component {
 			passwordErrorMessage: value,
 		});
 	};
+	setPassword2ErrorMessages = (value) => {
+		this.setState({
+			password2ErrorMessage: value,
+		});
+	}
 	setPasswordError = (value) => {
 
 		this.setState({passwordError:value})
+	};
+	setPassword2Error = (value) => {
+		this.setState({password2Error:value})
 	};
 	setPassword = (value) => {
 		this.setState({
 			password: value,
 		});
 	};
+	setPassword2 = (value) => {
+		this.setState({
+			password2: value,
+		});}
 	performSubmit=()=>{
 		
 		if(!this.noErrors){
@@ -140,14 +161,27 @@ export default class Register extends Component {
 	else{ 
 		
 
-		// TODO: Backend send
+		//  Backend send
+		this.handleSubmit();
+
 		return true; 
 	}
 		
 	}
-	handleSubmit = async (event) => {
+	handleSubmit =() => {
 		// Tu lógica de envío del formulario aquí
-		
+		const formData = new FormData();
+		formData.append('email', this.state.email);
+		formData.append('password', this.state.password);
+		formData.append('name', this.state.name);
+		axios.post('/api/register', formData) .then((response) => {
+			console.log(response);
+		  })
+		  .catch((error) => {
+			if (error.response) {
+			  showErrorResponse(error.response);
+			}
+		  });
 		return true;
 
 		
@@ -221,29 +255,40 @@ export default class Register extends Component {
 			
 			
 			if (hasError){
-        this.setPasswordErrorMessages("Password too weak");
+        this.setPasswordErrorMessages("Password doesn't meet requirements");
 		this.noErrors = false;
         this.setPasswordError(true);
       }
 		else {
-			this.setPasswordErrorMessages(''); // Accede a setEmailErrorMessage a través de this
-			this.setPasswordError(false); // Accede a setEmailError a través de this
+			this.setPasswordErrorMessages(''); 
+			this.setPasswordError(false);
 		}}
 	};
-	
+	validatePassword2 = () => {
+		const { password, password2 } = this.state;
+		if (password !== password2) {
+			this.setPassword2ErrorMessages('Passwords do not match');
+			this.setPassword2Error(true);
+			this.noErrors = false;
+		} else {
+			this.setPassword2ErrorMessages(''); 
+			this.setPassword2Error(false);
+		}
+	  };
 	navigateToHouse= () => {
 		if(!this.state.emailError && !this.state.passwordError){
 			window.location.href=""
 		}
 		
 	  };
-	validateParameters = () => {
+
+	  validateParameters = () => {
 		
 		this.validateEmail();
 		this.validatePassword();
 		this.validateName();
 		this.validateUserName();
-		
+		this.validatePassword2();
 		if(this.performSubmit()){
 			this.state.alertText='Registration Successful';
 			this.setSuccessfulSubmit(true);
@@ -254,7 +299,6 @@ export default class Register extends Component {
 		}
 		this.state.onOpenAlert = true;
 	};
-	
 
 
 	render() {
@@ -263,8 +307,11 @@ export default class Register extends Component {
       email,
       emailError,
       password,
+	  password2,
       passwordError,
+	  password2Error,
       name,
+	  lastName,
       nameError,
       userName,
       userError,
@@ -329,14 +376,27 @@ export default class Register extends Component {
               </Box>
               <Box my={4} textAlign="left">
                 <FormControl className="form" isInvalid={this.state.nameError}>
-                  <FormLabel>Full name</FormLabel>
+                  <FormLabel>First name</FormLabel>
                   <Input
                     type="name"
-                    placeholder="John Doe"
+                    placeholder="John"
                     value={name}
                     onChange={(e) => this.setName(e.target.value)}
                     onClick={() => this.setNameError(false)}
 					onBeforeInput={() => this.setNameError(false)}
+                  />
+                  <FormErrorMessage>
+                    {!this.state.nameError ? " " : this.state.nameErrorMessage}
+                  </FormErrorMessage>
+                </FormControl>
+				<FormControl className="form" >
+                  <FormLabel>Last name</FormLabel>
+                  <Input
+                    type="lastName"
+                    placeholder="Doe"
+                    value={lastName}
+                    onChange={(e) => this.setLastName(e.target.value)}
+
                   />
                   <FormErrorMessage>
                     {!this.state.nameError ? " " : this.state.nameErrorMessage}
@@ -403,7 +463,32 @@ export default class Register extends Component {
                     </FormErrorMessage>
                   )}
                 </FormControl>
+				<FormControl
+                  isInvalid={this.state.passwordError&&this.state.password2Error}
+                  className="form"
+                >
+                  <FormLabel>Repeat password</FormLabel>
 
+                    <InputGroup>
+                      <Input
+                        type={this.state.show ? "text" : "password"}
+                        value={password2}
+                        placeholder="*************"
+                        size="lg"
+                        onClick={() => this.setPassword2Error(false)}
+                        onChange={(e) => {
+                          this.setPassword2(e.target.value);
+                        }}
+						onBlur={() => this.setPassword2Error(false)}
+                      />
+                    </InputGroup>
+                  
+                  {!this.state.password2Error ? null : (
+                    <FormErrorMessage>
+                      {this.state.password2ErrorMessage}
+                    </FormErrorMessage>
+                  )}
+                </FormControl>
                 <Box textAlign="center">
                   <Button
                     mt={4}
