@@ -1,5 +1,6 @@
 
 import * as React from 'react'
+import axios from 'axios';
 import { Component } from 'react';
 import { render } from "react-dom";
 import App from './App.js';
@@ -31,22 +32,24 @@ import {
   } from '@chakra-ui/react'
 import '../../static/css/styles.css';
 import ErrorMessage from './ErrorMessage.js';
+axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
+axios.defaults.xsrfCookieName = "csrftoken";
 
 export default class Register extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
 			show: false,
-			email: '',
+			email: 'fa@d.com',
 			emailError: false,
-			password: '',
-			password2: '',
+			password: '1234Qwer@',
+			password2: '1234Qwer@',
 			passwordError: false,
 			password2Error: false,
-			name : '',
-			lastName: '',
+			name : 's',
+			lastName: 's',
 			nameError: false,
-			userName: '',
+			userName: 's',
 			userError: false,
 			errorMessages: '',
 			isSubmitting: false,
@@ -172,16 +175,23 @@ export default class Register extends Component {
 		// Tu lógica de envío del formulario aquí
 		const formData = new FormData();
 		formData.append('email', this.state.email);
-		formData.append('password', this.state.password);
-		formData.append('name', this.state.name);
-		axios.post('/api/register', formData) .then((response) => {
-			console.log(response);
-		  })
-		  .catch((error) => {
-			if (error.response) {
-			  showErrorResponse(error.response);
-			}
-		  });
+		formData.append('password1', this.state.password);
+		formData.append('first_name', this.state.name);
+		formData.append('last_name', this.state.lastName);
+		formData.append('username', this.state.userName);
+		formData.append('password2', this.state.password2);
+		
+
+		axios.post('/api/register/', formData)
+		.then((response) => {
+		  console.log(response);
+		})
+		.catch((error) => {
+		  if (error.response) {
+			showErrorResponse(error.response);
+		  }
+		});
+	  
 		return true;
 
 		

@@ -10,6 +10,7 @@ from .decorators import user_not_authenticated
 def register(request):
     if request.method == 'POST':
         form = UserRegistrationForm(request.POST)
+        print(form.data)
         if form.is_valid():
             user = form.save()
             messages.success(request, 'You have singed up successfully.')
