@@ -2,33 +2,34 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from .forms import UserRegistrationForm, UserLoginForm
+from django.http import JsonResponse
+from .forms import RegistrationForm, LoginForm
 from .decorators import user_not_authenticated
-from django.http import HttpResponse
+from .models import Post
+
 #US1.1
 @user_not_authenticated
 def register(request):
     if request.method == 'POST':
-        form = UserRegistrationForm(request.POST)
+        form = RegistrationForm(request.POST)
         if form.is_valid():
             user = form.save()
-            #messages.success(request, 'You have singed up successfully.')
-            #login(request)
-            return  HttpResponse('You have singed up successfully.',status=201)
+            messages.success(request, 'You have singed up successfully.')
+            login(request, user)
+            return redirect('/')
 
         else:
-            #for error in list(form.errors.values()):
-            errors = [str(error) for error in form.errors.keys()]
-            return JsonResponse({'errors':form.errors}, status=400)
+            for error in list(form.errors.values()):
+                print(request, error)
     else:
-        form = UserRegistrationForm()
-        return render(request, 'register', {'form': form})
+        form = RegistrationForm()
+    return render(request, 'main_app/register.html', {'form': form})
 
 #US2.1
 @user_not_authenticated
-def login(request):
+def log_in(request):
     if request.method == "POST":
-        form = UserLoginForm(request=request, data=request.POST)
+        form = LoginForm(request=request, data=request.POST)
         if form.is_valid():
             user = authenticate(
                 username=form.cleaned_data["username"],
@@ -36,27 +37,24 @@ def login(request):
             )
             if user is not None:
                 login(request, user)
+                messages.success(request, f"Hello <b>{user.username}</b>! You have been logged in")
                 return redirect("/")
 
         else:
             for error in list(form.errors.values()):
                 messages.error(request, error)
 
-    form = UserLoginForm()
+    form = LoginForm()
 
 
-    return render(request, 'login', {'form': form})
+    return render(request, 'main_app/login.html', {'form': form})
 
 #USX.X (logout)
 @login_required
-def logout(request):
+def log_out(request):
     logout(request)
     messages.info(request, "Logged out successfully")
     return redirect("/")
-from django.shortcuts import render
-from .models import Post
-from django.http import JsonResponse
-
 
 def index(request):
     posts = list(Post.objects.all())
@@ -66,8 +64,7 @@ def index(request):
     for i in range(12):
         extended_posts.extend(posts)
 
-    return render(request, 'login', {'posts': extended_posts})
-
+    return render(request, 'index.html', {'posts': extended_posts})
 
 def load_more_pictures(request):
 
