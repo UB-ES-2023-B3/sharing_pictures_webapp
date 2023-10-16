@@ -21,7 +21,7 @@ def register(request):
                 print(request, error)
     else:
         form = UserRegistrationForm()
-    return render(request, 'main_app/register.html', {'form': form})
+    return render(request, 'register', {'form': form})
 
 #US2.1
 @user_not_authenticated
@@ -35,8 +35,7 @@ def login(request):
             )
             if user is not None:
                 login(request, user)
-                messages.success(request, f"Hello <b>{user.username}</b>! You have been logged in")
-                return redirect("homepage")
+                return redirect("/")
 
         else:
             for error in list(form.errors.values()):
@@ -45,13 +44,13 @@ def login(request):
     form = UserLoginForm()
 
 
-    return render(request, 'main_app/login.html', {'form': form})
+    return render(request, 'login', {'form': form})
 
 #USX.X (logout)
 @login_required
 def logout(request):
     logout(request)
-    messages.info(request, "Logged out successfully!")
+    messages.info(request, "Logged out successfully")
     return redirect("/")
 from django.shortcuts import render
 from .models import Post
@@ -66,7 +65,7 @@ def index(request):
     for i in range(12):
         extended_posts.extend(posts)
 
-    return render(request, 'index.html', {'posts': extended_posts})
+    return render(request, 'login', {'posts': extended_posts})
 
 
 def load_more_pictures(request):
