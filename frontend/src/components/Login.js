@@ -12,7 +12,6 @@ import {
 	FormErrorMessage,
 	FormHelperText,
 } from '@chakra-ui/react'
-import { ViewIcon } from '@chakra-ui/icons'
 
 import {
 	Flex,

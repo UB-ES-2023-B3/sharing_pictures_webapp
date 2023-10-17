@@ -1,8 +1,9 @@
 from django import forms
-<<<<<<< HEAD
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import get_user_model
 from .models import CustomUser
+from .models import Post
+from django.core.exceptions import ValidationError
 
 class RegistrationForm(UserCreationForm):
     email = forms.EmailField(help_text='A valid email address, please.', required=True)
@@ -24,9 +25,6 @@ class LoginForm(AuthenticationForm):
     class Meta:
         model = get_user_model()
         fields = ['username', 'password']
-=======
-from .models import Post
-from django.core.exceptions import ValidationError
 
 #Classe especial de Django que permet crear formularis basats directament en un model. 
 #En lloc de definir manualment cada camp del formulari
@@ -54,4 +52,3 @@ class UploadPostForm(forms.ModelForm):
                 raise ValidationError('La imatge és massa gran. La mida màxima permesa és 100MB.')
 
         return image
->>>>>>> origin/test
