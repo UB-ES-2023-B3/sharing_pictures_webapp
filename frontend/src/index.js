@@ -13,5 +13,5 @@ document.addEventListener('DOMContentLoaded', function () {
 
 document.addEventListener('DOMContentLoaded', function () {
     const root = createRoot(document.getElementById('app-no-auth'));
-    root.render(<App_NoAuth />);
+    root.render(<App />);
   });

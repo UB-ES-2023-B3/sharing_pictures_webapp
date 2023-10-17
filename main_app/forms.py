@@ -19,7 +19,7 @@ class UploadPostForm(forms.ModelForm):
 
         if image:
             # Validar l'extensió del fitxer
-            ext = image.name.split('.')[-1]
+            ext = image.name.split('.')[-1].lower()
             if ext not in ['jpg', 'jpeg', 'png']:
                 raise ValidationError('El format d’imatge no està suportat. Utilitzi JPG, JPEG o PNG.')
 
