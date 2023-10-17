@@ -2,7 +2,7 @@ import * as React from 'react'
 import { Component } from 'react';
 import { render } from "react-dom";
 import App from './App.js';
-import { ChakraProvider } from '@chakra-ui/react'
+import { ChakraProvider,View } from '@chakra-ui/react'
 import { useState, useMemo, useEffect, useCallback } from "react";
 import axios from 'axios';
 import { Text, Input, Button, InputGroup, InputLeftElement, InputRightElement } from '@chakra-ui/react'
@@ -191,11 +191,7 @@ export default class Login extends Component {
 											size="lg"
 											onChange={(e) => this.setPassword(e.target.value)}
 										/>
-										<InputRightElement>
-											<IconButton h='2rem' size='sm' variant='ghost' onClick={this.setShow} icon={<ViewIcon />}>
-												{show ? 'Hide' : 'Show'}
-											</IconButton>
-										</InputRightElement>
+										
 									</InputGroup>
 									{!this.state.passwordError ? null : (
 										<FormErrorMessage>{this.state.passwordErrorMessage}</FormErrorMessage>
