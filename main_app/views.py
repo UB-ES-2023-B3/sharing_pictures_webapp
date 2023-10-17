@@ -38,14 +38,14 @@ def log_in(request):
             )
             if user is not None:
                 login(request, user)
-                return HttpResponse(201)
+                return HttpResponse(status=201)
 
         else:
             for error in list(form.errors.values()):
                 messages.error(request, error)
-            return HttpResponse(400)
+            return HttpResponse(status=400)
     else:
-        return HttpResponse(400)
+        return HttpResponse(status=400)
 
 #USX.X (logout)
 @login_required
