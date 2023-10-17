@@ -24,8 +24,6 @@ import {
 axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
 axios.defaults.xsrfCookieName = "csrftoken";
 
-import ErrorMessage from './ErrorMessage.js';
-
 export default class Login extends Component {
 	constructor(props) {
 		super(props);
