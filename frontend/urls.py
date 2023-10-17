@@ -6,5 +6,9 @@ from .views import index,login
 urlpatterns = [
    
     path('',index),
+<<<<<<< HEAD
     path('login/',index)
+=======
+
+>>>>>>> origin/test
 ]

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
@@ -6,6 +7,14 @@ from django.http import JsonResponse, HttpResponse
 from .forms import RegistrationForm, LoginForm
 from .decorators import user_not_authenticated
 from .models import Post
+=======
+from .models import Post
+from .forms import UploadPostForm
+from django.http import JsonResponse, HttpResponseBadRequest, HttpResponseRedirect, HttpResponse
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from django.urls import reverse
+>>>>>>> origin/test
 
 #US1.1
 #@user_not_authenticated
@@ -57,6 +66,7 @@ def log_out(request):
     messages.info(request, "Logged out successfully")
     return redirect("/")
 
+<<<<<<< HEAD
 def index(request):
     posts = list(Post.objects.all())
 
@@ -70,15 +80,40 @@ def index(request):
 def load_more_pictures(request):
 
     more_pictures = Post.objects.all()
+=======
+def load_pictures(request):
+    import random #import random module
+    posts = Post.objects.all()
+>>>>>>> origin/test
     picture_data = []
 
-    for post in more_pictures:
-        # Convert each Post object to a dictionary
-        for i in range(12):
-            picture_data.append({
-                'image_url': post.image.url,
-                'description': post.description,
-                'created_at': post.created_at.strftime('%F %d, %Y'),
-            })
+    #shuffle the posts to get a random order
+    posts = list(posts)
+    random.shuffle(posts)
+  
+    for post in posts:
+        picture_data.append({
+                    'image_url': post.image.url,
+                    'description': post.description,
+                    'created_at': post.created_at.strftime('%F %d, %Y'),
+                    'image_size': post.image.size,
+                })
 
+<<<<<<< HEAD
     return JsonResponse({'pictures': picture_data}, safe=False)
+=======
+    return JsonResponse({'pictures': picture_data}, safe=False)
+
+def upload_picture(request):
+    if request.method == 'POST':
+        form = UploadPostForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return JsonResponse({"status": "success"})
+        else:
+            return JsonResponse({"status": "error", "errors": form.errors}, status=400)
+    else:
+        load_pictures(request) 
+
+
+>>>>>>> origin/test
