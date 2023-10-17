@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from .forms import RegistrationForm, LoginForm
 from .decorators import user_not_authenticated
 from .models import Post
@@ -30,6 +30,7 @@ def register(request):
 def log_in(request):
     if request.method == "POST":
         form = LoginForm(request=request, data=request.POST)
+        print(form.data)
         if form.is_valid():
             user = authenticate(
                 username=form.cleaned_data["username"],
@@ -37,17 +38,14 @@ def log_in(request):
             )
             if user is not None:
                 login(request, user)
-                messages.success(request, f"Hello <b>{user.username}</b>! You have been logged in")
-                return redirect("/")
+                return HttpResponse(201)
 
         else:
             for error in list(form.errors.values()):
                 messages.error(request, error)
-
-    form = LoginForm()
-
-
-    return render(request, 'main_app/login.html', {'form': form})
+            return HttpResponse(400)
+    else:
+        return HttpResponse(400)
 
 #USX.X (logout)
 @login_required

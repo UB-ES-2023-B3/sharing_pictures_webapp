@@ -1,11 +1,10 @@
-
 import * as React from 'react'
 import { Component } from 'react';
 import { render } from "react-dom";
 import App from './App.js';
 import { ChakraProvider } from '@chakra-ui/react'
 import { useState, useMemo, useEffect, useCallback } from "react";
-
+import axios from 'axios';
 import { Text, Input, Button, InputGroup, InputLeftElement, InputRightElement } from '@chakra-ui/react'
 import {
 	FormControl,
@@ -22,6 +21,9 @@ import {
 	IconButton
 } from '@chakra-ui/react';
 
+axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
+axios.defaults.xsrfCookieName = "csrftoken";
+
 import ErrorMessage from './ErrorMessage.js';
 
 export default class Login extends Component {
@@ -30,13 +32,11 @@ export default class Login extends Component {
 		this.state = {
 			show: false,
 			email: '',
-			emailError: false,
 			password: '',
 			passwordError: false,
 			errorMessages: '',
-			isSubmitting: false,
+			isSubmitting: true,
 			isLoggedIn: false,
-			emailErrorMessage: '',
 			passwordErrorMessage: '',
 		};
 	}
@@ -47,25 +47,20 @@ export default class Login extends Component {
 	};
 
 	setEmail = (value) => {
-		this.setState({
+		this.setState(
+		  {
 			email: value,
-		});
-	};
+		  },
+		  () => {
+			this.setSubmitButtonState();
+		  }
+		);
+	  };
+	  
 
 	setShow = () => {
 		this.setState({
 			show: !this.state.show,
-		});
-	};
-
-	setEmailErrorMessage = (value) => {
-		this.setState({
-			emailErrorMessage: value,
-		});
-	};
-	setEmailError = (value) => {
-		this.setState({
-			emailError: value,
 		});
 	};
 	setPasswordErrorMessages = (value) => {
@@ -79,10 +74,15 @@ export default class Login extends Component {
 		});
 	};
 	setPassword = (value) => {
-		this.setState({
+		this.setState(
+		  {
 			password: value,
-		});
-	};
+		  },
+		  () => {
+			this.setSubmitButtonState();
+		  }
+		);
+	  };
 
 	handleSubmit = async (event) => {
 		// Tu lógica de envío del formulario aquí
@@ -93,21 +93,6 @@ export default class Login extends Component {
 	};
 
 	// Validaciones
-	validateEmail = () => {
-		const { email } = this.state; // Accede al email desde el estado
-		const mailformat = /^(([^<>()[]\.,;:\s@"]+(.[^<>()[]\.,;:\s@"]+)*)|(".+"))@(([[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}])|(([a-zA-Z-0-9]+.)+[a-zA-Z]{2,}))$/gi;
-		if (email === '') {
-			this.setEmailErrorMessage('Email is required'); // Accede a setEmailErrorMessage a través de this
-			this.setEmailError(true); // Accede a setEmailError a través de this
-		} else if (email.match(mailformat) === null) { // Cambia el operador de igualdad aquí
-			this.setEmailErrorMessage('Invalid email format'); // Accede a setEmailErrorMessage a través de this
-			this.setEmailError(true); // Accede a setEmailError a través de this
-		} else {
-			this.setEmailErrorMessage(''); // Accede a setEmailErrorMessage a través de this
-			this.setEmailError(false); // Accede a setEmailError a través de this
-		}
-	};
-
 	validatePassword = () => {
 		const { password } = this.state;
 		if (password.length < 1) {
@@ -119,21 +104,75 @@ export default class Login extends Component {
 		}
 	};
 	navigateToHouse= () => {
-		if(!this.state.emailError && !this.state.passwordError){
+		if(!this.state.passwordError){
 			window.location.href=""
 		}
 		
 	  };
 	validateParameters = () => {
-		this.validateEmail();
 		this.validatePassword();
+		this.setState({
+			isSubmitting: !this.state.passwordError,
+		  });
 	};
+	setSubmitButtonState = () => {
+		const { email, password } = this.state;
+		const isSubmitButtonDisabled = !email || !password;
+		this.setState({
+		  isSubmitting: isSubmitButtonDisabled,
+		});
+	  };
 
 	logOut = async () => {
 		// Tu lógica para cerrar sesión aquí
 	};
+	handlePostRequest = async() => {
+		// Tu lógica de envío del formulario aquí
+		const formData = new FormData();
+		formData.append('username', this.state.email);
+		formData.append('password', this.state.password);
+
+		axios.post('/api/login/', formData)
+		.then((response) => { // Registre exitós (status code 201)
+			alert(response)
+		  	console.log(response);
+    	window.location.href="/"
+		})
+		.catch((error) => { //Registre no exitós (status code 400)
+			alert(error.toString())
+			/*
+		  if (error.response) {
+
+			console.log(error.response);
+			const errorMessages = error.response.data.errors;
+			let errorMessage = 'This happened:<br>';
+			if ('username' in errorMessages) {
+
+			}
+			if('email' in errorMessages){
+				this.setEmailErrorMessage(errorMessages['email']);
+				this.setEmailError(true);
+			}
+			if('username' in errorMessages){
+				this.setUserNameErrorMessage(errorMessages['username']);
+				this.setUserNameError(true);
+			}
+      for (const key in errorMessages) {
+        errorMessage += `${errorMessages[key]}<br>`;
+      }
+
+      Swal.fire({
+        icon: 'error',
+        title: 'Registration Failed',
+        html: errorMessage,
+      });
+
+		  }
+		});*/})
+	  };
+	
 	render() {
-		const { show, email, emailError, password, passwordError, errorMessages, isSubmitting, isLoggedIn } = this.state;
+		const { show, email, password, passwordError, errorMessages, isSubmitting, isLoggedIn } = this.state;
 		return (
 			<ChakraProvider>
 				<div className="login-form">
@@ -143,12 +182,9 @@ export default class Login extends Component {
 								<Heading>Login</Heading>
 							</Box>
 							<Box my={4} textAlign="left">
-								<FormControl isInvalid={this.state.emailError}>
+								<FormControl>
 									<FormLabel>Email</FormLabel>
 									<Input type='email' value={email} onChange={(e) => this.setEmail(e.target.value)} />
-									{!this.state.emailError ? null : (
-										<FormErrorMessage>{this.state.emailErrorMessage}</FormErrorMessage>
-									)}
 								</FormControl>
 								<FormControl isInvalid={this.state.passwordError}>
 									<FormLabel>Password</FormLabel>
@@ -156,7 +192,7 @@ export default class Login extends Component {
 										<Input
 											type={this.state.show ? 'text' : 'password'}
 											value={password}
-											placeholder="*************"
+											placeholder="*****"
 											size="lg"
 											onChange={(e) => this.setPassword(e.target.value)}
 										/>
@@ -171,7 +207,7 @@ export default class Login extends Component {
 									)}
 								</FormControl>
 								<Box textAlign="center">
-									<Button mt={4} backgroundColor="#98A8F8" type='submit' onClick={this.validateParameters} isDisabled={this.state.emailError || this.state.passwordError}>
+									<Button mt={4} backgroundColor="#98A8F8" type='submit' onClick={this.validateParameters && this.handlePostRequest} isDisabled={this.state.isSubmitting}>
 										Submit
 									</Button>
 								</Box>
