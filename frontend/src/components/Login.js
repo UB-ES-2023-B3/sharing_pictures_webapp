@@ -134,12 +134,10 @@ export default class Login extends Component {
 
 		axios.post('/api/login/', formData)
 		.then((response) => { // Registre exitós (status code 201)
-			alert(response)
 		  	console.log(response);
-    	window.location.href="/"
+    		window.location.href="/"
 		})
 		.catch((error) => { //Registre no exitós (status code 400)
-			alert(error.toString())
 			/*
 		  if (error.response) {
 

@@ -8,7 +8,7 @@ from .decorators import user_not_authenticated
 from .models import Post
 
 #US1.1
-@user_not_authenticated
+#@user_not_authenticated
 def register(request):
     if request.method == 'POST':
         form = RegistrationForm(request.POST)
@@ -26,7 +26,7 @@ def register(request):
     return render(request, 'main_app/register.html', {'form': form})
 
 #US2.1
-@user_not_authenticated
+#@user_not_authenticated
 def log_in(request):
     if request.method == "POST":
         form = LoginForm(request=request, data=request.POST)
@@ -38,17 +38,20 @@ def log_in(request):
             )
             if user is not None:
                 login(request, user)
+                print("201")
                 return HttpResponse(status=201)
 
         else:
             for error in list(form.errors.values()):
                 messages.error(request, error)
+            print("400-1")
             return HttpResponse(status=400)
     else:
+        print("400-2")
         return HttpResponse(status=400)
 
 #USX.X (logout)
-@login_required
+#@login_required
 def log_out(request):
     logout(request)
     messages.info(request, "Logged out successfully")
