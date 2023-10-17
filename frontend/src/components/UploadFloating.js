@@ -11,7 +11,7 @@ const UploadFloating = () => {
             Swal.fire({
                 html: `
                     <h1 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">Upload an Image</h1>
-                    <form id="imageUploadForm" action="/api/upload/" method="post" encType="multipart/form-data" class="bg-white dark:bg-gray-800 shadow-md rounded-lg p-6">
+                    <form id="imageUploadForm" class="bg-white dark:bg-gray-800 shadow-md rounded-lg p-6">
                         <div class="mb-4">
                             <label class="block text-sm font-medium text-gray-700 dark-text-white">Upload an image:</label>
                             <input class="block w-full text-sm text-gray-900 dark-text-gray-200 border border-gray-300 rounded-md cursor-pointer bg-gray-100 dark-bg-gray-700 focus:outline-none" id="file_input" type="file" name="image">
@@ -26,7 +26,7 @@ const UploadFloating = () => {
                                 <img src="" style="max-width: 100%; max-height: 50vh;" id="previewImage">
                             </div>
                         </div>
-                        <button id="publish-button" class="block w-full bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-md shadow-md cursor-pointer transition duration-300 ease-in-out transform hover:scale-105">Publish Post</button>
+                        <button type="butto" id="publish-button" class="block w-full bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-md shadow-md cursor-pointer transition duration-300 ease-in-out transform hover:scale-105">Publish Post</button>
                     </form>
                 `,
                 showCloseButton: true,
@@ -91,23 +91,33 @@ const UploadFloating = () => {
             });
         };
 
-        const handlePublish = () => {
-          const image = selectedImage.value;
-          const description = document.getElementById('image-description').value;
+        const handlePublish = (e) => {
+            e.preventDefault();
+            
+            const imageUpload = document.getElementById('file_input');
+            const image = imageUpload.files[0];
+            const description = document.getElementById('image-description').value;
         
-          // If all checks passed, send the request
-          const formData = new FormData();
-          formData.append('image', image);
-          formData.append('description', description);
+            // If all checks passed, send the request
+            const formData = new FormData();
+            formData.append('image', image);
+            formData.append('description', description);
         
-          axios.post('/api/upload/', formData)
-            .then((response) => {
-              console.log(response);
+            axios.post('/api/upload/', formData).then((response) => {
+                console.log(response);
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Upload Successfully',
+                    text: 'Your image was uploaded successfuly!',
+                }).then(() => {
+                    location.reload();
+                });
             })
             .catch((error) => {
-              if (error.response) {
-                showErrorResponse(error.response);
-              }
+                console.log(error.response.data)
+                if (error.response) {
+                    showErrorResponse(error.response);
+                }
             });
         };
 

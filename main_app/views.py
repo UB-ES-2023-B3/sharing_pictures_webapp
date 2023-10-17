@@ -1,8 +1,9 @@
 from .models import Post
 from .forms import UploadPostForm
-from django.http import JsonResponse, HttpResponseBadRequest
+from django.http import JsonResponse, HttpResponseBadRequest, HttpResponseRedirect, HttpResponse
 from django.shortcuts import render, redirect
 from django.contrib import messages
+from django.urls import reverse
 
 
 def load_pictures(request):
@@ -29,9 +30,9 @@ def upload_picture(request):
         form = UploadPostForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
-            return load_pictures(request) 
+            return JsonResponse({"status": "success"})
         else:
-            return HttpResponseBadRequest("Form validation failed")
+            return JsonResponse({"status": "error", "errors": form.errors}, status=400)
     else:
         load_pictures(request) 
 
