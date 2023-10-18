@@ -134,36 +134,15 @@ export default class Login extends Component {
 		  	console.log(response);
     		window.location.href="/"
 		})
-		.catch((error) => { //Registre no exitós (status code 400)
-			/*
-		  if (error.response) {
-
-			console.log(error.response);
-			const errorMessages = error.response.data.errors;
-			let errorMessage = 'This happened:<br>';
-			if ('username' in errorMessages) {
-
-			}
-			if('email' in errorMessages){
-				this.setEmailErrorMessage(errorMessages['email']);
-				this.setEmailError(true);
-			}
-			if('username' in errorMessages){
-				this.setUserNameErrorMessage(errorMessages['username']);
-				this.setUserNameError(true);
-			}
-      for (const key in errorMessages) {
-        errorMessage += `${errorMessages[key]}<br>`;
-      }
+		.catch((error) => {
 
       Swal.fire({
         icon: 'error',
         title: 'Registration Failed',
-        html: errorMessage,
       });
 
 		  }
-		});*/})
+		)
 	  };
 	
 	render() {
