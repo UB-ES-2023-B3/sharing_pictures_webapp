@@ -3,10 +3,7 @@ import * as React from 'react'
 import Swal from 'sweetalert2';
 import axios from 'axios';
 import { Component } from 'react';
-import { render } from "react-dom";
-import App from './App.js';
-import { ChakraProvider,useDisclosure } from '@chakra-ui/react'
-import { useState, useMemo, useEffect, useCallback } from "react";
+import { ChakraProvider } from '@chakra-ui/react'
 import { Text, Input, Button, InputGroup, InputLeftElement, InputRightElement } from '@chakra-ui/react'
 import {
 	FormControl,
@@ -14,25 +11,14 @@ import {
 	FormErrorMessage,
 	FormHelperText,
 } from '@chakra-ui/react'
-import { ViewIcon,InfoOutlineIcon } from '@chakra-ui/icons'
-import { Tooltip } from '@chakra-ui/react';
 import {
 	Flex,
 	Box,
 	Heading,
-	IconButton
+	
 } from '@chakra-ui/react';
-import {
-	AlertDialog,
-	AlertDialogBody,
-	AlertDialogFooter,
-	AlertDialogHeader,
-	AlertDialogContent,
-	AlertDialogOverlay,
-	AlertDialogCloseButton,
-  } from '@chakra-ui/react'
+import { Tooltip } from '@chakra-ui/react'
 import '../../static/css/styles.css';
-import ErrorMessage from './ErrorMessage.js';
 axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
 axios.defaults.xsrfCookieName = "csrftoken";
 
@@ -185,11 +171,15 @@ export default class Register extends Component {
 		axios.post('/api/register/', formData)
 		.then((response) => { // Registre exitós (status code 201)
 		  	console.log(response);
-		  	Swal.fire({ //Llencem notificació
-			icon: 'success',
-			title:  'Registration Successful',
-		});
-		this.navigateToMainPage();
+			  Swal.fire({
+				icon: 'success',
+				title: 'Registration Successful',
+			  }).then((result) => {
+				if (result.isConfirmed || result.dismiss === Swal.DismissReason.close) {
+				  // Call the function to navigate to the main page
+				  navigateToMainPage();
+				}
+			  });
 		})
 		.catch((error) => { //Registre no exitós (status code 400)
 		  if (error.response) {
@@ -227,9 +217,11 @@ export default class Register extends Component {
 	
 	navigateToLogin = () => {
 		//TODO: Navigate to login page
+		window.location.href="../login/"
 	};
 	navigateToMainPage = () => {
 		//TODO: Navigate to main page
+		window.location.href="../"
 	};
 	
 	// Validaciones
@@ -520,6 +512,7 @@ export default class Register extends Component {
                       marginLeft="5px"
                       colorScheme="#98A8F8"
                       variant="link"
+					  onClick={() => {this.navigateToLogin();}}
                     >
                       Log in
                     </Button>
@@ -532,6 +525,6 @@ export default class Register extends Component {
       </ChakraProvider>
     );
 	}
-}
+}/*
 const appDiv = document.getElementById("register");
-render(<Register />, appDiv);
+render(<Register />, appDiv);*/

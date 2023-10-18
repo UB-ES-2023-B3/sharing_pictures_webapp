@@ -1,5 +1,5 @@
 django
 django-advanced_password_validation
-node
+
 Pillow
 validate_email

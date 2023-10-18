@@ -5,7 +5,6 @@ from django.db import migrations, models
 import django.utils.timezone
 import uuid
 
-
 class Migration(migrations.Migration):
 
     initial = True
@@ -40,13 +39,13 @@ class Migration(migrations.Migration):
             managers=[
                 ('objects', django.contrib.auth.models.UserManager()),
             ],
-    ),
-    migrations.CreateModel(
-        name='Post',
+        ),
+        migrations.CreateModel(
+            name='Post',
             fields=[
                 ('id', models.UUIDField(default=uuid.uuid4, primary_key=True, serialize=False)),
                 ('image', models.ImageField(upload_to='post_images')),
-                ('description', models.TextField()),
+                ('description', models.TextField(default='')),
                 ('created_at', models.DateTimeField(default=datetime.datetime.now)),
             ],
         ),
