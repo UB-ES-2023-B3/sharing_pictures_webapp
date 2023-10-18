@@ -21,41 +21,21 @@ export default class App extends Component {
 
 	constructor(props) {
 		super(props);
-	this.state = {
-		userAuthenticated: false,
-	};
-		
+
 	}
 
 	render() {
-		if(this.state.userAuthenticated ==true){
+		
 		return (
 			<Router>
 				<Routes>
 					<Route exact path="" element={<Home />}>
 					</Route>
-					<Route exact path="login/" element={<Login />}>
-					</Route> 
-					<Route exact path = "register/" element={<Register />}>
-					</Route>   
 				</Routes> 
 			</Router>
 		);
-		}
-		else {
-			return (
-			<Router>
-				<Routes>
-					<Route exact path="" element={<Home_NoAuth />}>
-					</Route>
-					<Route exact path="login/" element={<Login />}>
-					</Route>    
-					<Route exact path = "register/" element={<Register />}>
-					</Route>   
-				</Routes> 
-			</Router>
-		);
-		}
+		
+
 	}
 }
 
