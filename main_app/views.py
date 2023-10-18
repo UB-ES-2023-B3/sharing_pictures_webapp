@@ -26,7 +26,7 @@ def register(request):
         if form.is_valid():
             user = form.save()
             #messages.success(request, 'You have singed up successfully.')
-            #log_in(request)
+            login(request, user)
             return  HttpResponse('You have singed up successfully.',status=201)
 
         else:
