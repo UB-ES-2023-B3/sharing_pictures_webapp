@@ -174,11 +174,8 @@ export default class Register extends Component {
 			  Swal.fire({
 				icon: 'success',
 				title: 'Registration Successful',
-			  }).then((result) => {
-				if (result.isConfirmed || result.dismiss === Swal.DismissReason.close) {
-				  // Call the function to navigate to the main page
-				  navigateToMainPage();
-				}
+			  }).then(() => {
+				this.navigateToMainPage();
 			  });
 		})
 		.catch((error) => { //Registre no exitós (status code 400)
@@ -317,6 +314,10 @@ export default class Register extends Component {
 
 	  validateParameters = () => {
 		
+
+
+	
+
 		this.validateEmail();
 		this.validatePassword();
 		this.validateName();

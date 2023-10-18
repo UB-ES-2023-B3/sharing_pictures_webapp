@@ -26,7 +26,7 @@ def register(request):
         if form.is_valid():
             user = form.save()
             #messages.success(request, 'You have singed up successfully.')
-            #login(request)
+            #log_in(request)
             return  HttpResponse('You have singed up successfully.',status=201)
 
         else:
@@ -38,28 +38,7 @@ def register(request):
         return render(request, 'register', {'form': form})
 
 #US2.1
-@user_not_authenticated
-def log_in(request):
-    if request.method == "POST":
-        form = LoginForm(request=request, data=request.POST)
-        if form.is_valid():
-            user = authenticate(
-                username=form.cleaned_data["username"],
-                password=form.cleaned_data["password"],
-            )
-            if user is not None:
-                login(request, user)
-                messages.success(request, f"Hello <b>{user.username}</b>! You have been logged in")
-                return redirect("/")
 
-        else:
-            for error in list(form.errors.values()):
-                messages.error(request, error)
-
-    form = LoginForm()
-
-
-    return render(request, 'main_app/login.html', {'form': form})
 
 #USX.X (logout)
 @login_required

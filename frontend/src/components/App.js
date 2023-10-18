@@ -38,7 +38,7 @@ export default class App extends Component {
 
 	}
 }
-
+/*
 const root = createRoot(document.getElementById('app'));
 root.render(<App />);
-
+*/

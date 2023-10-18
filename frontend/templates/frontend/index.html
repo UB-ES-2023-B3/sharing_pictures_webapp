@@ -47,9 +47,9 @@
     <div id="main">
       {% if user.is_authenticated %} 
       <!-- SI SE QUIERE PROBAR SIN ESTAR AUTENTICADO JUGAR CON ESTE IF -->
-      <div id="app"></div>
+      <div id="root" auth = "true"></div>
       {% else %}
-        <div id="app-no-auth">hhh</div>
+        <div id="root" auth = "false"> </div>
       {% endif %}
     </div>
     <!--

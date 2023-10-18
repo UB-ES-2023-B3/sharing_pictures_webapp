@@ -1,8 +1,7 @@
 import '../../static/css/styles.css';
 import * as React from 'react'
 import { Component } from 'react';
-import { render } from "react-dom";
-import Home from './Home.js';
+
 import Home_NoAuth from './Home_NoAuth.js';
 import { createRoot } from 'react-dom/client';
 import Login from './Login.js';
@@ -39,7 +38,7 @@ export default class App_NoAuth extends Component {
 		
 	}
 }
-
+/*
 const root = createRoot(document.getElementById('app-no-auth'));
 root.render(<App_NoAuth />);
-
+*/
