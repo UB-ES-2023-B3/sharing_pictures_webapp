@@ -5,3 +5,12 @@ body {
     height: 100vh;
  
 }
+.form {
+   padding-bottom: 20px;
+}
+.register-form{
+    
+}
+.register-box{
+    background-color: aliceblue;
+}
