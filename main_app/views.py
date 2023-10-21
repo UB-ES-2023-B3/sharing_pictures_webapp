@@ -1,22 +1,18 @@
+import json
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse, HttpResponse
 from .forms import RegistrationForm, LoginForm
-from .decorators import user_not_authenticated
-from .models import Post
-
-#US1.1
-
 from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse, HttpResponseBadRequest, HttpResponseRedirect, HttpResponse
+from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from .forms import RegistrationForm, LoginForm
-from .decorators import user_not_authenticated
-from .models import Post
-from .forms import UploadPostForm
+from .forms import RegistrationForm, LoginForm, UploadPostForm
+from .models import Post, Profile, FollowersCount, CustomUser
+from django.core.cache import cache
+from django.core.serializers import serialize
 
 #US1.1
 #@user_not_authenticated
@@ -25,6 +21,9 @@ def register(request):
         form = RegistrationForm(request.POST)
         if form.is_valid():
             user = form.save()
+            user_model = CustomUser.objects.get(email=user.email)
+            new_profile = Profile.objects.create(user=user_model, id_user=user_model.id)
+            new_profile.save()
             login(request, user)
             return  HttpResponse('You have singed up successfully.',status=201)
 
@@ -79,24 +78,32 @@ def log_out(request):
     messages.info(request, "Logged out successfully")
     return redirect("/")
 
+
 def load_pictures(request):
-    import random #import random module
-    posts = Post.objects.all()
-    picture_data = []
+    # Get the list of pictures already seen from the session cookie
+    pictures_seen = request.session.get('pictures_seen', [])
 
-    #shuffle the posts to get a random order
-    posts = list(posts)
-    random.shuffle(posts)
-  
+    # Get the next 10 unseen pictures
+    posts = Post.objects.exclude(id__in=pictures_seen).order_by('-created_at')[:10]
+
+    new_pictures = []
+
     for post in posts:
-        picture_data.append({
-                    'image_url': post.image.url,
-                    'description': post.description,
-                    'created_at': post.created_at.strftime('%F %d, %Y'),
-                    'image_size': post.image.size,
-                })
+        new_pictures.append({
+            'image_url': post.image.url,
+            'description': post.description,
+            'created_at': post.created_at.strftime('%F %d, %Y'),
+            'image_size': post.image.size,
+            'id': str(post.id),  # Convert the UUID to a string
+        })
 
-    return JsonResponse({'pictures': picture_data}, safe=False)
+        # Add the picture to the list of seen pictures
+        pictures_seen.append(str(post.id))
+
+    # Update the session cookie with the updated list of seen pictures
+    request.session['pictures_seen'] = pictures_seen
+
+    return JsonResponse({'pictures': new_pictures}, safe=False)
 
 def upload_picture(request):
     if request.method == 'POST':
@@ -108,3 +115,46 @@ def upload_picture(request):
             return JsonResponse({"status": "error", "errors": form.errors}, status=400)
     else:
         load_pictures(request)
+
+def profile(request, pk):
+    # Check if the requested username matches the authenticated user
+    is_own_profile = (request.user.username == pk)
+    
+    user_object = CustomUser.objects.get(username=pk)
+    user_profile = Profile.objects.get(user=user_object)
+    follower = request.user.username
+
+    if FollowersCount.objects.filter(follower=follower, user=user_object).first():
+        button_text = 'Unfollow'
+    else:
+        button_text = 'Follow'
+
+    user_followers = len(FollowersCount.objects.filter(user=user_object))
+    user_following = len(FollowersCount.objects.filter(follower=pk))
+
+    # Serialize the CustomUser model to JSON
+    user_object_json = serialize('json', [user_object])
+
+    # Parse the serialized data to convert it into a Python dictionary
+    user_object_data = json.loads(user_object_json)
+
+    #the same serialization with the profile
+    user_profile_json = serialize('json', [user_profile])
+
+    # Parse the serialized data to convert it into a Python dictionary
+    user_profile_data = json.loads(user_profile_json)
+
+    context = {
+        'user_object': user_object_data[0],  # Extract the first item from the serialized data
+        'user_profile': user_profile_data[0],
+        'button_text': button_text,
+        'profile_image': user_profile_data[0]['fields']['profileimg'],  # Include the .url to access the URL
+        'user_followers': user_followers,
+        'user_following': user_following,
+        'is_own_profile': is_own_profile,
+    }
+
+    print("--------------------------------------")
+    print("\n", context, "\n")
+
+    return JsonResponse(context, safe=False)
