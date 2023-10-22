@@ -16,6 +16,7 @@ class Post(models.Model):
     
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     image = models.ImageField(upload_to='post_images')
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     description = models.TextField(default='')
     created_at = models.DateTimeField(default=datetime.now)
 
@@ -23,7 +24,7 @@ class Profile(models.Model):
 
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     id_user = models.IntegerField()
-    bio = models.TextField(blank=True)
+    bio = models.TextField(blank=True, default='')
     profileimg = models.ImageField(upload_to='profile_images', default='blank-profile-picture.png')
 
     def __str__(self):

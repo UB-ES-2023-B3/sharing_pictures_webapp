@@ -61,3 +61,4 @@ class UploadPostForm(forms.ModelForm):
                 raise ValidationError('La imatge és massa gran. La mida màxima permesa és 100MB.')
 
         return image
+    

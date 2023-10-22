@@ -14,6 +14,7 @@ from .models import Post, Profile, FollowersCount, CustomUser
 from django.core.cache import cache
 from django.core.serializers import serialize
 
+
 #US1.1
 #@user_not_authenticated
 def register(request):
@@ -109,6 +110,7 @@ def upload_picture(request):
     if request.method == 'POST':
         form = UploadPostForm(request.POST, request.FILES)
         if form.is_valid():
+            form.instance.user = request.user
             form.save()
             return JsonResponse({"status": "success"})
         else:
@@ -123,6 +125,8 @@ def profile(request, pk):
     user_object = CustomUser.objects.get(username=pk)
     user_profile = Profile.objects.get(user=user_object)
     follower = request.user.username
+    
+    uloaded_posts = Post.objects.filter(user=user_object).order_by('-created_at')
 
     if FollowersCount.objects.filter(follower=follower, user=user_object).first():
         button_text = 'Unfollow'
@@ -144,6 +148,12 @@ def profile(request, pk):
     # Parse the serialized data to convert it into a Python dictionary
     user_profile_data = json.loads(user_profile_json)
 
+    #the same with the posts of the user
+    uloaded_posts_json = serialize('json', uloaded_posts)
+
+    # Parse the serialized data to convert it into a Python dictionary
+    uloaded_posts = json.loads(uloaded_posts_json)
+
     context = {
         'user_object': user_object_data[0],  # Extract the first item from the serialized data
         'user_profile': user_profile_data[0],
@@ -154,7 +164,33 @@ def profile(request, pk):
         'is_own_profile': is_own_profile,
     }
 
+    if uloaded_posts:
+        context['uploaded_posts'] = uloaded_posts
+
     print("--------------------------------------")
     print("\n", context, "\n")
 
     return JsonResponse(context, safe=False)
+
+def update_profile(request):
+    if request.method == 'POST':
+        # Pasem a JSON el contingut del cos de la petició
+        post_data = json.loads(request.body.decode('utf-8'))
+
+        user_object = CustomUser.objects.get(username=request.user.username)
+        user_profile = Profile.objects.get(user=user_object)
+
+        bio = post_data.get('bio')
+        user_profile.bio = bio
+
+        first_name = post_data.get('first_name')
+        user_object.first_name = first_name
+
+        last_name = post_data.get('last_name')
+        user_object.last_name = last_name
+
+        user_profile.save()
+        user_object.save()
+        return HttpResponse(status=201)
+    else:
+        return HttpResponse(status=400)

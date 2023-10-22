@@ -1,158 +1,253 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import Card from './Card.js';
+import Swal from 'sweetalert2';
+import axios from 'axios';
 
 function Profile() {
-    const [profileData, setProfileData] = useState(null);
-    const [activeTab, setActiveTab] = useState('my-posts');
-    const { username } = useParams();
-    
-    useEffect(() => {
-        const apiUrl = `/api/profile/${username}`;
+  const [profileData, setProfileData] = useState(null);
+  const [activeTab, setActiveTab] = useState('my-posts');
+  const { username } = useParams();
 
-        fetch(apiUrl)
-            .then((response) => response.json())
-            .then((data) => {
-                // Map the context data to the expected structure
-                const profileData = {
-                    user_object: {
-                        first_name: data.user_object.fields.first_name,
-                        last_name: data.user_object.fields.last_name,
-                        username: data.user_object.fields.username,
-                    },
-                    user_profile: {
-                        profileimg: data.profile_image,
-                        bio: data.user_profile.fields.bio,
-                    },
-                    user_followers: data.user_followers,
-                    user_following: data.user_following,
-                    is_own_profile: data.is_own_profile,
-                };
+  useEffect(() => {
+    const apiUrl = `/api/profile/${username}`;
 
-                console.log('profileData: ', profileData);
-                setProfileData(profileData);
-            })
-            .catch((error) => console.error('Error fetching profile data:', error));
-    }, [username]);
+    fetch(apiUrl)
+      .then((response) => response.json())
+      .then((data) => {
+        const profileData = {
+          user_object: {
+            first_name: data.user_object.fields.first_name,
+            last_name: data.user_object.fields.last_name,
+            username: data.user_object.fields.username,
+          },
+          user_profile: {
+            profileimg: data.profile_image,
+            bio: data.user_profile.fields.bio,
+          },
+          user_followers: data.user_followers,
+          user_following: data.user_following,
+          is_own_profile: data.is_own_profile,
+          uploaded_pictures: data.uploaded_posts,
+        };
 
-    const handleTabClick = (tab) => {
-        setActiveTab(tab);
-    };
+        console.log('profileData: ', profileData);
+        setProfileData(profileData);
+      })
+      .catch((error) => console.error('Error fetching profile data:', error));
+  }, [username]);
 
-    if (!profileData) {
-        return <div>Loading...</div>;
-    }
+  if (!profileData) {
+    return <div>Loading...</div>;
+  }
 
-    return (
-        <div className="bg-cover bg-center bg-no-repeat bg-fixed bg-opacity-60">
-            <div className="bg-white bg-opacity-90 p-4 container">
-                <img
-                    src={`/media/${profileData.user_profile.profileimg}`}
-                    alt="Profile Picture"
-                    className="h-36 w-36 rounded-full mx-auto mb-4"
-                />
-                <div className="text-3xl font-semibold text-center">{profileData.user_object.first_name} {profileData.user_object.last_name}</div>
-                <div className="text-lg text-gray-600 text-center">@{profileData.user_object.username}</div>
-                <div className="text-lg text-gray-600 text-center">
-                    Followers: {profileData.user_followers} Following: {profileData.user_following}
-                </div>
-                <div className="text-lg text-gray-600 text-center">
-                    {profileData.user_profile.bio}
-                </div>
+  const styles = {
+    pin_container: {
+      margin: 0,
+      padding: 0,
+      width: '90vw',
+      display: 'grid',
+      gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
+      gridAutoRows: '10px',
+      position: 'absolute',
+      left: '50%',
+      transform: 'translateX(-50%)',
+      justifyContent: 'center',
+    },
+  };
 
-                {profileData.is_own_profile && (
-                    <div className="flex justify-center mt-4 space-x-4">
-                        <button className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:text-red-300">
-                            Edit Profile
-                        </button>
-                    </div>
-                )}
-            </div>
-
-            <div className="text-center mt-6">
-                <div className="mb-4 border-b border-gray-200 dark:border-gray-700 inline-block">
-                    <ul
-                        className="flex flex-wrap -mb-px text-lg font-medium text-center" 
-                        id="myTab" 
-                        data-tabs-toggle="#myTabContent" 
-                        role="tablist"
-                    >
-                        <li role="presentation">
-                            <button 
-                                className={`inline-block p-4 border-b-2 rounded-t-lg ${
-                                    activeTab === 'my-posts' ? 'border-red-600 text-red-600' : 'hover:text-red-600 dark:hover-text-red-300'
-                                } tab-button`} 
-                                id="my-posts-tab" 
-                                data-tabs-target="#my-posts" 
-                                type="button" 
-                                role="tab" 
-                                aria-controls="my-posts" 
-                                aria-selected={activeTab === 'my-posts'}
-                                onClick={() => handleTabClick('my-posts')}
-                            >
-                                My Posts
-                            </button>
-                        </li>
-                        <li className="mr-2" role="presentation">
-                            <button 
-                                className={`inline-block p-4 border-b-2 rounded-t-lg ${
-                                    activeTab === 'liked-posts' ? 'border-red-600 text-red-600' : 'hover:text-red-600 dark:hover-text-red-300'
-                                } tab-button`} 
-                                id="liked-posts-tab" 
-                                data-tabs-target="#liked-posts" 
-                                type="button" 
-                                role="tab" 
-                                aria-controls="liked-posts" 
-                                aria-selected={activeTab === 'liked-posts'}
-                                onClick={() => handleTabClick('liked-posts')}
-                            >
-                                Liked Posts
-                            </button>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-
-            <div id="myTabContent">
-                {/* My Posts Tab Content */}
-                {activeTab === 'my-posts' && (
-                    <div className="my-posts p-4 rounded-lg bg-white" id="my-posts" role="tabpanel" aria-labelledby="my-posts-tab">
-                        <div className="post-grid">
-                            {/* Sample My Posts */}
-                            <div className="post">
-                                <div className="bg-white rounded-lg shadow-lg">
-                                    <img src="https://via.placeholder.com/400" alt="My Post 1" className="w-full h-96 object-cover rounded-t-lg" />
-                                    <div className="p-6">
-                                        <h3 className="text-xl font-semibold">My Post Title</h3>
-                                        <p className="text-gray-600">My Post Description</p>
-                                    </div>
-                                </div>
-                            </div>
-                            {/* Add more "My Posts" here */}
-                        </div>
-                    </div>
-                )}
-
-                {/* Liked Posts Tab Content */}
-                {activeTab === 'liked-posts' && (
-                    <div className="liked-posts p-4 rounded-lg bg-white" id="liked-posts" role="tabpanel" aria-labelledby="liked-posts-tab">
-                        <div className="post-grid">
-                            {/* Sample Liked Posts */}
-                            <div className="post">
-                                <div className="bg-white rounded-lg shadow-lg">
-                                    <img src="https://via.placeholder.com/400" alt="Liked Post 1" className="w-full h-96 object-cover rounded-t-lg" />
-                                    <div className="p-6">
-                                        <h3 className="text-xl font-semibold">Liked Post Title</h3>
-                                        <p className="text-gray-600">Liked Post Description</p>
-                                    </div>
-                                </div>
-                            </div>
-                            {/* Add more "Liked Posts" here */}
-                        </div>
-                    </div>
-                )}
-            </div>
+  const handleEditProfile = () => {
+    Swal.fire({
+      title: 'Edit Profile',
+      html: `
+        <div style="text-align: center;">
+          <div class="w-full max-w-md mx-auto">
+            <label for="swal-first-name" class="block text-sm font-medium text-gray-700">First Name</label>
+            <input id="swal-first-name" class="swal2-input w-full border border-gray-300 rounded-lg" placeholder="First Name" value="${profileData.user_object.first_name}">
+          </div>
+  
+          <div class="w-full max-w-md mx-auto">
+            <label for="swal-last-name" class="block text-sm font-medium text-gray-700">Last Name</label>
+            <input id="swal-last-name" class="swal2-input w-full border border-gray-300 rounded-lg" placeholder="Last Name" value="${profileData.user_object.last_name}">
+          </div>
+  
+          <div class="w-full max-w-md mx-auto">
+            <label for="swal-bio" class="block text-sm font-medium text-gray-700">Bio</label>
+            <textarea id="swal-bio" class="swal2-textarea w-full border border-gray-300 rounded-lg" placeholder="Your description">${profileData.user_profile.bio}</textarea>
+          </div>
         </div>
-    );
+      `,
+      showCancelButton: true,
+      confirmButtonText: 'Save',
+      cancelButtonText: 'Cancel',
+      focusConfirm: false,
+      showLoaderOnConfirm: true,
+      preConfirm: () => {
+        const firstName = Swal.getPopup().querySelector('#swal-first-name').value;
+        const lastName = Swal.getPopup().querySelector('#swal-last-name').value;
+        const bio = Swal.getPopup().querySelector('#swal-bio').value;
+
+        console.log('firstName:', firstName);
+        console.log('lastName:', lastName);
+        console.log('bio:', bio);
+
+  return { firstName, lastName, bio };
+      },
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const { firstName, lastName, bio } = result.value;
+  
+        setProfileData((prevData) => ({
+          ...prevData,
+          user_object: {
+            ...prevData.user_object,
+            first_name: firstName,
+            last_name: lastName,
+          },
+          user_profile: {
+            ...prevData.user_profile,
+            bio: bio,
+          },
+        }));
+  
+        axios.post('/api/update_profile/', {
+            // TODO: Add the rest of the fields here
+            first_name: firstName,
+            last_name: lastName,
+            bio: bio,
+
+        }, { headers: { 'Content-Type': 'application/json' } })
+        .then((response) => {
+          console.log(response);
+          Swal.fire({
+            icon: 'success',
+            title: 'Profile Updated',
+          });
+        })
+        .catch((error) => {
+          console.error('Error updating profile:', error);
+        });
+      }
+    });
+  };
+  
+  
+
+  const myPosts = (
+    <div style={styles.pin_container}>
+      {profileData.uploaded_pictures.map((picture, index) => (
+        <Card
+          key={index}
+          size={picture.image_size}
+          image={`/media/${picture.fields.image}`}
+          description={picture.fields.description}
+        />
+      ))}
+    </div>
+  );
+
+  const likedPosts = (
+    <div className="liked-posts p-4 rounded-lg bg-white" id="liked-posts" role="tabpanel" aria-labelledby="liked-posts-tab">
+      <div className="post-grid">
+        <div className="post">
+          <div className="bg-white rounded-lg shadow-lg">
+            <img src="https://via.placeholder.com/500" alt="Liked Post 1" className="w-full h-96 object-cover rounded-t-lg" />
+            <div className="p-6">
+              <h3 className="text-xl font-semibold">Liked Post Title 1</h3>
+              <p className="text-gray-600">Liked Post Description 1</p>
+            </div>
+          </div>
+        </div>
+        <div className="post">
+          <div className="bg-white rounded-lg shadow-lg">
+            <img src="https://via.placeholder.com/300" alt="Liked Post 2" className="w-full h-96 object-cover rounded-t-lg" />
+            <div className="p-6">
+              <h3 className="text-xl font-semibold">Liked Post Title 2</h3>
+              <p className="text-gray-600">Liked Post Description 2</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="bg-cover bg-center bg-no-repeat bg-fixed bg-opacity-60">
+      <div className="bg-white bg-opacity-90 p-4 container">
+        <img
+          src={`/media/${profileData.user_profile.profileimg}`}
+          alt="Profile Picture"
+          className="h-36 w-36 rounded-full mx-auto mb-4"
+        />
+        <div className="text-3xl font-semibold text-center">{profileData.user_object.first_name} {profileData.user_object.last_name}</div>
+        <div className="text-lg text-gray-600 text-center">@{profileData.user_object.username}</div>
+        <div className="text-lg text-gray-600 text-center">
+          Followers: {profileData.user_followers} Following: {profileData.user_following}
+        </div>
+        <div className="text-lg text-gray-600 text-center">
+          {profileData.user_profile.bio}
+        </div>
+
+        {profileData.is_own_profile && (
+          <div className="flex justify-center mt-4 space-x-4">
+            <button className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:text-red-300" onClick={handleEditProfile}>
+              Edit Profile
+            </button>
+          </div>
+        )}
+      </div>
+
+      <div className="text-center mt-6">
+        <div className="mb-4 border-b border-gray-200 dark:border-gray-700 inline-block">
+          <ul
+            className="flex flex-wrap -mb-px text-lg font-medium text-center"
+            id="myTab"
+            data-tabs-toggle="#myTabContent"
+            role="tablist"
+          >
+            <li role="presentation">
+              <button
+                className={`inline-block p-4 border-b-2 rounded-t-lg ${
+                  activeTab === 'my-posts' ? 'border-red-600 text-red-600' : 'hover:text-red-600 dark:hover-text-red-300'
+                } tab-button`}
+                id="my-posts-tab"
+                data-tabs-target="#my-posts"
+                type="button"
+                role="tab"
+                aria-controls="my-posts"
+                aria-selected={activeTab === 'my-posts'}
+                onClick={() => setActiveTab('my-posts')}
+              >
+                My Posts
+              </button>
+            </li>
+            <li className="mr-2" role="presentation">
+              <button
+                className={`inline-block p-4 border-b-2 rounded-t-lg ${
+                  activeTab === 'liked-posts' ? 'border-red-600 text-red-600' : 'hover:text-red-600 dark:hover-text-red-300'
+                } tab-button`}
+                id="liked-posts-tab"
+                data-tabs-target="#liked-posts"
+                type="button"
+                role="tab"
+                aria-controls="liked-posts"
+                aria-selected={activeTab === 'liked-posts'}
+                onClick={() => setActiveTab('liked-posts')}
+              >
+                Liked Posts
+              </button>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div id="myTabContent">
+        {activeTab === 'my-posts' ? myPosts : null}
+        {activeTab === 'liked-posts' ? likedPosts : null}
+      </div>
+    </div>
+  );
 }
 
 export default Profile;
+
