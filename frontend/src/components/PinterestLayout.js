@@ -65,10 +65,12 @@ function PinterestLayout() {
   return (
     <div style={styles.pin_container}>
       {posts.map((post, index) => (
-        <Card
+        
+        <Card 
           key={index}
           size={post.image_size}
           image={post.image_url}
+          
           description={post.description}
         />
       ))}

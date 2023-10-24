@@ -13,7 +13,7 @@ function Home_NoAuth (){
         <div>
             
           <PinterestLayout_NoAuth />
-         <UploadFloating_NoAuth />
+          <UploadFloating_NoAuth />
          
         </div>
 

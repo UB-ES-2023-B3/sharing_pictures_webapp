@@ -7,6 +7,7 @@ import Home_NoAuth from './Home_NoAuth.js';
 import { createRoot } from 'react-dom/client';
 import Login from './Login.js';
 import Register from './Register.js';
+import ImageCard from './ImageCard.js';
 import {
 	BrowserRouter as Router,
 	Routes,
@@ -15,6 +16,7 @@ import {
 	Redirect,
 } from "react-router-dom";
 
+import { ChakraProvider } from '@chakra-ui/react'
 
 
 export default class App extends Component {
@@ -27,12 +29,17 @@ export default class App extends Component {
 	render() {
 		
 		return (
+			<ChakraProvider>
 			<Router>
 				<Routes>
 					<Route exact path="" element={<Home />}>
 					</Route>
+					<Route exact path="viewImage/" element={<ImageCard />}>
+					</Route> 
 				</Routes> 
 			</Router>
+			</ChakraProvider>
+
 		);
 		
 

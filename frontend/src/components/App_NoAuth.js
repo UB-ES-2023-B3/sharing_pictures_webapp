@@ -6,6 +6,7 @@ import Home_NoAuth from './Home_NoAuth.js';
 import { createRoot } from 'react-dom/client';
 import Login from './Login.js';
 import Register from './Register.js';
+import ImageCard from './ImageCard.js';
 import {
 	BrowserRouter as Router,
 	Routes,
@@ -31,7 +32,8 @@ export default class App_NoAuth extends Component {
 					<Route exact path="login/" element={<Login />}>
 					</Route>    
 					<Route exact path = "register/" element={<Register />}>
-					</Route>   
+					</Route>
+					
 				</Routes> 
 			</Router>
 		);
