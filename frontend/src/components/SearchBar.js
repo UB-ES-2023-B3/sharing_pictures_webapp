@@ -42,7 +42,7 @@ function SearchBar() {
                 </div>
             ))}
             {/* Display 'Show More' link if more than 5 results */}
-            {results.length > 5 && (
+            {results.length > 0 && (
                 <div className="show-more" onClick={handleShowMore}>
                     Show more results
                 </div>

@@ -121,12 +121,18 @@ def search(request):
     users_starting_with_query = CustomUser.objects.filter(username__istartswith=query)
     users_containing_query = CustomUser.objects.filter(username__icontains=query).exclude(pk__in=users_starting_with_query.values('pk'))
     
-    # Combine the querysets and take the first 5
     combined_users = (list(users_starting_with_query) + list(users_containing_query))
-    if not combined_users:
-        return JsonResponse({'users': ['No users found']})
-    else:
-        user_data = [{'id': user.id, 'username': user.username} for user in combined_users]
-        return JsonResponse({'users': user_data}, safe=False)
+    user_data = [{'id': user.id, 'username': user.username} for user in combined_users]
+    
+    # Searching Posts based on description
+    matching_posts = Post.objects.filter(description__icontains=query)
+    picture_data = [{
+                    'image_url': post.image.url,
+                    'description': post.description,
+                    'created_at': post.created_at.strftime('%F %d, %Y'),
+                    'image_size': post.image.size,
+                } for post in matching_posts]
+    
+    return JsonResponse({'users': user_data, 'pictures': picture_data}, safe=False)
 
 
