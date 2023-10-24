@@ -6,6 +6,7 @@ from django.http import JsonResponse, HttpResponse
 from .forms import RegistrationForm, LoginForm
 from .decorators import user_not_authenticated
 from .models import Post
+from .models import CustomUser
 
 #US1.1
 
@@ -108,3 +109,24 @@ def upload_picture(request):
             return JsonResponse({"status": "error", "errors": form.errors}, status=400)
     else:
         load_pictures(request)
+
+def search(request):
+    """
+    Search for users based on a query string in their username.
+    """
+    query = request.GET.get('q', '')  # Get the query parameter named 'q' from the request.
+    if not query:
+        return JsonResponse({'error': 'Query parameter is missing'}, status=400)
+    
+    users_starting_with_query = CustomUser.objects.filter(username__istartswith=query)
+    users_containing_query = CustomUser.objects.filter(username__icontains=query).exclude(pk__in=users_starting_with_query.values('pk'))
+    
+    # Combine the querysets and take the first 5
+    combined_users = (list(users_starting_with_query) + list(users_containing_query))
+    if not combined_users:
+        return JsonResponse({'users': ['No users found']})
+    else:
+        user_data = [{'id': user.id, 'username': user.username} for user in combined_users]
+        return JsonResponse({'users': user_data}, safe=False)
+
+
