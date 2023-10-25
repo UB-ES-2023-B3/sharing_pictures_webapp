@@ -12,6 +12,7 @@ import {
 	Routes,
 	Route,
 } from "react-router-dom";
+import { ChakraProvider } from '@chakra-ui/react'
 
 
 
@@ -25,6 +26,7 @@ export default class App_NoAuth extends Component {
 	render() {
 		
 			return (
+			<ChakraProvider>
 			<Router>
 				<Routes>
 					<Route exact path="" element={<Home_NoAuth />}>
@@ -36,6 +38,7 @@ export default class App_NoAuth extends Component {
 					
 				</Routes> 
 			</Router>
+			</ChakraProvider>
 		);
 		
 	}
