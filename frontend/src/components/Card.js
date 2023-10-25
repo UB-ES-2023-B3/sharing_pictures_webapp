@@ -1,10 +1,16 @@
 import React, { useState } from 'react';
 import ImageCard from './ImageCard';
 import { useHistory } from 'react-router-dom';
+import {
+    IconButton,
+} from "@chakra-ui/react";
+import { FiHeart } from "react-icons/fi";
 
 function Card(props) {
     const [isMouseOver, setIsMouseOver] = useState(false);
+    const [isMouseOverHeart, setIsMouseOverHeart] = useState(false);
     const [posts, setPosts] = useState([]);
+    const [isClicked, setisClicked] = useState(false)
     // const { key, size, image, description } = props;
     var typeCard = "small";
     if (props.size > 250000) {
@@ -17,14 +23,19 @@ function Card(props) {
         const hashtagRegex = /#(\w+)/g;
         const hashtags = [];
         let match;
-        
+
         while ((match = hashtagRegex.exec(description)) !== null) {
             hashtags.push(match[1]); // El grupo 1 contiene el texto del hashtag sin el #
         }
-        
+
         return hashtags;
     };
-    const handleClick = (size, image,description)  => {
+    const handleButtonClicked = (event) => {
+        event.stopPropagation(); // Evita la propagación del clic al contenedor
+        setisClicked(!isClicked);
+    }
+
+    const handleClick = (size, image, description) => {
         // Definir la acción que se realizará al hacer clic en el Card
         //window.location.href = "../viewImage?key=${key}&size=${size}&image=${image}&description=${description}";
         //window.location.href = `../viewImage/${size}/${image}`;
@@ -33,23 +44,66 @@ function Card(props) {
         const descriptionWithoutHashtags = description.replace(/#(\w+)/g, '');
         window.location.href = (`/viewImage/?size=${size}&image=${image}&description=${description}&descriptionWithoutHashtags=${descriptionWithoutHashtags}&hashtags=${hashtags}`);
     };
+    const handleMouseEnter = () => {
+        setIsMouseOver(true);
+    }
+
+    const handleMouseLeave = () => {
+        setIsMouseOver(false);
+    }
+    const handleMouseEnterHeart = () => {
+        setIsMouseOverHeart(true);
+    }
+
+    const handleMouseLeaveHeart = () => {
+        setIsMouseOverHeart(false);
+    }
+    const handleImageClick = () => {
+        if (!isMouseOverHeart) {
+            handleClick(props.size, props.image, props.description);
+        }
+    }
     console.log(props.description)
     return (
         <div
-            onClick={() => handleClick(props.size, props.image,props.description)}
-            onMouseEnter={() => setIsMouseOver(true)}
-            onMouseLeave={() => setIsMouseOver(false)}
+            onClick={handleImageClick}
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
             style={{
                 ...styles.card,
                 ...styles[typeCard],
                 backgroundImage: `url(${props.image})`,
                 backgroundSize: "cover",
                 backgroundPosition: "center",
-                opacity: isMouseOver ? 0.1 : 1, // Cambiar la opacidad cuando el mouse está sobre la imagen
-                transition: 'opacity 0.5s', // Agregar una transición para suavizar el cambio de opacidad
+                opacity: !isMouseOver ? 1 : 0.7,
+                position: 'relative',
+                transition: 'opacity 0.5s',
             }}
-        >  </div>
-        
+        >
+            {isMouseOver && (
+                <IconButton
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}
+                    variant='link'
+                    zIndex={1}
+                    onClick={handleButtonClicked}
+                    icon={
+                        <FiHeart
+                            className='heart'
+                            fill={isClicked ? "red" : "#1a1b1b"}
+                            opacity={isClicked ? 1 : 0.5}
+                            color={isClicked ? "red" : "white"}
+                            boxSize={8}
+                        />
+                    }
+                    style={{
+                        position: 'absolute',
+                        top: '10px',
+                        right: '10px',
+                    }}
+                />
+            )}
+        </div>
     );
 }
 
