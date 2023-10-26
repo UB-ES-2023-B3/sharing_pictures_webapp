@@ -19,6 +19,7 @@ import {
   ModalFooter,
   Textarea
 } from '@chakra-ui/react'
+import { FiHeart } from "react-icons/fi";
 import { ExternalLinkIcon, LinkIcon, DownloadIcon, StarIcon } from '@chakra-ui/icons'
 
 function extractHashtagsAndDescriptionFromURL() {
@@ -144,7 +145,7 @@ export default class ImageCard extends Component {
     const { isFollowing } = this.state;
     const followButtonText = isFollowing ? 'Seguint' : 'Seguir';
     const { isLiked } = this.state;
-
+    
 
 
     const handleDownload = () => {
@@ -199,6 +200,20 @@ export default class ImageCard extends Component {
                     <IconButton size='lg' borderRadius='30' variant='ghost' colorScheme='red' icon={<ExternalLinkIcon />} onClick={this.openReportModal} />
                     <IconButton size='lg' borderRadius='30' variant='ghost' icon={<LinkIcon />} onClick={handleCopyUrl} />
                     <IconButton size='lg' borderRadius='30' variant='ghost' icon={<DownloadIcon />} onClick={handleDownload} />
+                    <IconButton size='lg' borderRadius='30' variant='ghost' marginRight="0"
+                      ml="auto" 
+                      icon={
+                        <FiHeart
+                            fontSize="2rem"
+                            className='heart'
+                            fill={isLiked ? "red" : "#1a1b1b"}
+                            opacity={isLiked ? 1 : 0.5}
+                            color={isLiked ? "red" : "white"}
+                        />
+                    } 
+                    
+                    onClick={this.toggleLike}
+                    />
                   </Box>
 
 
