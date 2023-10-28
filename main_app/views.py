@@ -115,24 +115,20 @@ def search(request):
     Search for users based on a query string in their username.
     """
     query = request.GET.get('q', '')  # Get the query parameter named 'q' from the request.
+    
     if not query:
         return JsonResponse({'error': 'Query parameter is missing'}, status=400)
     
     users_starting_with_query = CustomUser.objects.filter(username__istartswith=query)
     users_containing_query = CustomUser.objects.filter(username__icontains=query).exclude(pk__in=users_starting_with_query.values('pk'))
-    
     combined_users = (list(users_starting_with_query) + list(users_containing_query))
     user_data = [{'id': user.id, 'username': user.username} for user in combined_users]
     
-    # Searching Posts based on description
-    matching_posts = Post.objects.filter(description__icontains=query)
-    picture_data = [{
-                    'image_url': post.image.url,
-                    'description': post.description,
-                    'created_at': post.created_at.strftime('%F %d, %Y'),
-                    'image_size': post.image.size,
-                } for post in matching_posts]
     
-    return JsonResponse({'users': user_data, 'pictures': picture_data}, safe=False)
+    # If no users or pictures match the search query
+    if not user_data:
+        return JsonResponse({'error': 'No results found for the given query.'}, status=404)
+    
+    return JsonResponse({'users': user_data}, safe=False)
 
 
