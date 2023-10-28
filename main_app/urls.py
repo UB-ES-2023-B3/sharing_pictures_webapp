@@ -8,4 +8,5 @@ urlpatterns = [
     path('logout/', views.log_out, name='logout'), #USX.X (logout)
     path('load_pictures/', views.load_pictures, name='load_more_pictures'),
     path('upload/', views.upload_picture, name='upload_picture'),
+    path('profile/<str:pk>', views.profile, name='profile'),
     ]

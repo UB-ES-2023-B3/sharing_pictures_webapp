@@ -23,7 +23,8 @@ urlpatterns = [
     #path("", include('main_app.urls')), #US1.1, US2.1
     path('admin/', admin.site.urls),
     path("api/", include("main_app.urls")),
-    path('',include ('frontend.urls'))
+    path('',include ('frontend.urls')),
+    
 ]
 
 urlpatterns = urlpatterns+static(settings.MEDIA_URL,

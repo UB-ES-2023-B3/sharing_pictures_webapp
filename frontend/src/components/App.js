@@ -7,6 +7,7 @@ import Home_NoAuth from './Home_NoAuth.js';
 import { createRoot } from 'react-dom/client';
 import Login from './Login.js';
 import Register from './Register.js';
+import Profile from './Profile.js';
 import {
 	BrowserRouter as Router,
 	Routes,
@@ -30,6 +31,8 @@ export default class App extends Component {
 			<Router>
 				<Routes>
 					<Route exact path="" element={<Home />}>
+					</Route>
+					<Route exact path="/profile/:username" element={<Profile />}>
 					</Route>
 				</Routes> 
 			</Router>
