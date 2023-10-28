@@ -25,7 +25,8 @@ class Profile(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     id_user = models.IntegerField()
     bio = models.TextField(blank=True, default='')
-    profileimg = models.ImageField(upload_to='profile_images', default='blank-profile-picture.png')
+    profileimg = models.ImageField(upload_to='profile_images',
+                                    default='blank-profile-picture.png')
 
     def __str__(self):
         return self.user.username

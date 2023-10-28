@@ -9,4 +9,6 @@ urlpatterns = [
     path('upload/', views.upload_picture, name='upload_picture'),
     path('profile/<str:pk>', views.profile, name='profile'),
     path('update_profile/', views.update_profile, name='update_profile'),
+    path('update_profile_picture/', views.update_profile_picture, name='update_profile_picture'),
+    path('follow/<str:pk>', views.follow, name='follow'),
     ]

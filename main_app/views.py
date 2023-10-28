@@ -13,6 +13,7 @@ from .forms import RegistrationForm, LoginForm, UploadPostForm
 from .models import Post, Profile, FollowersCount, CustomUser
 from django.core.cache import cache
 from django.core.serializers import serialize
+import os
 
 
 #US1.1
@@ -81,12 +82,18 @@ def log_out(request):
 
 
 def load_pictures(request):
-    # Get the list of pictures already seen from the session cookie
-    pictures_seen = request.session.get('pictures_seen', [])
 
-    # Get the next 10 unseen pictures
-    posts = Post.objects.exclude(id__in=pictures_seen).order_by('-created_at')[:10]
 
+    #lo comentado es para más adelante si hay muchas fotografias!!
+
+    # Agafem la llista de les imatges que ja s'han vist de la sessió
+    #pictures_seen = request.session.get('pictures_seen', [])
+
+    # Agafem la llista de les imatges que no s'han vist de la sessió 
+    #posts = Post.objects.exclude(id__in=pictures_seen).order_by('-created_at')[:10]
+
+    posts = Post.objects.all().order_by('?')[:10]
+    
     new_pictures = []
 
     for post in posts:
@@ -98,11 +105,11 @@ def load_pictures(request):
             'id': str(post.id),  # Convert the UUID to a string
         })
 
-        # Add the picture to the list of seen pictures
-        pictures_seen.append(str(post.id))
+        # Afegeix l'identificador de la imatge a la llista de les imatges vistes
+        #pictures_seen.append(str(post.id))
 
-    # Update the session cookie with the updated list of seen pictures
-    request.session['pictures_seen'] = pictures_seen
+    # Actualitza la llista de les imatges vistes a la sessió
+    #request.session['pictures_seen'] = pictures_seen
 
     return JsonResponse({'pictures': new_pictures}, safe=False)
 
@@ -122,7 +129,12 @@ def profile(request, pk):
     # Check if the requested username matches the authenticated user
     is_own_profile = (request.user.username == pk)
     
-    user_object = CustomUser.objects.get(username=pk)
+    user_object = CustomUser.objects.get(username=pk) 
+
+    #handle error if the user does not exist
+    if not user_object:
+        return HttpResponse(status=404, content="User not found")
+    
     user_profile = Profile.objects.get(user=user_object)
     follower = request.user.username
     
@@ -158,7 +170,7 @@ def profile(request, pk):
         'user_object': user_object_data[0],  # Extract the first item from the serialized data
         'user_profile': user_profile_data[0],
         'button_text': button_text,
-        'profile_image': user_profile_data[0]['fields']['profileimg'],  # Include the .url to access the URL
+        'profile_image': os.path.basename(user_profile_data[0]['fields']['profileimg']),  # Include the .url to access the URL
         'user_followers': user_followers,
         'user_following': user_following,
         'is_own_profile': is_own_profile,
@@ -194,3 +206,44 @@ def update_profile(request):
         return HttpResponse(status=201)
     else:
         return HttpResponse(status=400)
+    
+
+def update_profile_picture(request):
+    if request.method == 'POST':
+        # Check if the request has a file in it
+        if 'profileimg' in request.FILES:
+            profileimg = request.FILES['profileimg']
+
+            user_object = CustomUser.objects.get(username=request.user.username)
+            user_profile = Profile.objects.get(user=user_object)
+
+            # Assuming you want to save the uploaded image directly to the user's profile
+            user_profile.profileimg = profileimg
+            user_profile.save()
+
+            # Devuelve solo el nombre del archivo
+            response_data = {'profileimg': profileimg.name}
+            return JsonResponse(response_data, status=201)
+        else:
+            return JsonResponse({'error': 'No profileimg provided in the request'}, status=400)
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=400)
+    
+def follow(request, pk):
+
+    if request.method == 'POST':
+        
+        user_to_follow = CustomUser.objects.get(username=pk)
+
+        follower = request.user.username
+
+        if FollowersCount.objects.filter(follower=follower, user=user_to_follow).first():
+            FollowersCount.objects.filter(follower=follower, user=user_to_follow).delete()
+            return HttpResponse(status=201)
+        
+        else:
+            new_follower = FollowersCount.objects.create(follower=follower, user=user_to_follow)
+            new_follower.save()
+            return HttpResponse(status=201)
+        
+    return HttpResponse(status=400)
