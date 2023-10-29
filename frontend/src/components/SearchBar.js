@@ -7,6 +7,7 @@ function SearchBar() {
     const [query, setQuery] = useState('');
     const [results, setResults] = useState({ profiles: []});
     const [error, setError] = useState(null); // to hold error messages
+    const [searched, setSearched] = useState(false);
 
     const handleShowMore = () => {
         window.location.href = `/search_results?q=${query}`;
@@ -18,8 +19,10 @@ function SearchBar() {
         axios.get(`/api/search/?q=${query}`).then(response => {           
             setResults(response.data);
             setError(null);
+            setSearched(true);
         }).catch(error => {
             setError(error.response.data.error);
+            setSearched(true);
         });
     };
 
@@ -55,7 +58,7 @@ function SearchBar() {
             ))}
 
             {/* Display 'Show More' link if there are results */}
-            {!error && results.profiles.length > 0 && (
+            {searched && (
                 <div className="show-more" onClick={handleShowMore}>
                     Show more results
                 </div>

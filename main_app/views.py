@@ -137,9 +137,34 @@ def search(request):
     
     # If no profiles match the search query
     if not profile_data:
-        return JsonResponse({'error': 'No results found for the given query.'}, status=404)
+        return JsonResponse({'error': 'No users found.'}, status=404)
     
     return JsonResponse({'profiles': profile_data}, safe=False)
+
+def search_pictures(request):
+    import random
+
+    # Get the word from the request (assuming it's a GET parameter named 'word')
+    word = request.GET.get('q', '')
+
+    # Filter the posts by descriptions that contain the word
+    posts = Post.objects.filter(description__icontains=word)
+
+    picture_data = []
+
+    # Shuffle the posts to get a random order
+    posts = list(posts)
+    random.shuffle(posts)
+  
+    for post in posts:
+        picture_data.append({
+            'image_url': post.image.url,
+            'description': post.description,
+            'created_at': post.created_at.strftime('%F %d, %Y'),
+            'image_size': post.image.size,
+        })
+
+    return JsonResponse({'pictures': picture_data}, safe=False)
 
 
 
