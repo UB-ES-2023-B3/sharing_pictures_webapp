@@ -16,6 +16,14 @@
     
 }
 
+.profile-image {
+    width: 40px;  /* Adjust as needed */
+    height: 40px;
+    border-radius: 50%;  /* Makes the image round */
+    margin-right: 10px;  /* Space between image and username */
+    vertical-align: middle; /* Aligns the image with the middle of the adjacent text */
+}
+
 .search-bar input {
     flex: 1;
     border-radius: 30px; /* This rounds the corners of the input */
@@ -35,6 +43,11 @@
     cursor: pointer;
     transition: background-color 0.3s ease;
     border-radius: 8px;
+}
+
+.search-result {
+    display: flex;
+    align-items: center;
 }
 
 .search-bar button:hover {

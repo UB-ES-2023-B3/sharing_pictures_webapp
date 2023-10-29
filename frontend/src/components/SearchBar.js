@@ -5,7 +5,7 @@ import './SearchBar.css';
 
 function SearchBar() {
     const [query, setQuery] = useState('');
-    const [results, setResults] = useState({ users: []});
+    const [results, setResults] = useState({ profiles: []});
     const [error, setError] = useState(null); // to hold error messages
 
     const handleShowMore = () => {
@@ -43,14 +43,19 @@ function SearchBar() {
             )}
 
             {/* Display up to 5 search results */}
-            {!error && results.users.slice(0, 5).map((user) => (
-                <div key={user.id}>
-                    {user.username}
-                </div>
+            {!error && results.profiles.slice(0, 5).map((profile) => (
+                <button 
+                    key={profile.id} 
+                    className="search-result-button"
+                    onClick={() => window.location.href = `/profile/${profile.username}`} 
+                    >
+                    <img src={profile.profileimg} alt={profile.username} className="profile-image" />
+                    {profile.username}
+                </button>
             ))}
 
             {/* Display 'Show More' link if there are results */}
-            {!error && results.users.length > 0 && (
+            {!error && results.profiles.length > 0 && (
                 <div className="show-more" onClick={handleShowMore}>
                     Show more results
                 </div>
