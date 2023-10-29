@@ -15,6 +15,7 @@ class CustomUser(AbstractUser):
 class Post(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     image = models.ImageField(upload_to='post_images')
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     description = models.TextField(default='')
     created_at = models.DateTimeField(default=datetime.now)
 
