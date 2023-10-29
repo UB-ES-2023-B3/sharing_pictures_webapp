@@ -35,14 +35,14 @@ function Card(props) {
         setisClicked(!isClicked);
     }
 
-    const handleClick = (size, image, description) => {
+    const handleClick = (size, image, description,id) => {
         // Definir la acción que se realizará al hacer clic en el Card
         //window.location.href = "../viewImage?key=${key}&size=${size}&image=${image}&description=${description}";
         //window.location.href = `../viewImage/${size}/${image}`;
         //window.location.href = 'viewImage/'
         const hashtags = extractHashtags(description);
         const descriptionWithoutHashtags = description.replace(/#(\w+)/g, '');
-        window.location.href = (`/viewImage/?size=${size}&image=${image}&description=${description}&descriptionWithoutHashtags=${descriptionWithoutHashtags}&hashtags=${hashtags}`);
+        window.location.href = (`/viewImage/?size=${size}&image=${image}&description=${description}&descriptionWithoutHashtags=${descriptionWithoutHashtags}&hashtags=${hashtags}&id=${id}`);
     };
     const handleMouseEnter = () => {
         setIsMouseOver(true);
@@ -60,10 +60,10 @@ function Card(props) {
     }
     const handleImageClick = () => {
         if (!isMouseOverHeart) {
-            handleClick(props.size, props.image, props.description);
+            handleClick(props.size, props.image, props.description,props.id);
         }
     }
-    console.log(props.description)
+   
     return (
         <div
             onClick={handleImageClick}

@@ -94,6 +94,7 @@ def load_pictures(request):
                     'description': post.description,
                     'created_at': post.created_at.strftime('%F %d, %Y'),
                     'image_size': post.image.size,
+                    'id_image' : post.id,
                 })
 
     return JsonResponse({'pictures': picture_data}, safe=False)

@@ -73,7 +73,8 @@ export default class ImageCard extends Component {
     // Realiza la llamada al backend aquí
     // Puedes usar axios para hacer una solicitud POST o GET al servidor
   
-    axios.post('/ruta-al-backend', { userId: 'ID_DEL_USUARIO' })
+    axios.post('/api/follow/<str:pk>', { userId: 'ID_DEL_USUARIO' })
+    
       .then(response => {
         // Manejar la respuesta del servidor si es necesario
         console.log('Backend response:', response.data);

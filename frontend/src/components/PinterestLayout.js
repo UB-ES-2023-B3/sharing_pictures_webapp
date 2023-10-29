@@ -70,7 +70,7 @@ function PinterestLayout() {
           key={index}
           size={post.image_size}
           image={post.image_url}
-          
+          id={post.id}
           description={post.description}
         />
       ))}
