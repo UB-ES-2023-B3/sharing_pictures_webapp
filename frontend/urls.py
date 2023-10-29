@@ -5,7 +5,7 @@ from .views import index
 urlpatterns = [
    # path('', index, name='index'),
     path('register/',index),
-   
+    path('profile/<str:pk>',index),
     path('',index),
     path('login/',index)
 ]
