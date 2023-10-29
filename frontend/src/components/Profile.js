@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import Card from './Card';
+import axios from 'axios';
 
 function Profile() {
 const [profileData, setProfileData] = useState(null);
@@ -65,9 +66,114 @@ fetch(apiUrl)
     });
 }, [username]);
 
+const handleProfileEditError = () => {
+
+    Swal.fire({
+        icon: 'error',
+        title: 'Oops... Something went wrong updating your profile!',
+        text: 'Please check that your first name, last name and bio are not longer than 30, 30 and 100 characters respectively.',
+
+    });
+}
+
+const handleEditProfile = () => {
+    Swal.fire({
+        title: 'Edit Profile',
+        html: `
+        <div style="text-align: center; overflow-x: hidden;">
+        <div class="w-full max-w-md mx-auto">
+            <div style="display: flex; flex-direction: column; align-items: center;">
+                <br>
+                <label for="swal-first-name" class="block text-sm font-medium text-gray-700">First Name</label>
+                <input id="swal-first-name" class="swal2-input w-full border border-gray-300 rounded-lg" placeholder="First Name" value="${profileData.user_object.first_name}">
+            </div>
+        </div>
+    
+        <div class="w-full max-w-md mx-auto">
+            <div style="display: flex; flex-direction: column; align-items: center;">
+                <br>
+                <label for="swal-last-name" class="block text-sm font-medium text-gray-700">Last Name</label>
+                <input id="swal-last-name" class="swal2-input w-full border border-gray-300 rounded-lg" placeholder="Last Name" value="${profileData.user_object.last_name}">
+            </div>
+        </div>
+    
+        <div class="w-full max-w-md mx-auto">
+            <div style="display: flex; flex-direction: column; align-items: center;">
+                <br>
+                <label for="swal-bio" class="block text-sm font-medium text-gray-700">Bio</label>
+                <textarea id="swal-bio" class="swal2-textarea w-full border border-gray-300 rounded-lg" placeholder="Your description">${profileData.user_profile.bio}</textarea>
+            </div>
+        </div>
+    </div>
+    
+        `,
+        showCancelButton: true,
+        confirmButtonText: 'Save',
+        cancelButtonText: 'Cancel',
+        focusConfirm: false,
+        showLoaderOnConfirm: true,
+        preConfirm: () => {
+        const firstName = Swal.getPopup().querySelector('#swal-first-name').value;
+        const lastName = Swal.getPopup().querySelector('#swal-last-name').value;
+        const bio = Swal.getPopup().querySelector('#swal-bio').value;
+    
+        console.log('firstName:', firstName);
+        console.log('lastName:', lastName);
+        console.log('bio:', bio);
+    
+        return { firstName, lastName, bio };
+        },
+    }).then((result) => {
+        if (result.isConfirmed) {
+        const { firstName, lastName, bio } = result.value;
+
+        if (firstName.length > 30 || lastName.length > 30 || bio.length > 100){
+            handleProfileEditError();
+            return;
+        }
+
+        setProfileData((prevData) => ({
+            ...prevData,
+            user_object: {
+            ...prevData.user_object,
+            first_name: firstName,
+            last_name: lastName,
+            },
+            user_profile: {
+            ...prevData.user_profile,
+            bio: bio,
+            },
+        }));
+        
+        axios
+            .post('/api/update_profile/', {
+            first_name: firstName,
+            last_name: lastName,
+            bio: bio,
+            }, { headers: { 'Content-Type': 'application/json' } })
+            .then((response) => {
+            console.log(response);
+            Swal.fire({
+                icon: 'success',
+                title: 'Profile Updated',
+            });
+            })
+            .catch((error) => {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops... Something went wrong updating your profile!',
+                    text: error.response.data.message,
+                });
+            });
+        }
+    });
+    };
+
 if (!profileData) {
 return <div>Loading...</div>;
 }
+
+
 
 const myPosts = profileData.uploaded_pictures ? (
     <div style={styles.pin_container}>
@@ -112,6 +218,16 @@ return (
         <div className="text-lg text-gray-600 text-center">
         {profileData.user_profile.bio}
         </div>
+        {profileData.is_own_profile ? (
+            <div className="flex justify-center mt-4 space-x-4">
+                <button
+                className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:text-red-300"
+                onClick={handleEditProfile}
+                >
+                Edit Profile
+                </button>
+            </div>
+            ) : null}
         </div>   
         <div className="text-center mt-6">
         <div className="mb-4 border-b border-gray-200 dark:border-gray-700 inline-block">

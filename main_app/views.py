@@ -200,3 +200,31 @@ def profile(request, pk):
 
 
     return JsonResponse(context, safe=False)
+
+
+def update_profile(request):
+    if request.method == 'POST':
+        # Pasem a JSON el contingut del cos de la petició
+        post_data = json.loads(request.body.decode('utf-8'))
+
+        user_object = CustomUser.objects.get(username=request.user.username)
+        user_profile = Profile.objects.get(user=user_object)
+
+        bio = post_data.get('bio')
+
+        if bio and len(bio) > 100:
+            return HttpResponse(status=400, content="Bio too long")
+            
+        user_profile.bio = bio
+
+        first_name = post_data.get('first_name')
+        user_object.first_name = first_name
+
+        last_name = post_data.get('last_name')
+        user_object.last_name = last_name
+
+        user_profile.save()
+        user_object.save()
+        return HttpResponse(status=201)
+    else:
+        return HttpResponse(status=400)
