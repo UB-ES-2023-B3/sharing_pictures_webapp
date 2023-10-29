@@ -1,11 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import Swal from 'sweetalert2';
+import Card from './Card';
 
 function Profile() {
 const [profileData, setProfileData] = useState(null);
+const [activeTab, setActiveTab] = useState('my-posts');
 const { username } = useParams();
 
+const styles = {
+    pin_container: {
+    margin: 0,
+    padding: 0,
+    width: '90vw',
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
+    gridAutoRows: '10px',
+    position: 'absolute',
+    left: '50%',
+    transform: 'translateX(-50%)',
+    justifyContent: 'center',
+    },
+    };
 
 useEffect(() => {
 const apiUrl = `/api/profile/${username}`;
@@ -53,6 +69,21 @@ if (!profileData) {
 return <div>Loading...</div>;
 }
 
+const myPosts = profileData.uploaded_pictures ? (
+    <div style={styles.pin_container}>
+      {profileData.uploaded_pictures.map((picture, index) => (
+        <Card
+          key={index}
+          size={picture.image_size}
+          image={`/media/${picture.fields.image}`}
+          description={picture.fields.description}
+        />
+      ))}
+    </div>
+  ) : (
+    <div className="text-center">No posts available.</div>
+  );
+
 return (
 <div className="bg-cover bg-center bg-no-repeat bg-fixed bg-opacity-60">
 <div className="bg-white bg-opacity-90 p-4 container">
@@ -81,8 +112,41 @@ return (
         <div className="text-lg text-gray-600 text-center">
         {profileData.user_profile.bio}
         </div>
-        </div>     
+        </div>   
+        <div className="text-center mt-6">
+        <div className="mb-4 border-b border-gray-200 dark:border-gray-700 inline-block">
+        <ul
+            className="flex flex-wrap -mb-px text-lg font-medium text-center"
+            id="myTab"
+            data-tabs-toggle="#myTabContent"
+            role="tablist"
+        >
+            <li role="presentation">
+            <button
+                className={`inline-block p-4 border-b-2 rounded-t-lg ${
+                activeTab === 'my-posts'
+                    ? 'border-red-600 text-red-600'
+                    : 'hover:text-red-600 dark:hover-text-red-300'
+                } tab-button`}
+                id="my-posts-tab"
+                data-tabs-target="#my-posts"
+                type="button"
+                role="tab"
+                aria-controls="my-posts"
+                aria-selected={activeTab === 'my-posts'}
+                onClick={() => setActiveTab('my-posts')}
+            >
+                Posts
+                </button>
+            </li>
+        </ul>
         </div>
+    </div>
+    <div id="myTabContent">
+          {activeTab === 'my-posts' ? myPosts : null}
+        </div>
+    </div>
+
 );
     
 }

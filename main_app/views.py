@@ -110,6 +110,7 @@ def upload_picture(request):
     if request.method == 'POST':
         form = UploadPostForm(request.POST, request.FILES)
         if form.is_valid():
+            form.instance.user = request.user
             form.save()
             return JsonResponse({"status": "success"})
         else:
@@ -144,17 +145,24 @@ def search(request):
 
 
 def profile(request, pk):
-    # Comprobar si el perfil es del usuario logueado
+    # Check if the requested username matches the authenticated user
     is_own_profile = (request.user.username == pk)
     
-    # Cogemos la información de perfil del usuario
     user_object = CustomUser.objects.get(username=pk) 
-    
+
+    #handle error if the user does not exist
     if not user_object:
         return HttpResponse(status=404, content="User not found")
     
     user_profile = Profile.objects.get(user=user_object)
     follower = request.user.username
+    
+    uloaded_posts = Post.objects.filter(user=user_object).order_by('-created_at')
+
+    if FollowersCount.objects.filter(follower=follower, user=user_object).first():
+        button_text = 'Unfollow'
+    else:
+        button_text = 'Follow'
 
     user_followers = len(FollowersCount.objects.filter(user=user_object))
     user_following = len(FollowersCount.objects.filter(follower=pk))
@@ -171,13 +179,24 @@ def profile(request, pk):
     # Parse the serialized data to convert it into a Python dictionary
     user_profile_data = json.loads(user_profile_json)
 
+    #the same with the posts of the user
+    uloaded_posts_json = serialize('json', uloaded_posts)
+
+    # Parse the serialized data to convert it into a Python dictionary
+    uloaded_posts = json.loads(uloaded_posts_json)
+
     context = {
         'user_object': user_object_data[0],  # Extract the first item from the serialized data
         'user_profile': user_profile_data[0],
-        'profile_image': os.path.basename(user_profile_data[0]['fields']['profileimg']), 
+        'button_text': button_text,
+        'profile_image': os.path.basename(user_profile_data[0]['fields']['profileimg']),  # Include the .url to access the URL
         'user_followers': user_followers,
         'user_following': user_following,
         'is_own_profile': is_own_profile,
     }
+
+    if uloaded_posts:
+        context['uploaded_posts'] = uloaded_posts
+
 
     return JsonResponse(context, safe=False)
