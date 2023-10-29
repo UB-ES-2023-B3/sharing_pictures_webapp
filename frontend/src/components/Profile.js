@@ -136,7 +136,7 @@ return (
                 aria-selected={activeTab === 'my-posts'}
                 onClick={() => setActiveTab('my-posts')}
             >
-                My Posts
+                Posts
                 </button>
             </li>
         </ul>
