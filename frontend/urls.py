@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, re_path
 from .views import index
 
 
@@ -7,5 +7,7 @@ urlpatterns = [
     path('register/',index),
     path('profile/<str:pk>',index),
     path('',index),
-    path('login/',index)
+    path('login/',index),
+    path('search_results/',index)
+
 ]
