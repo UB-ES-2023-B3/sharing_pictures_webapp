@@ -20,6 +20,7 @@ import {
   Textarea
 } from '@chakra-ui/react'
 import { FiHeart } from "react-icons/fi";
+import axios from 'axios';
 import { ExternalLinkIcon, LinkIcon, DownloadIcon, StarIcon } from '@chakra-ui/icons'
 
 function extractHashtagsAndDescriptionFromURL() {
@@ -63,11 +64,26 @@ export default class ImageCard extends Component {
   }
 
   toggleFollow = () => {
+    this.callBackendToggleFollow();
     this.setState((prevState) => ({
       isFollowing: !prevState.isFollowing,
     }));
   };
-
+  callBackendToggleFollow = () => {
+    // Realiza la llamada al backend aquí
+    // Puedes usar axios para hacer una solicitud POST o GET al servidor
+  
+    axios.post('/ruta-al-backend', { userId: 'ID_DEL_USUARIO' })
+      .then(response => {
+        // Manejar la respuesta del servidor si es necesario
+        console.log('Backend response:', response.data);
+      })
+      .catch(error => {
+        // Manejar errores si la solicitud falla
+        console.error('Error en la solicitud al backend:', error);
+      });
+  };
+  
   toggleLike = () => {
     this.setState((prevState) => ({
       isLiked: !prevState.isLiked,
