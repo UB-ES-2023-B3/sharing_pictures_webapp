@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios'; 
+import './SearchBar.css';
+
 
 function SearchBar() {
     const [query, setQuery] = useState('');
@@ -48,7 +50,7 @@ function SearchBar() {
             ))}
 
             {/* Display 'Show More' link if there are results */}
-            {!error && (
+            {!error && results.users.length > 0 && (
                 <div className="show-more" onClick={handleShowMore}>
                     Show more results
                 </div>
