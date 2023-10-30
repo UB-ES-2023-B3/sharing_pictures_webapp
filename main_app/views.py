@@ -149,11 +149,12 @@ def profile(request, pk):
     is_own_profile = (request.user.username == pk)
     
     user_object = CustomUser.objects.get(username=pk) 
-
+   
     #handle error if the user does not exist
-    if not user_object:
+    if not user_object: 
+        print("**********does not exist*******")
         return HttpResponse(status=404, content="User not found")
-    
+  
     user_profile = Profile.objects.get(user=user_object)
     follower = request.user.username
     
