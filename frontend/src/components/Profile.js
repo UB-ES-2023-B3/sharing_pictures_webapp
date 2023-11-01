@@ -243,7 +243,11 @@ const handleProfilePictureUpload = (selectedFile) => {
             });
         })
         .catch((error) => {
-            console.error('Error updating profile picture:', error);
+            Swal.fire({
+            icon: 'error',
+            title: 'Oops... Something went wrong updating your profile picture!',
+            text: error.response.data.message,
+            });
         });
     }
     };
