@@ -235,3 +235,28 @@ def like(request):
             return HttpResponse(status=201)
         
     return HttpResponse(status=400)
+
+def get_is_liked(request):
+    
+    if request.method == 'POST':
+        post_data = json.loads(request.body)
+        user_username =post_data['username']
+        user_object = CustomUser.objects.get(username=user_username) 
+
+        if not user_object:
+            return HttpResponse(status=404, content="User not found")
+    
+        user_profile = Profile.objects.get(user=user_object)
+
+        post_id = post_data.get('post_id')
+        post = Post.objects.get(id=post_id)
+        if user_profile.likes.filter(id=post.id).exists():
+
+             return JsonResponse({'message':'Sacar like'})
+        
+        else:
+            
+            
+             return JsonResponse({'message':'añadir like'})
+        
+    return HttpResponse(status=400)

@@ -11,4 +11,7 @@ urlpatterns = [
     path('profile/<str:pk>', views.profile, name='profile'),
     path('likes/', views.like, name='likes'),
     path('get_logged_in_user/', views.get_logged_in_user, name='get_logged_in_user'),
+    path('get_is_liked/', views.get_is_liked, name='get_is_liked'),
+
+    
     ]
