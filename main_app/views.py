@@ -102,6 +102,7 @@ def load_pictures(request):
                     'description': post.description,
                     'created_at': post.created_at.strftime('%F %d, %Y'),
                     'image_size': post.image.size,
+                    'post_id' : post.id,
                 })
 
     return JsonResponse({'pictures': picture_data}, safe=False)
@@ -200,3 +201,37 @@ def profile(request, pk):
 
 
     return JsonResponse(context, safe=False)
+
+def get_logged_in_user(request):
+    if request.user.is_authenticated:
+        user = request.user
+        return JsonResponse({'username': user.username})
+    else:
+        return JsonResponse({'message': 'No user logged in'})
+
+
+def like(request):
+
+    if request.method == 'POST':
+        post_data = json.loads(request.body)
+        user_username =post_data['username']
+        user_object = CustomUser.objects.get(username=user_username) 
+
+        if not user_object:
+            return HttpResponse(status=404, content="User not found")
+    
+        user_profile = Profile.objects.get(user=user_object)
+
+        post_id = post_data.get('post_id')
+        post = Post.objects.get(id=post_id)
+        if user_profile.likes.filter(id=post.id).exists():
+
+            user_profile.likes.remove(post)
+            return HttpResponse(status=201)
+        
+        else:
+            
+            user_profile.likes.add(post)
+            return HttpResponse(status=201)
+        
+    return HttpResponse(status=400)

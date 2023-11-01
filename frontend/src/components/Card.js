@@ -5,6 +5,7 @@ import {
     IconButton,
 } from "@chakra-ui/react";
 import { FiHeart } from "react-icons/fi";
+import axios from 'axios';
 
 function Card(props) {
     const [isMouseOver, setIsMouseOver] = useState(false);
@@ -31,7 +32,27 @@ function Card(props) {
         return hashtags;
     };
     const handleButtonClicked = (event) => {
+ 
         event.stopPropagation(); // Evita la propagación del clic al contenedor
+        
+        fetch('api/likes/', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ username: props.user ,post_id: props.id}),
+          })
+          .then(response => {
+            // Manejar la respuesta del servidor si es necesario
+            console.log('Backend response:');
+          })
+          .catch(error => {
+            // Manejar errores si la solicitud falla
+            console.error('Error en la solicitud al backend:');
+          });
+          
+
+
         setisClicked(!isClicked);
     }
 
