@@ -213,6 +213,7 @@ const handleProfilePictureSelect = (event) => {
             title: 'Oops...',
             text: 'File size cannot exceed 4MB!',
         });
+        return;
     };
 
     handleProfilePictureUpload(file);
