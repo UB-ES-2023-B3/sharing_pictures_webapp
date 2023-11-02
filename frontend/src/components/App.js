@@ -9,7 +9,6 @@ import Login from './Login.js';
 import SearchResults from './SearchResults';
 import Register from './Register.js';
 import Profile from './Profile.js';
-import ImageCard from './ImageCard.js';
 import {
 	BrowserRouter as Router,
 	Routes,
@@ -30,20 +29,16 @@ export default class App extends Component {
 	render() {
 
 		return (
-			<ChakraProvider>
-				<Router>
-					<Routes>
-						<Route exact path="" element={<Home />} />
-						<Route path="/search_results" element={<SearchResults />} />
-						<Route exact path="" element={<Home />}>
-						</Route>
-						<Route exact path="/profile/:username" element={<Profile />}>
-						</Route>
-						<Route exact path="viewImage/" element={<ImageCard />}>
-					</Route> 
-					</Routes>
-				</Router>
-			</ChakraProvider>
+			<Router>
+				<Routes>
+					<Route exact path="" element={<Home />}/>
+					<Route path="/search_results" element={<SearchResults />} />
+					<Route exact path="" element={<Home />}>
+					</Route>
+					<Route exact path="/profile/:username" element={<Profile />}>
+					</Route>
+				</Routes> 
+			</Router>
 		);
 
 

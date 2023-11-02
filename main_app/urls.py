@@ -14,4 +14,5 @@ urlpatterns = [
     path('get_is_liked/', views.get_is_liked, name='get_is_liked'),
 
     
+    path('update_profile/', views.update_profile, name='update_profile'),
     ]

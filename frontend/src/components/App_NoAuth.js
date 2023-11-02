@@ -11,8 +11,8 @@ import {
 	Routes,
 	Route,
 } from "react-router-dom";
-
 import { ChakraProvider } from '@chakra-ui/react'
+
 
 export default class App_NoAuth extends Component {
 
