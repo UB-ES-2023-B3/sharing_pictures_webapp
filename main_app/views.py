@@ -151,7 +151,10 @@ def profile(request, pk):
     
     user_object = CustomUser.objects.get(username=pk) 
    
+   
     #handle error if the user does not exist
+    if not user_object: 
+        print("**********does not exist*******")
     if not user_object: 
         print("**********does not exist*******")
         return HttpResponse(status=404, content="User not found")

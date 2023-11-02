@@ -217,7 +217,11 @@
 /*!***************************************************!*\
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   !*** ./node_modules/react-icons/lib/esm/index.js ***!
+=======
+  !*** ./node_modules/prop-types/checkPropTypes.js ***!
+>>>>>>> b08162a9047eed7e6dbab60cfbe60e338b09c709
 =======
   !*** ./node_modules/prop-types/checkPropTypes.js ***!
 >>>>>>> b08162a9047eed7e6dbab60cfbe60e338b09c709
@@ -357,10 +361,13 @@
 /*!*********************************************************!*\
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   !*** ./node_modules/react-icons/lib/esm/iconContext.js ***!
   \*********************************************************/
 
 =======
+=======
+>>>>>>> b08162a9047eed7e6dbab60cfbe60e338b09c709
 =======
 >>>>>>> b08162a9047eed7e6dbab60cfbe60e338b09c709
   !*** ./node_modules/focus-lock/dist/es2015/commands.js ***!
@@ -383,6 +390,9 @@
   \**********************************************************/
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> b08162a9047eed7e6dbab60cfbe60e338b09c709
+=======
 >>>>>>> b08162a9047eed7e6dbab60cfbe60e338b09c709
 =======
 >>>>>>> b08162a9047eed7e6dbab60cfbe60e338b09c709
@@ -457,8 +467,11 @@
 /*!***********************************************************!*\
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   !*** ./node_modules/react-icons/lib/esm/iconsManifest.js ***!
 =======
+=======
+>>>>>>> b08162a9047eed7e6dbab60cfbe60e338b09c709
 =======
 >>>>>>> b08162a9047eed7e6dbab60cfbe60e338b09c709
   !*** ./node_modules/react-focus-lock/dist/es2015/Lock.js ***!
@@ -471,6 +484,9 @@
 /*!***********************************************************!*\
   !*** ./node_modules/react-focus-lock/dist/es2015/util.js ***!
 <<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> b08162a9047eed7e6dbab60cfbe60e338b09c709
+=======
 >>>>>>> b08162a9047eed7e6dbab60cfbe60e338b09c709
 =======
 >>>>>>> b08162a9047eed7e6dbab60cfbe60e338b09c709
