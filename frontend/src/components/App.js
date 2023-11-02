@@ -18,7 +18,6 @@ import {
 	Redirect,
 } from "react-router-dom";
 
-import { ChakraProvider } from '@chakra-ui/react'
 
 export default class App extends Component {
 
