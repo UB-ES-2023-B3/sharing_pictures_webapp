@@ -18,7 +18,7 @@ import {
 	Redirect,
 } from "react-router-dom";
 
-
+import { ChakraProvider } from '@chakra-ui/react'
 
 export default class App extends Component {
 
@@ -28,7 +28,7 @@ export default class App extends Component {
 	}
 
 	render() {
-		
+
 		return (
 			<ChakraProvider>
 			<Router>
@@ -43,7 +43,7 @@ export default class App extends Component {
 			</Router>
 			</ChakraProvider>
 		);
-		
+
 
 	}
 }

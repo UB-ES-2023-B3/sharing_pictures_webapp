@@ -8,6 +8,7 @@ urlpatterns = [
     path('profile/<str:pk>',index),
     path('',index),
     path('login/',index),
-    path('search_results/',index)
+    path('search_results/',index),
+    path('viewImage/',index)
 
 ]
