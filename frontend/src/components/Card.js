@@ -88,9 +88,12 @@ function Card(props) {
             //window.location.href = "../viewImage?key=${key}&size=${size}&image=${image}&description=${description}";
             //window.location.href = `../viewImage/${size}/${image}`;
             //window.location.href = 'viewImage/'
-            const hashtags = extractHashtags(description);
-            const descriptionWithoutHashtags = description.replace(/#(\w+)/g, '');
-            window.location.href = (`/viewImage/?size=${size}&image=${image}&description=${description}&descriptionWithoutHashtags=${descriptionWithoutHashtags}&hashtags=${hashtags}&id=${id}`);
+            console.log(size)
+            console.log(image)
+            console.log(description)
+            console.log(id)
+            console.log(props.user)
+            window.location.href = (`/viewImage/?size=${size}&image=${image}&description=${description}&id=${id}`);
         };
         const handleMouseEnter = () => {
             handleIsLiked();
@@ -108,9 +111,12 @@ function Card(props) {
             setIsMouseOverHeart(false);
         }
         const handleImageClick = () => {
+           
             if (!isMouseOverHeart) {
+                
                 handleClick(props.size, props.image, props.description, props.id);
             }
+            
         }
 
         return (
