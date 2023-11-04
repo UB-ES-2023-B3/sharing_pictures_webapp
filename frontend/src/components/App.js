@@ -10,6 +10,7 @@ import SearchResults from './SearchResults';
 import Register from './Register.js';
 import Profile from './Profile.js';
 import { ChakraProvider } from '@chakra-ui/react'
+import ImageCard from './ImageCard.js';
 import {
 	BrowserRouter as Router,
 	Routes,
@@ -38,6 +39,8 @@ export default class App extends Component {
 					</Route>
 					<Route exact path="/profile/:username" element={<Profile />}>
 					</Route>
+					<Route exact path="viewImage/" element={<ImageCard />}>
+					</Route> 
 				</Routes> 
 			</Router>
 			</ChakraProvider>
