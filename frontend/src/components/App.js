@@ -19,7 +19,6 @@ import {
 } from "react-router-dom";
 
 
-
 export default class App extends Component {
 
 	constructor(props) {
@@ -28,7 +27,7 @@ export default class App extends Component {
 	}
 
 	render() {
-		
+
 		return (
 			<ChakraProvider>
 			<Router>
@@ -43,7 +42,7 @@ export default class App extends Component {
 			</Router>
 			</ChakraProvider>
 		);
-		
+
 
 	}
 }
