@@ -6,6 +6,8 @@ import Card from './Card.js';
 function PinterestSearchLayout() {
     const [results, setResults] = useState({ pictures: [], profiles: [] });
     const [searchParams] = useSearchParams();
+    const [error, setError] = useState(null);
+    
     const query = searchParams.get('q');
     const sentinelRef = useRef(null);
     const maxLoadCount = 10000;
@@ -33,8 +35,12 @@ function PinterestSearchLayout() {
                 });
                 loadCount += newPictures.length;
             }
+            if (!newPictures.length && !newProfiles.length) {
+                setError('Error');
+            }
         })).catch(error => {
             console.error('There was an error fetching search results', error);
+            setError(error.response.data.error);
         });
     };
 
@@ -70,10 +76,9 @@ function PinterestSearchLayout() {
 
     return (
         <div style={styles.pin_container}>
-
             <div style={styles.user_container}>
                 <h3>Users</h3>
-                <div>
+                <div style={styles.users_scroll}>
                     {results.profiles.map((profile, index) => (
                         <button
                             key={index}
@@ -89,7 +94,7 @@ function PinterestSearchLayout() {
 
             
             <div style={styles.pictures_container}>
-                <h3>Pictures</h3>
+                <h3 style={{ textAlign: 'center', width: '100%' }}>Pictures</h3>
                 <div style={styles.pictures}>
                     {results.pictures.map((picture, index) => (
                         <Card
@@ -103,6 +108,13 @@ function PinterestSearchLayout() {
             </div>
             
             <div ref={sentinelRef} style={{ height: '10px' }}></div>
+
+            {/* Display errors if they exist */}
+            {error && (
+                <div className="error-message">
+                    No results found
+                </div>
+            )}
         </div>
     );
 }
@@ -123,6 +135,13 @@ const styles = {
         flexDirection: 'column',
         alignItems: 'center',
         marginBottom: '20px',
+        overflow: 'hidden',
+    },
+
+    users_scroll: {
+        display: 'flex',
+        flexDirection: 'row', // To place items horizontally
+        overflowX: 'scroll', // Enable horizontal scroll
     },
     
     user: {
@@ -140,7 +159,10 @@ const styles = {
     },
     pictures_container: {
         width: '100%',
+        
+        
     },
+    
     pictures: {
         display: 'grid',
         gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',

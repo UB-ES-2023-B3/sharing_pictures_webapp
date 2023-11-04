@@ -135,9 +135,9 @@ def search(request):
     combined_profiles = (list(profiles_starting_with_query) + list(profiles_containing_query))
     profile_data = [{'id': profile.id, 'username': profile.user.username, 'profileimg': profile.profileimg.url} for profile in combined_profiles]
     
-    # If no profiles match the search query
-    if not profile_data:
-        return JsonResponse({'error': 'No users found.'}, status=404)
+    # # If no profiles match the search query
+    # if not profile_data:
+    #     return JsonResponse({'error': 'No users found.'}, status=404)
     
     return JsonResponse({'profiles': profile_data}, safe=False)
 
@@ -164,6 +164,8 @@ def search_pictures(request):
             'image_size': post.image.size,
         })
 
+    # if not picture_data:
+    #     return JsonResponse({'error': 'No posts found.'}, status=404)
     return JsonResponse({'pictures': picture_data}, safe=False)
 
 

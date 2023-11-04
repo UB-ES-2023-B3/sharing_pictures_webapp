@@ -37,30 +37,38 @@ function SearchBar() {
                 />
                 <button type="submit" disabled={!query.trim()}>Search</button>
             </form>
-
+    
             {/* Display errors if they exist */}
             {error && (
                 <div className="error-message">
                     {error}
                 </div>
             )}
-
-            {/* Display up to 5 search results */}
-            {!error && results.profiles.slice(0, 5).map((profile) => (
-                <button 
-                    key={profile.id} 
-                    className="search-result-button"
-                    onClick={() => window.location.href = `/profile/${profile.username}`} 
-                    >
-                    <img src={profile.profileimg} alt={profile.username} className="profile-image" />
-                    {profile.username}
-                </button>
-            ))}
-
+    
+            {/* Display up to 5 search results or a 'no results' message */}
+            {searched && !error && (
+                results.profiles.length > 0 ? (
+                    results.profiles.slice(0, 5).map((profile) => (
+                        <button 
+                            key={profile.id} 
+                            className="search-result-button"
+                            onClick={() => window.location.href = `/profile/${profile.username}`} 
+                            >
+                            <img src={profile.profileimg} alt={profile.username} className="profile-image" />
+                            {profile.username}
+                        </button>
+                    ))
+                ) : (
+                    <div className="no-results">
+                        No users found.
+                    </div>
+                )
+            )}
+    
             {/* Display 'Show More' link if there are results */}
             {searched && (
                 <div className="show-more" onClick={handleShowMore}>
-                    Show more results
+                    Show more results and posts
                 </div>
             )}
         </div>
