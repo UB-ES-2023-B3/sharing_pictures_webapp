@@ -13,6 +13,15 @@ function PinterestSearchLayout() {
     const maxLoadCount = 10000;
     let loadCount = 0;
 
+    const headerStyle = {
+        color: '#FFCCCC',
+        fontFamily: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif', // Example font family
+        fontSize: '24px', // Example font size
+        fontWeight: 'bold', // Bold font weight
+        textAlign: 'center', // Center align text
+        marginBottom: '10px', // Space below the header
+    };
+
     const fetchSearchResults = () => {
         axios.all([
             axios.get(`/api/search_pictures/?q=${query}`),
@@ -77,7 +86,7 @@ function PinterestSearchLayout() {
     return (
         <div style={styles.pin_container}>
             <div style={styles.user_container}>
-                <h3>Users</h3>
+                <h3 style={headerStyle}>Users</h3>
                 <div style={styles.users_scroll}>
                     {results.profiles.map((profile, index) => (
                         <button
@@ -94,7 +103,7 @@ function PinterestSearchLayout() {
 
             
             <div style={styles.pictures_container}>
-                <h3 style={{ textAlign: 'center', width: '100%' }}>Pictures</h3>
+                <h3 style={headerStyle}>Pictures</h3>
                 <div style={styles.pictures}>
                     {results.pictures.map((picture, index) => (
                         <Card
@@ -136,6 +145,7 @@ const styles = {
         alignItems: 'center',
         marginBottom: '20px',
         overflow: 'hidden',
+    
     },
 
     users_scroll: {
@@ -157,6 +167,7 @@ const styles = {
         objectFit: 'cover',
         marginBottom: '5px',
     },
+
     pictures_container: {
         width: '100%',
         
