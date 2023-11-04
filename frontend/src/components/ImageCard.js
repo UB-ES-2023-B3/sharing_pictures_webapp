@@ -33,8 +33,8 @@ function extractHashtagsAndDescriptionFromURL() {
   const descriptionWithHashtags = descriptionWithoutHashtags + ' ' + hashtags.map(tag => `#${tag}`).join(' ');
 
   return {
-      descriptionWithHashtags,
-      hashtags,
+    descriptionWithHashtags,
+    hashtags,
   };
 }
 export default class ImageCard extends Component {
@@ -72,9 +72,9 @@ export default class ImageCard extends Component {
   callBackendToggleFollow = () => {
     // Realiza la llamada al backend aquí
     // Puedes usar axios para hacer una solicitud POST o GET al servidor
-  
+
     axios.post('/api/follow/<str:pk>', { userId: 'ID_DEL_USUARIO' })
-    
+
       .then(response => {
         // Manejar la respuesta del servidor si es necesario
         console.log('Backend response:', response.data);
@@ -84,7 +84,7 @@ export default class ImageCard extends Component {
         console.error('Error en la solicitud al backend:', error);
       });
   };
-  
+
   toggleLike = () => {
     this.setState((prevState) => ({
       isLiked: !prevState.isLiked,
@@ -122,7 +122,7 @@ export default class ImageCard extends Component {
       this.closeReportModal();
     }, 2000); // Cierra el cuadro de diálogo después de 2 segundos
   };
-  renderDescription(descriptionWithHashtags,hashtags) {
+  renderDescription(descriptionWithHashtags, hashtags) {
     console.log(descriptionWithHashtags)
     if (descriptionWithHashtags && descriptionWithHashtags.trim() !== "") {
       const words = descriptionWithHashtags.split(' ');
@@ -148,7 +148,7 @@ export default class ImageCard extends Component {
       );
     }
   }
- 
+
 
   render() {
     const { imageHeight, isReporting, reportReason, reportDescription, reportSubmitted } = this.state;
@@ -162,7 +162,7 @@ export default class ImageCard extends Component {
     const { isFollowing } = this.state;
     const followButtonText = isFollowing ? 'Seguint' : 'Seguir';
     const { isLiked } = this.state;
-    
+
 
 
     const handleDownload = () => {
@@ -208,11 +208,18 @@ export default class ImageCard extends Component {
               </div>
 
             </div>
+            <div div style={styles.imageleft}>
 
-          
+              <Flex marginLeft="10px" marginRight='10px' justifyContent="space-between" >
+                <Box width='100%'>
+                <IconButton size='lg' borderRadius='30' variant='ghost' icon={<LinkIcon />} onClick={handleCopyUrl} />
+                </Box>
+              </Flex>
+            </div>
+
           </div>
 
-    
+
         </div>
       </ChakraProvider>
     );

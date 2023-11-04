@@ -8,6 +8,7 @@ import { createRoot } from 'react-dom/client';
 import Login from './Login.js';
 import SearchResults from './SearchResults';
 import Register from './Register.js';
+import ImageCard from './ImageCard.js';
 import Profile from './Profile.js';
 import { ChakraProvider } from '@chakra-ui/react'
 import ImageCard from './ImageCard.js';
@@ -39,8 +40,8 @@ export default class App extends Component {
 					</Route>
 					<Route exact path="/profile/:username" element={<Profile />}>
 					</Route>
-					<Route exact path="viewImage/" element={<ImageCard />}>
-					</Route> 
+					<Route exact path="/viewImage" element={<ImageCard />}>
+					</Route>
 				</Routes> 
 			</Router>
 			</ChakraProvider>
