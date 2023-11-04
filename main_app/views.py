@@ -277,7 +277,7 @@ def update_profile(request):
 
         if bio and len(bio) > 100:
             return HttpResponse(status=400, content="Bio too long")
-            
+
         user_profile.bio = bio
 
         first_name = post_data.get('first_name')
@@ -291,3 +291,36 @@ def update_profile(request):
         return HttpResponse(status=201)
     else:
         return HttpResponse(status=400)
+
+def update_profile_picture(request):
+    if request.method == 'POST':
+        # Check if the request has a file in it
+        if 'profileimg' in request.FILES:
+            profileimg = request.FILES['profileimg']
+
+            #check if the file is an image and size less than 4MB and only type png, jpg or jpeg
+
+            if not profileimg.content_type.startswith('image/'):
+                return HttpResponse(status=400, content="File is not an image")
+
+            if profileimg.size > 4 * 1024 * 1024:
+                return HttpResponse(status=400, content="File is too big")
+
+            if not profileimg.name.endswith('.png') and not profileimg.name.endswith('.jpg') and not profileimg.name.endswith('.jpeg'):
+                return HttpResponse(status=400, content="File is not a png, jpg or jpeg")
+
+
+            user_object = CustomUser.objects.get(username=request.user.username)
+            user_profile = Profile.objects.get(user=user_object)
+
+            # Assuming you want to save the uploaded image directly to the user's profile
+            user_profile.profileimg = profileimg
+            user_profile.save()
+
+            # Devuelve solo el nombre del archivo
+            response_data = {'profileimg': profileimg.name}
+            return JsonResponse(response_data, status=201)
+        else:
+            return JsonResponse({'error': 'No profileimg provided in the request'}, status=400)
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=400)
