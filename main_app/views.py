@@ -124,24 +124,50 @@ def upload_picture(request):
 
 def search(request):
     """
-    Search for users based on a query string in their username.
+    Search for profiles based on a query string in their associated CustomUser username.
     """
     query = request.GET.get('q', '')  # Get the query parameter named 'q' from the request.
     
     if not query:
         return JsonResponse({'error': 'Query parameter is missing'}, status=400)
     
-    users_starting_with_query = CustomUser.objects.filter(username__istartswith=query)
-    users_containing_query = CustomUser.objects.filter(username__icontains=query).exclude(pk__in=users_starting_with_query.values('pk'))
-    combined_users = (list(users_starting_with_query) + list(users_containing_query))
-    user_data = [{'id': user.id, 'username': user.username} for user in combined_users]
+    profiles_starting_with_query = Profile.objects.filter(user__username__istartswith=query)
+    profiles_containing_query = Profile.objects.filter(user__username__icontains=query).exclude(pk__in=profiles_starting_with_query.values('pk'))
+    combined_profiles = (list(profiles_starting_with_query) + list(profiles_containing_query))
+    profile_data = [{'id': profile.id, 'username': profile.user.username, 'profileimg': profile.profileimg.url} for profile in combined_profiles]
     
+    # # If no profiles match the search query
+    # if not profile_data:
+    #     return JsonResponse({'error': 'No users found.'}, status=404)
     
-    # If no users or pictures match the search query
-    if not user_data:
-        return JsonResponse({'error': 'No results found for the given query.'}, status=404)
-    
-    return JsonResponse({'users': user_data}, safe=False)
+    return JsonResponse({'profiles': profile_data}, safe=False)
+
+def search_pictures(request):
+    import random
+
+    # Get the word from the request (assuming it's a GET parameter named 'word')
+    word = request.GET.get('q', '')
+
+    # Filter the posts by descriptions that contain the word
+    posts = Post.objects.filter(description__icontains=word)
+
+    picture_data = []
+
+    # Shuffle the posts to get a random order
+    posts = list(posts)
+    random.shuffle(posts)
+  
+    for post in posts:
+        picture_data.append({
+            'image_url': post.image.url,
+            'description': post.description,
+            'created_at': post.created_at.strftime('%F %d, %Y'),
+            'image_size': post.image.size,
+        })
+
+    # if not picture_data:
+    #     return JsonResponse({'error': 'No posts found.'}, status=404)
+    return JsonResponse({'pictures': picture_data}, safe=False)
 
 
 
