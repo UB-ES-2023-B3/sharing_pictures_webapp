@@ -168,7 +168,7 @@ export default class ImageCard extends Component {
     const handleDownload = () => {
       console.log(this.imageRef);
       const a = document.createElement('a');
-      a.href = this.imageRef;
+      a.href = this.imageRef.current.src;
       a.download = 'imagen.jpg'; // Nombre del archivo de descarga
       a.style.display = 'none';
       document.body.appendChild(a);
