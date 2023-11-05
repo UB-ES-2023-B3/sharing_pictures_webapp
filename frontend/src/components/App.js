@@ -8,7 +8,10 @@ import { createRoot } from 'react-dom/client';
 import Login from './Login.js';
 import SearchResults from './SearchResults';
 import Register from './Register.js';
+import ImageCard from './ImageCard.js';
 import Profile from './Profile.js';
+import { ChakraProvider } from '@chakra-ui/react'
+
 import {
 	BrowserRouter as Router,
 	Routes,
@@ -16,7 +19,6 @@ import {
 	Link,
 	Redirect,
 } from "react-router-dom";
-
 
 
 export default class App extends Component {
@@ -27,8 +29,9 @@ export default class App extends Component {
 	}
 
 	render() {
-		
+
 		return (
+			<ChakraProvider>
 			<Router>
 				<Routes>
 					<Route exact path="" element={<Home />}/>
@@ -37,10 +40,13 @@ export default class App extends Component {
 					</Route>
 					<Route exact path="/profile/:username" element={<Profile />}>
 					</Route>
+					<Route exact path="/viewImage" element={<ImageCard />}>
+					</Route>
 				</Routes> 
 			</Router>
+			</ChakraProvider>
 		);
-		
+
 
 	}
 }

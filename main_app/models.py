@@ -26,6 +26,7 @@ class Profile(models.Model):
     bio = models.TextField(blank=True, default='')
     profileimg = models.ImageField(upload_to='profile_images',
                                     default='blank-profile-picture.png')
+    likes = models.ManyToManyField(Post, related_name='user_posts')
 
     def __str__(self):
         return self.user.username

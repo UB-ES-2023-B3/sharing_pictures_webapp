@@ -102,6 +102,7 @@ def load_pictures(request):
                     'description': post.description,
                     'created_at': post.created_at.strftime('%F %d, %Y'),
                     'image_size': post.image.size,
+                    'post_id' : post.id,
                 })
 
     return JsonResponse({'pictures': picture_data}, safe=False)
@@ -175,11 +176,15 @@ def profile(request, pk):
     is_own_profile = (request.user.username == pk)
     
     user_object = CustomUser.objects.get(username=pk) 
-
+   
+   
     #handle error if the user does not exist
-    if not user_object:
+    if not user_object: 
+        print("**********does not exist*******")
+    if not user_object: 
+        print("**********does not exist*******")
         return HttpResponse(status=404, content="User not found")
-    
+  
     user_profile = Profile.objects.get(user=user_object)
     follower = request.user.username
     
@@ -226,3 +231,122 @@ def profile(request, pk):
 
 
     return JsonResponse(context, safe=False)
+
+def get_logged_in_user(request):
+    if request.user.is_authenticated:
+        user = request.user
+        return JsonResponse({'username': user.username})
+    else:
+        return JsonResponse({'message': 'No user logged in'})
+
+
+def like(request):
+
+    if request.method == 'POST':
+        post_data = json.loads(request.body)
+        user_username =post_data['username']
+        user_object = CustomUser.objects.get(username=user_username) 
+
+        if not user_object:
+            return HttpResponse(status=404, content="User not found")
+    
+        user_profile = Profile.objects.get(user=user_object)
+
+        post_id = post_data.get('post_id')
+        post = Post.objects.get(id=post_id)
+        if user_profile.likes.filter(id=post.id).exists():
+
+            user_profile.likes.remove(post)
+            return HttpResponse(status=201)
+        
+        else:
+            
+            user_profile.likes.add(post)
+            return HttpResponse(status=201)
+        
+    return HttpResponse(status=400)
+
+def get_is_liked(request):
+    
+    if request.method == 'POST':
+        post_data = json.loads(request.body)
+        user_username =post_data['username']
+        user_object = CustomUser.objects.get(username=user_username) 
+
+        if not user_object:
+            return HttpResponse(status=404, content="User not found")
+    
+        user_profile = Profile.objects.get(user=user_object)
+
+        post_id = post_data.get('post_id')
+        post = Post.objects.get(id=post_id)
+        if user_profile.likes.filter(id=post.id).exists():
+
+             return JsonResponse({'message':'Sacar like'})
+        
+        else:
+            
+            
+             return JsonResponse({'message':'añadir like'})
+        
+    return HttpResponse(status=400)
+
+def update_profile(request):
+    if request.method == 'POST':
+        # Pasem a JSON el contingut del cos de la petició
+        post_data = json.loads(request.body.decode('utf-8'))
+
+        user_object = CustomUser.objects.get(username=request.user.username)
+        user_profile = Profile.objects.get(user=user_object)
+
+        bio = post_data.get('bio')
+
+        if bio and len(bio) > 100:
+            return HttpResponse(status=400, content="Bio too long")
+
+        user_profile.bio = bio
+
+        first_name = post_data.get('first_name')
+        user_object.first_name = first_name
+
+        last_name = post_data.get('last_name')
+        user_object.last_name = last_name
+
+        user_profile.save()
+        user_object.save()
+        return HttpResponse(status=201)
+    else:
+        return HttpResponse(status=400)
+
+def update_profile_picture(request):
+    if request.method == 'POST':
+        # Check if the request has a file in it
+        if 'profileimg' in request.FILES:
+            profileimg = request.FILES['profileimg']
+
+            #check if the file is an image and size less than 4MB and only type png, jpg or jpeg
+
+            if not profileimg.content_type.startswith('image/'):
+                return HttpResponse(status=400, content="File is not an image")
+
+            if profileimg.size > 4 * 1024 * 1024:
+                return HttpResponse(status=400, content="File is too big")
+
+            if not profileimg.name.endswith('.png') and not profileimg.name.endswith('.jpg') and not profileimg.name.endswith('.jpeg'):
+                return HttpResponse(status=400, content="File is not a png, jpg or jpeg")
+
+
+            user_object = CustomUser.objects.get(username=request.user.username)
+            user_profile = Profile.objects.get(user=user_object)
+
+            # Assuming you want to save the uploaded image directly to the user's profile
+            user_profile.profileimg = profileimg
+            user_profile.save()
+
+            # Devuelve solo el nombre del archivo
+            response_data = {'profileimg': profileimg.name}
+            return JsonResponse(response_data, status=201)
+        else:
+            return JsonResponse({'error': 'No profileimg provided in the request'}, status=400)
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=400)

@@ -4,6 +4,8 @@ import Swal from 'sweetalert2';
 
 function PinterestLayout() {
   const [posts, setPosts] = useState([]);
+  const [username, setUsername] = useState("");
+
   const sentinelRef = useRef(null);
   const maxLoadCount = 10000; // Maximum number of pictures to load
   let loadCount = 0; // Counter to keep track of loaded pictures
@@ -29,7 +31,18 @@ function PinterestLayout() {
         console.error('Error loading more posts:', error);
       });
   };
-
+  const fetchUser = () => {
+    
+    // Fetch more posts from the API and append them to the existing posts
+    fetch("api/get_logged_in_user/")
+      .then((response) => response.json())
+      .then((data) => {
+        setUsername(data.username);
+      })
+      .catch((error) => {
+        console.error('Error loading more posts:', error);
+      });
+  };
   
 
   const handleIntersect = (entries) => {
@@ -40,6 +53,7 @@ function PinterestLayout() {
 
   useEffect(() => {
     fetchPostData(); // Initial data load
+    fetchUser();
   }, []);
 
   useEffect(() => {
@@ -61,7 +75,7 @@ function PinterestLayout() {
       }
     };
   }, []);
-
+  
   return (
     <div style={styles.pin_container}>
       {posts.map((post, index) => (
@@ -69,7 +83,9 @@ function PinterestLayout() {
           key={index}
           size={post.image_size}
           image={post.image_url}
+          id={post.post_id}
           description={post.description}
+          user={username}
         />
       ))}
       <div ref={sentinelRef} style={{ height: '10px' }}></div>
