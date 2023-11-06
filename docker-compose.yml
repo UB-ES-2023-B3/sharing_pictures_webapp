@@ -1,0 +1,73 @@
+version: '3.8'
+
+#project:
+  #name: sharing_pictures_webapp
+
+services:
+
+  frontend:
+    build: ./services/frontend
+    image: node:14 #EXAMPLE
+    #container_name: sharing_pictures_frontend
+    #working_dir: /app/frontend
+    volumes:
+      - './services/frontend:/app'
+      #- ./frontend:/app/frontend
+      #- '/app/node_modules'
+    ports:
+      - 8080:8080
+      #- 80:80
+    environment:
+      - API_URL=http://backend:8000
+    depends_on:
+      - backend
+    #networks:
+        #- app-network
+    command: npm start
+
+
+  backend:
+    build: ./services/backend
+    image: django:latest  # Use the appropriate Django image
+    #container_name: sharing_pictures_backend
+    #working_dir: /app/backend
+    volumes:
+      - ./services/backend:/app
+      #- ./backend:/app/backend
+    ports:
+      - 8000:8000
+    environment:
+      #- DJANGO_SETTINGS_MODULE=your_project.settings ????
+      #- DATABASE_URL=postgresql://postgres:postgres@db:5432/appdb
+      - DATABASE_URL=sqlite:///app/db.sqlite3
+    #command: uvicorn src.main:app --reload --host 0.0.0.0 --port 8000 --env-file path/fitxer/.env
+    command: python manage.py runserver 0.0.0.0:8000
+    depends_on:
+      #- db
+      - database
+    #networks:
+      #- app-network
+      
+  
+  #db:
+  database:
+    image: sqlite:latest
+    #image: postgres:15.1
+    #container_name: sharing_pictures_db
+    #expose:
+      #- 5432
+    #environment:
+      #- POSTGRES_USER=postgres
+      #- POSTGRES_PASSWORD=postgres
+      #- POSTGRES_DB=appdb
+    volumes:
+      #- postgres_data:/var/lib/postgresql/data/
+      - ./db.sqlite3:/app/db.sqlite3
+    #networks:
+        #- app-network
+
+#volumes:
+  #postgres_data:
+
+networks:
+  app-network:
