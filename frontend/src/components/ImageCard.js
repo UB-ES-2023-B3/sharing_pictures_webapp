@@ -166,9 +166,9 @@ export default class ImageCard extends Component {
 
 
     const handleDownload = () => {
-
+      console.log(this.imageRef);
       const a = document.createElement('a');
-      a.href = this.imageRef;
+      a.href = this.imageRef.current.src;
       a.download = 'imagen.jpg'; // Nombre del archivo de descarga
       a.style.display = 'none';
       document.body.appendChild(a);
@@ -212,14 +212,20 @@ export default class ImageCard extends Component {
 
               <Flex marginLeft="10px" marginRight='10px' justifyContent="space-between" >
                 <Box width='100%'>
+                  <Box >
+                    <IconButton size='lg' borderRadius='30' variant='ghost' icon={<DownloadIcon />} onClick={handleDownload} />
+                  </Box>
+                </Box>
+              </Flex>            <div div style={styles.imageleft}>
+
+              <Flex marginLeft="10px" marginRight='10px' justifyContent="space-between" >
+                <Box width='100%'>
                 <IconButton size='lg' borderRadius='30' variant='ghost' icon={<LinkIcon />} onClick={handleCopyUrl} />
                 </Box>
               </Flex>
             </div>
-
+  </div>
           </div>
-
-
         </div>
       </ChakraProvider>
     );
