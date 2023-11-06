@@ -10,5 +10,6 @@ urlpatterns = [
     path('login/',index),
     path('search_results/',index),
     path('viewImage/',index)
+  
 
 ]

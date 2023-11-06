@@ -71,11 +71,9 @@ function Card(props) {
                 if (result.message === 'Sacar like') {
                     // Si el mensaje es "Sacar like", establece isClicked en false
                     setisClicked(true);
-                    console.log(isClicked);
                 } else if (result.message === 'añadir like') {
                     // Si el mensaje es "añadir like", establece isClicked en true
                     setisClicked(false);
-                    console.log(isClicked);
                 }
 
             })
@@ -83,14 +81,14 @@ function Card(props) {
                 console.error('Error:', error);
             });
         }
-    const handleClick = (size, image, description, id) => {
+    const handleClick = (size, image, description, id,username) => {
             // Definir la acción que se realizará al hacer clic en el Card
             //window.location.href = "../viewImage?key=${key}&size=${size}&image=${image}&description=${description}";
             //window.location.href = `../viewImage/${size}/${image}`;
             //window.location.href = 'viewImage/'
             const hashtags = extractHashtags(description);
             const descriptionWithoutHashtags = description.replace(/#(\w+)/g, '');
-            window.location.href = (`/viewImage/?size=${size}&image=${image}&description=${description}&descriptionWithoutHashtags=${descriptionWithoutHashtags}&hashtags=${hashtags}&id=${id}`);
+            window.location.href = (`/viewImage/?size=${size}&image=${image}&description=${description}&username=${username}&id=${id}`);
         };
         const handleMouseEnter = () => {
             handleIsLiked();
@@ -109,7 +107,7 @@ function Card(props) {
         }
         const handleImageClick = () => {
             if (!isMouseOverHeart) {
-                handleClick(props.size, props.image, props.description, props.id);
+                handleClick(props.size, props.image, props.description, props.id,props.user);
             }
         }
 

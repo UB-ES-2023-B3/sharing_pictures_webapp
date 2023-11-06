@@ -37,6 +37,7 @@ function extractHashtagsAndDescriptionFromURL() {
     hashtags,
   };
 }
+
 export default class ImageCard extends Component {
   constructor(props) {
     super(props);
@@ -53,6 +54,7 @@ export default class ImageCard extends Component {
     };
 
     this.imageRef = React.createRef();
+    this.handleIsLiked2();
   }
 
   componentDidMount() {
@@ -61,6 +63,7 @@ export default class ImageCard extends Component {
       const height = this.imageRef.current.clientHeight;
       this.setState({ imageHeight: height });
     };
+   
   }
 
   toggleFollow = () => {
@@ -85,11 +88,7 @@ export default class ImageCard extends Component {
       });
   };
 
-  toggleLike = () => {
-    this.setState((prevState) => ({
-      isLiked: !prevState.isLiked,
-    }));
-  };
+
   openReportModal = () => {
     this.setState({ isReporting: true });
   };
@@ -102,6 +101,7 @@ export default class ImageCard extends Component {
     });
   };
 
+
   handleReportReasonChange = (event) => {
     this.setState({ reportReason: event.target.value });
   };
@@ -109,6 +109,7 @@ export default class ImageCard extends Component {
   handleReportDescriptionChange = (event) => {
     this.setState({ reportDescription: event.target.value });
   };
+
 
   handleReportSubmit = () => {
     // Supongamos que enviaste el informe al servidor aquí
@@ -123,10 +124,10 @@ export default class ImageCard extends Component {
     }, 2000); // Cierra el cuadro de diálogo después de 2 segundos
   };
   renderDescription(descriptionWithHashtags, hashtags) {
-    console.log(descriptionWithHashtags)
+
     if (descriptionWithHashtags && descriptionWithHashtags.trim() !== "") {
       const words = descriptionWithHashtags.split(' ');
-      console.log(descriptionWithHashtags)
+
       return (
         <Box style={styles.boxStyle}>
           <Text fontSize='2xl' paddingTop="5%">
@@ -148,20 +149,106 @@ export default class ImageCard extends Component {
       );
     }
   }
+  handleIsLiked2 = (event) => {
+  
+    const urlParams = new URLSearchParams(window.location.search);
+    
+    const user = urlParams.get('username');
+    const id = urlParams.get('id');
+    
+    fetch('/api/get_is_liked/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ username: user, post_id: id }),
+    })
+      .then(response => response.json())
+      .then(result => {
+        if (result.message === 'Sacar like') {
+          // Si el mensaje es "Sacar like", establece isClicked en false
+          this.setState({isLiked : true});
+        } else if (result.message === 'añadir like') {
+          // Si el mensaje es "añadir like", establece isClicked en true
+          this.setState({isLiked : false})
+      
+        }
 
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+  }
 
+  
   render() {
     const { imageHeight, isReporting, reportReason, reportDescription, reportSubmitted } = this.state;
     const { isLarge } = this.props;
     const urlParams = new URLSearchParams(window.location.search);
     const size = urlParams.get('size');
     const image = urlParams.get('image');
+    const username = urlParams.get('username');
+    const id = urlParams.get('id');
     const description = urlParams.get('description');
     const { descriptionWithHashtags, hashtags } = extractHashtagsAndDescriptionFromURL();
-    console.log(description)
+
     const { isFollowing } = this.state;
     const followButtonText = isFollowing ? 'Seguint' : 'Seguir';
-    const { isLiked } = this.state;
+    const isLiked  = this.state.isLiked;
+
+
+
+
+
+    const handleButtonClicked = (event) => {
+
+      event.stopPropagation(); // Evita la propagación del clic al contenedor
+      const user = username;
+      fetch('/api/likes/', {
+      
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username: user, post_id: id }),
+      })
+        .then(response => {
+          // Manejar la respuesta del servidor si es necesario
+          handleIsLiked();
+        })
+        .catch(error => {
+          // Manejar errores si la solicitud falla
+          console.error('Error en la solicitud al backend:');
+        });
+
+        
+    }
+    
+    const handleIsLiked = (event) => {
+  
+      
+      fetch('/api/get_is_liked/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username: username, post_id: id }),
+      })
+        .then(response => response.json())
+        .then(result => {
+          if (result.message === 'Sacar like') {
+            // Si el mensaje es "Sacar like", establece isClicked en false
+            this.setState({ isLiked: true })
+          } else if (result.message === 'añadir like') {
+            // Si el mensaje es "añadir like", establece isClicked en true
+            this.setState({isLiked : false})
+          }
+
+        })
+        .catch(error => {
+          console.error('Error:', error);
+        });
+    }
 
 
 
@@ -212,7 +299,23 @@ export default class ImageCard extends Component {
 
               <Flex marginLeft="10px" marginRight='10px' justifyContent="space-between" >
                 <Box width='100%'>
-                <IconButton size='lg' borderRadius='30' variant='ghost' icon={<LinkIcon />} onClick={handleCopyUrl} />
+                  <IconButton size='lg' borderRadius='30' variant='ghost' icon={<LinkIcon />} onClick={handleCopyUrl} />
+                  <IconButton size='lg' borderRadius='30' variant='ghost' marginRight="0"
+                    ml="auto"
+                    onClick={handleButtonClicked}
+                    icon={
+                      <FiHeart
+                        fontSize="2rem"
+                        className='heart'
+
+                        fill={isLiked ? "red" : "#1a1b1b"}
+                        opacity={isLiked ? 1 : 0.5}
+                        color={isLiked ? "red" : "white"}
+                      />
+                    }
+
+
+                  />
                 </Box>
               </Flex>
             </div>

@@ -271,8 +271,9 @@ def get_is_liked(request):
     if request.method == 'POST':
         post_data = json.loads(request.body)
         user_username =post_data['username']
+       
         user_object = CustomUser.objects.get(username=user_username) 
-
+       
         if not user_object:
             return HttpResponse(status=404, content="User not found")
     
