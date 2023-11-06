@@ -49,42 +49,95 @@ export default class ImageCard extends Component {
       reportReason: '',
       reportDescription: '',
       reportSubmitted: false,
-
+      postOwner: '',
     };
 
     this.imageRef = React.createRef();
   }
+
+  getOwnerOfPost = () => {
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const id = urlParams.get('id');
+
+    fetch('/api/getOwnerPost/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ post_id: id }),
+    })
+      .then(response => response.json())
+      .then(result => {
+        this.setState({ postOwner: result.message });
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+  };
 
   componentDidMount() {
     // Obtenemos la altura de la imagen una vez que esté cargada
     this.imageRef.current.onload = () => {
       const height = this.imageRef.current.clientHeight;
       this.setState({ imageHeight: height });
+      this.getOwnerOfPost();
+      this.handleIsFollowing();
     };
-  }
+
+  };
 
   toggleFollow = () => {
     this.callBackendToggleFollow();
-    this.setState((prevState) => ({
-      isFollowing: !prevState.isFollowing,
-    }));
   };
   callBackendToggleFollow = () => {
     // Realiza la llamada al backend aquí
     // Puedes usar axios para hacer una solicitud POST o GET al servidor
+    const urlParams = new URLSearchParams(window.location.search);
+    const user = urlParams.get('username');
 
-    axios.post('/api/follow/<str:pk>', { userId: 'ID_DEL_USUARIO' })
-
+    fetch('/api/follow/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ username: user, user: this.state.postOwner }),
+    })
       .then(response => {
         // Manejar la respuesta del servidor si es necesario
-        console.log('Backend response:', response.data);
+        this.handleIsFollowing();
       })
       .catch(error => {
         // Manejar errores si la solicitud falla
-        console.error('Error en la solicitud al backend:', error);
+        console.error('Error en la solicitud al backend:');
       });
-  };
+  }
 
+
+  handleIsFollowing = () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const user = urlParams.get('username');
+
+    fetch('/api/get_is_user_following/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ username: user, user: this.state.postOwner }),
+    })
+      .then(response => response.json())
+      .then(result => {
+        if (result.message === 'Follow') {
+          this.setState({ isFollowing: true })
+        } else if (result.message === 'Unfollow') {
+          this.setState({ isFollowing: false })
+        }
+
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+  }
   toggleLike = () => {
     this.setState((prevState) => ({
       isLiked: !prevState.isLiked,
@@ -123,10 +176,8 @@ export default class ImageCard extends Component {
     }, 2000); // Cierra el cuadro de diálogo después de 2 segundos
   };
   renderDescription(descriptionWithHashtags, hashtags) {
-    console.log(descriptionWithHashtags)
     if (descriptionWithHashtags && descriptionWithHashtags.trim() !== "") {
       const words = descriptionWithHashtags.split(' ');
-      console.log(descriptionWithHashtags)
       return (
         <Box style={styles.boxStyle}>
           <Text fontSize='2xl' paddingTop="5%">
@@ -157,16 +208,16 @@ export default class ImageCard extends Component {
     const size = urlParams.get('size');
     const image = urlParams.get('image');
     const description = urlParams.get('description');
+    const username = urlParams.get('username');
     const { descriptionWithHashtags, hashtags } = extractHashtagsAndDescriptionFromURL();
-    console.log(description)
     const { isFollowing } = this.state;
     const followButtonText = isFollowing ? 'Seguint' : 'Seguir';
     const { isLiked } = this.state;
+    const { postOwner } = this.state;
 
 
 
     const handleDownload = () => {
-      console.log(this.imageRef);
       const a = document.createElement('a');
       a.href = this.imageRef.current.src;
       a.download = 'imagen.jpg'; // Nombre del archivo de descarga
@@ -214,17 +265,24 @@ export default class ImageCard extends Component {
                 <Box width='100%'>
                   <Box >
                     <IconButton size='lg' borderRadius='30' variant='ghost' icon={<DownloadIcon />} onClick={handleDownload} />
+                    <IconButton size='lg' borderRadius='30' variant='ghost' icon={<LinkIcon />} onClick={handleCopyUrl} />
                   </Box>
                 </Box>
-              </Flex>            <div div style={styles.imageleft}>
-
-              <Flex marginLeft="10px" marginRight='10px' justifyContent="space-between" >
-                <Box width='100%'>
-                <IconButton size='lg' borderRadius='30' variant='ghost' icon={<LinkIcon />} onClick={handleCopyUrl} />
-                </Box>
               </Flex>
+              <div div style={styles.imageleft}>
+                <Box padding="5%">
+                  <Button borderRadius="30" size="lg" ml="auto" marginRight="0" onClick={this.toggleFollow} style={{
+                    backgroundColor: isFollowing ? 'black' : 'red',
+                    color: 'white',
+                  }}>
+
+                    {followButtonText}
+                  </Button>
+
+                </Box >
+
+              </div>
             </div>
-  </div>
           </div>
         </div>
       </ChakraProvider>

@@ -13,8 +13,9 @@ urlpatterns = [
     path('likes/', views.like, name='likes'),
     path('get_logged_in_user/', views.get_logged_in_user, name='get_logged_in_user'),
     path('get_is_liked/', views.get_is_liked, name='get_is_liked'),
-
-    
+    path('follow/', views.follow, name='follow'),
+    path('get_is_user_following/', views.get_is_user_following, name='get_is_user_following'),
+    path('getOwnerPost/', views.getOwnerPost, name='getOwnerPost'),
     path('update_profile/', views.update_profile, name='update_profile'),
     path('update_profile_picture/', views.update_profile_picture, name='update_profile_picture'),
     ]
