@@ -10,7 +10,6 @@ import SearchResults from './SearchResults';
 import Register from './Register.js';
 import ImageCard from './ImageCard.js';
 import Profile from './Profile.js';
-import ImageCard from './ImageCard.js';
 import { ChakraProvider } from '@chakra-ui/react'
 
 import {
