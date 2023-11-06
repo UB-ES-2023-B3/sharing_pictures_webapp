@@ -216,8 +216,15 @@ export default class ImageCard extends Component {
                     <IconButton size='lg' borderRadius='30' variant='ghost' icon={<DownloadIcon />} onClick={handleDownload} />
                   </Box>
                 </Box>
+              </Flex>            <div div style={styles.imageleft}>
+
+              <Flex marginLeft="10px" marginRight='10px' justifyContent="space-between" >
+                <Box width='100%'>
+                <IconButton size='lg' borderRadius='30' variant='ghost' icon={<LinkIcon />} onClick={handleCopyUrl} />
+                </Box>
               </Flex>
             </div>
+  </div>
           </div>
         </div>
       </ChakraProvider>
