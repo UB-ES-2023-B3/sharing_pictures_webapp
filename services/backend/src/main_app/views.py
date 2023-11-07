@@ -108,3 +108,6 @@ def upload_picture(request):
             return JsonResponse({"status": "error", "errors": form.errors}, status=400)
     else:
         load_pictures(request)
+
+def index(request,*args,**kwargs):
+    return render(request, '')

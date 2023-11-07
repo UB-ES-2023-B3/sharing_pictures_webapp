@@ -39,8 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_advanced_password_validation', #US1.1
-    'main_app', #US1.1, US2.1
-    'frontend.apps.FrontendConfig'
+    'main_app' #US1.1, US2.1
+    #'frontend.apps.FrontendConfig'
 ]
 
 AUTH_USER_MODEL = 'main_app.CustomUser'
@@ -159,9 +159,6 @@ LOGIN_URL = 'login' #US2.1
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static')
-]
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
