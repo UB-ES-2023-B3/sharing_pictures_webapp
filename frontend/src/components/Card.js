@@ -71,11 +71,9 @@ function Card(props) {
                 if (result.message === 'Sacar like') {
                     // Si el mensaje es "Sacar like", establece isClicked en false
                     setisClicked(true);
-                    console.log(isClicked);
                 } else if (result.message === 'añadir like') {
                     // Si el mensaje es "añadir like", establece isClicked en true
                     setisClicked(false);
-                    console.log(isClicked);
                 }
 
             })
@@ -88,11 +86,6 @@ function Card(props) {
             //window.location.href = "../viewImage?key=${key}&size=${size}&image=${image}&description=${description}";
             //window.location.href = `../viewImage/${size}/${image}`;
             //window.location.href = 'viewImage/'
-            console.log(size)
-            console.log(image)
-            console.log(description)
-            console.log(id)
-            console.log(props.user)
             window.location.href = (`/viewImage/?size=${size}&image=${image}&description=${description}&username=${username}&id=${id}`);
         };
         const handleMouseEnter = () => {
