@@ -255,13 +255,13 @@ def like(request):
         post_id = post_data.get('post_id')
         post = Post.objects.get(id=post_id)
         if user_profile.likes.filter(id=post.id).exists():
-
             user_profile.likes.remove(post)
+            user_profile.save()
             return HttpResponse(status=201)
         
         else:
-            
             user_profile.likes.add(post)
+            user_profile.save()
             return HttpResponse(status=201)
         
     return HttpResponse(status=400)
@@ -271,8 +271,9 @@ def get_is_liked(request):
     if request.method == 'POST':
         post_data = json.loads(request.body)
         user_username =post_data['username']
+       
         user_object = CustomUser.objects.get(username=user_username) 
-
+       
         if not user_object:
             return HttpResponse(status=404, content="User not found")
     
@@ -290,6 +291,74 @@ def get_is_liked(request):
              return JsonResponse({'message':'añadir like'})
         
     return HttpResponse(status=400)
+
+def follow(request):
+
+    if request.method == 'POST':
+        post_data = json.loads(request.body)
+        user_username =post_data['username']
+        user_object = CustomUser.objects.get(username=user_username) 
+
+        if not user_object:
+            return HttpResponse(status=404, content="User1 not found")
+    
+        user_profile = Profile.objects.get(user=user_object)
+
+        user_name = post_data.get('user')
+        user = CustomUser.objects.get(username=user_username)
+        if not user:
+            return HttpResponse(status=404, content="User2 not found")
+
+        if user_profile.following.filter(username=user.username).exists():
+            user_profile.following.remove(user)
+            unfollow = FollowersCount.objects.get(follower=user_username, user = user_name)
+            unfollow.delete()
+            user_profile.save()
+            unfollow.save()
+            return HttpResponse(status=201)
+        
+        else:
+            user_profile.following.add(user)
+            follow = FollowersCount.objects.create(user = user_name, follower = user_username)
+            user_profile.save()
+            follow.save()
+            return HttpResponse(status=201)
+        
+    return HttpResponse(status=400)
+
+def get_is_user_following(request):
+    
+    if request.method == 'POST':
+        post_data = json.loads(request.body)
+        user_username =post_data['username']
+        user_object = CustomUser.objects.get(username=user_username) 
+
+        if not user_object:
+            return HttpResponse(status=404, content="User1 not found")
+    
+        user_profile = Profile.objects.get(user=user_object)
+
+        user_name = post_data.get('user')
+        user = CustomUser.objects.get(username=user_username)
+        if not user:
+            return HttpResponse(status=404, content="User2 not found")
+        if user_profile.following.filter(username=user.username).exists():
+             return JsonResponse({'message':'Follow'})
+        
+        else:
+             return JsonResponse({'message':'Unfollow'})
+        
+    return HttpResponse(status=400)
+
+def getOwnerPost(request):
+    if request.method == 'POST':
+        post_data = json.loads(request.body)
+        post_id = post_data.get('post_id')
+        post = Post.objects.get(id=post_id)
+
+        return JsonResponse({'message': post.user.username})
+    else:
+        return HttpResponse(status=400)
 
 def update_profile(request):
     if request.method == 'POST':
