@@ -86,6 +86,8 @@ function Card(props) {
             //window.location.href = "../viewImage?key=${key}&size=${size}&image=${image}&description=${description}";
             //window.location.href = `../viewImage/${size}/${image}`;
             //window.location.href = 'viewImage/'
+            const hashtags = extractHashtags(description);
+            const descriptionWithoutHashtags = description.replace(/#(\w+)/g, '');
             window.location.href = (`/viewImage/?size=${size}&image=${image}&description=${description}&id=${id}`);
         };
         const handleMouseEnter = () => {

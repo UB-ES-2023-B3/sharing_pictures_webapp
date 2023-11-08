@@ -37,6 +37,7 @@ function extractHashtagsAndDescriptionFromURL() {
     hashtags,
   };
 }
+
 export default class ImageCard extends Component {
   constructor(props) {
     super(props);
@@ -51,7 +52,7 @@ export default class ImageCard extends Component {
       reportSubmitted: false,
       postOwner: '',
       user:"",
-
+ 
     };
 
     this.imageRef = React.createRef();
@@ -87,8 +88,8 @@ export default class ImageCard extends Component {
       this.setState({ imageHeight: height });
       this.getOwnerOfPost();
     };
-
-  };
+   
+  }
 
   toggleFollow = () => {
     this.callBackendToggleFollow();
@@ -155,6 +156,7 @@ export default class ImageCard extends Component {
     });
   };
 
+
   handleReportReasonChange = (event) => {
     this.setState({ reportReason: event.target.value });
   };
@@ -162,6 +164,7 @@ export default class ImageCard extends Component {
   handleReportDescriptionChange = (event) => {
     this.setState({ reportDescription: event.target.value });
   };
+
 
   handleReportSubmit = () => {
     // Supongamos que enviaste el informe al servidor aquí
@@ -199,6 +202,38 @@ export default class ImageCard extends Component {
       );
     }
   }
+ 
+
+  handleIsLiked2 = (user) => {
+  
+    const urlParams = new URLSearchParams(window.location.search);
+    
+    const id = urlParams.get('id');
+    
+    fetch('/api/get_is_liked/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ username: user, post_id: id }),
+    })
+      .then(response => response.json())
+      .then(result => {
+        if (result.message === 'Sacar like') {
+          // Si el mensaje es "Sacar like", establece isClicked en false
+          this.setState({isLiked : true});
+        } else if (result.message === 'añadir like') {
+          // Si el mensaje es "añadir like", establece isClicked en true
+          this.setState({isLiked : false})
+      
+        }
+
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+  }
+
   fetchUser2 = () => {
     
     // Fetch more posts from the API and append them to the existing posts
@@ -208,27 +243,81 @@ export default class ImageCard extends Component {
       .then((data) => {
     
         this.setState({ user: data.username });
-        //this.handleIsFollowing(data.username);
+        this.handleIsLiked2(data.username);
       })
       .catch((error) => {
         console.error('Error loading more posts:', error);
       });
   };
   
-
   render() {
     const { imageHeight, isReporting, reportReason, reportDescription, reportSubmitted } = this.state;
     const { isLarge } = this.props;
     const urlParams = new URLSearchParams(window.location.search);
     const size = urlParams.get('size');
     const image = urlParams.get('image');
+    
+    const id = urlParams.get('id');
     const description = urlParams.get('description');
     const username = urlParams.get('username');
     const { descriptionWithHashtags, hashtags } = extractHashtagsAndDescriptionFromURL();
+
     const { isFollowing } = this.state;
     const followButtonText = isFollowing ? 'Seguint' : 'Seguir';
-    const { isLiked } = this.state;
-    const { postOwner } = this.state;
+    const isLiked  = this.state.isLiked;
+
+
+   
+
+    const handleButtonClicked = (event) => {
+
+      event.stopPropagation(); // Evita la propagación del clic al contenedor
+    
+      fetch('/api/likes/', {
+      
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username: this.state.user, post_id: id }),
+      })
+        .then(response => {
+          // Manejar la respuesta del servidor si es necesario
+          handleIsLiked();
+        })
+        .catch(error => {
+          // Manejar errores si la solicitud falla
+          console.error('Error en la solicitud al backend:');
+        });
+
+        
+    }
+   
+    const handleIsLiked = (event) => {
+  
+      
+      fetch('/api/get_is_liked/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username: this.state.user, post_id: id }),
+      })
+        .then(response => response.json())
+        .then(result => {
+          if (result.message === 'Sacar like') {
+            // Si el mensaje es "Sacar like", establece isClicked en false
+            this.setState({ isLiked: true })
+          } else if (result.message === 'añadir like') {
+            // Si el mensaje es "añadir like", establece isClicked en true
+            this.setState({isLiked : false})
+          }
+
+        })
+        .catch(error => {
+          console.error('Error:', error);
+        });
+    }
 
 
 
@@ -276,6 +365,23 @@ export default class ImageCard extends Component {
             <div div style={styles.imageleft}>
               <Flex marginLeft="10px" marginRight='10px' justifyContent="space-between" >
                 <Box width='100%'>
+                  <IconButton size='lg' borderRadius='30' variant='ghost' icon={<LinkIcon />} onClick={handleCopyUrl} />
+                  <IconButton size='lg' borderRadius='30' variant='ghost' marginRight="0"
+                    ml="auto"
+                    onClick={handleButtonClicked}
+                    icon={
+                      <FiHeart
+                        fontSize="2rem"
+                        className='heart'
+
+                        fill={isLiked ? "red" : "#1a1b1b"}
+                        opacity={isLiked ? 1 : 0.5}
+                        color={isLiked ? "red" : "white"}
+                      />
+                    }
+
+
+                  />
                   <Box >
                     <IconButton size='lg' borderRadius='30' variant='ghost' icon={<DownloadIcon />} onClick={handleDownload} />
                     <IconButton size='lg' borderRadius='30' variant='ghost' icon={<LinkIcon />} onClick={handleCopyUrl} />
