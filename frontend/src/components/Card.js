@@ -81,7 +81,7 @@ function Card(props) {
                 console.error('Error:', error);
             });
         }
-    const handleClick = (size, image, description, id) => {
+    const handleClick =(size, image, description, id) => {
             // Definir la acción que se realizará al hacer clic en el Card
             //window.location.href = "../viewImage?key=${key}&size=${size}&image=${image}&description=${description}";
             //window.location.href = `../viewImage/${size}/${image}`;
@@ -106,9 +106,12 @@ function Card(props) {
             setIsMouseOverHeart(false);
         }
         const handleImageClick = () => {
+           
             if (!isMouseOverHeart) {
+                
                 handleClick(props.size, props.image, props.description, props.id);
             }
+            
         }
 
         return (

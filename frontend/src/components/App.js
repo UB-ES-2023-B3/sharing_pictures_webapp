@@ -40,8 +40,8 @@ export default class App extends Component {
 					</Route>
 					<Route exact path="/profile/:username" element={<Profile />}>
 					</Route>
-					<Route exact path="/viewImage" element={<ImageCard />}>
-					</Route>
+					<Route exact path="viewImage/" element={<ImageCard />}>
+					</Route> 
 				</Routes> 
 			</Router>
 			</ChakraProvider>

@@ -50,48 +50,100 @@ export default class ImageCard extends Component {
       reportReason: '',
       reportDescription: '',
       reportSubmitted: false,
+      postOwner: '',
       user:"",
-
+ 
     };
 
     this.imageRef = React.createRef();
     this.fetchUser2();  
-    
-    
   }
+
+  getOwnerOfPost = () => {
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const id = urlParams.get('id');
+
+    fetch('/api/getOwnerPost/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ post_id: id }),
+    })
+      .then(response => response.json())
+      .then(result => {
+        this.setState({ postOwner: result.message });
+        this.handleIsFollowing(result.message);
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+  };
 
   componentDidMount() {
     // Obtenemos la altura de la imagen una vez que esté cargada
     this.imageRef.current.onload = () => {
       const height = this.imageRef.current.clientHeight;
       this.setState({ imageHeight: height });
+      this.getOwnerOfPost();
     };
    
   }
 
   toggleFollow = () => {
     this.callBackendToggleFollow();
-    this.setState((prevState) => ({
-      isFollowing: !prevState.isFollowing,
-    }));
   };
   callBackendToggleFollow = () => {
     // Realiza la llamada al backend aquí
     // Puedes usar axios para hacer una solicitud POST o GET al servidor
+    
 
-    axios.post('/api/follow/<str:pk>', { userId: 'ID_DEL_USUARIO' })
-
+    fetch('/api/follow/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ username: this.state.user, user: this.state.postOwner }),
+    })
       .then(response => {
         // Manejar la respuesta del servidor si es necesario
-        console.log('Backend response:', response.data);
+        this.handleIsFollowing();
       })
       .catch(error => {
         // Manejar errores si la solicitud falla
-        console.error('Error en la solicitud al backend:', error);
+        console.error('Error en la solicitud al backend:');
       });
+  }
+
+
+  handleIsFollowing = () => {
+  
+    fetch('/api/get_is_user_following/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ username: this.state.user, user: this.state.postOwner }),
+    })
+      .then(response => response.json())
+      .then(result => {
+        if (result.message === 'Follow') {
+          this.setState({ isFollowing: true })
+        } else if (result.message === 'Unfollow') {
+          this.setState({ isFollowing: false })
+        }
+
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+  }
+  toggleLike = () => {
+    this.setState((prevState) => ({
+      isLiked: !prevState.isLiked,
+    }));
   };
-
-
   openReportModal = () => {
     this.setState({ isReporting: true });
   };
@@ -127,10 +179,8 @@ export default class ImageCard extends Component {
     }, 2000); // Cierra el cuadro de diálogo después de 2 segundos
   };
   renderDescription(descriptionWithHashtags, hashtags) {
-
     if (descriptionWithHashtags && descriptionWithHashtags.trim() !== "") {
       const words = descriptionWithHashtags.split(' ');
-
       return (
         <Box style={styles.boxStyle}>
           <Text fontSize='2xl' paddingTop="5%">
@@ -209,6 +259,7 @@ export default class ImageCard extends Component {
     
     const id = urlParams.get('id');
     const description = urlParams.get('description');
+    const username = urlParams.get('username');
     const { descriptionWithHashtags, hashtags } = extractHashtagsAndDescriptionFromURL();
 
     const { isFollowing } = this.state;
@@ -271,9 +322,8 @@ export default class ImageCard extends Component {
 
 
     const handleDownload = () => {
-
       const a = document.createElement('a');
-      a.href = this.imageRef;
+      a.href = this.imageRef.current.src;
       a.download = 'imagen.jpg'; // Nombre del archivo de descarga
       a.style.display = 'none';
       document.body.appendChild(a);
@@ -311,10 +361,8 @@ export default class ImageCard extends Component {
                   style={{ width: '100%' }}
                 />
               </div>
-
             </div>
             <div div style={styles.imageleft}>
-
               <Flex marginLeft="10px" marginRight='10px' justifyContent="space-between" >
                 <Box width='100%'>
                   <IconButton size='lg' borderRadius='30' variant='ghost' icon={<LinkIcon />} onClick={handleCopyUrl} />
@@ -334,13 +382,24 @@ export default class ImageCard extends Component {
 
 
                   />
+                  <Box >
+                    <IconButton size='lg' borderRadius='30' variant='ghost' icon={<DownloadIcon />} onClick={handleDownload} />
+                    <IconButton size='lg' borderRadius='30' variant='ghost' icon={<LinkIcon />} onClick={handleCopyUrl} />
+                  </Box>
                 </Box>
               </Flex>
+              <div div style={styles.imageleft}>
+                <Box padding="5%">
+                  <Button borderRadius="30" size="lg" ml="auto" marginRight="0" onClick={this.toggleFollow} style={{
+                    backgroundColor: isFollowing ? 'black' : 'red',
+                    color: 'white',
+                  }}>
+                    {followButtonText}
+                  </Button>
+                </Box >
+              </div>
             </div>
-
           </div>
-
-
         </div>
       </ChakraProvider>
     );
