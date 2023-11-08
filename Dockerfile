@@ -1,5 +1,7 @@
 FROM python:3.11.6
 
+ENV PYTHONUNBUFFERED 1
+
 WORKDIR /app
 
 COPY . /app
@@ -7,6 +9,6 @@ COPY . /app
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
-EXPOSE 8080
+EXPOSE 8000
 
-CMD ["python", "manage.py", "runserver", "127.0.0.1:8080"]
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
