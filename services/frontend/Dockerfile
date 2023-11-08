@@ -12,5 +12,5 @@ COPY package-lock.json .
 RUN npm install
 RUN npm run build   
 
-CMD ["npm", "run", "serve"]
-#CMD ["npm", "run", "dev"]
+CMD ["npm", "run", "--prefix", ".\frontend", "dev"]
+#CMD ["npm", "run", "serve"]
