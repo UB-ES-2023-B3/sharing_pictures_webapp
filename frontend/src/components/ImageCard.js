@@ -50,11 +50,14 @@ export default class ImageCard extends Component {
       reportReason: '',
       reportDescription: '',
       reportSubmitted: false,
+      user:"",
 
     };
 
     this.imageRef = React.createRef();
-    this.handleIsLiked2();
+    this.fetchUser2();  
+    
+    
   }
 
   componentDidMount() {
@@ -149,11 +152,12 @@ export default class ImageCard extends Component {
       );
     }
   }
-  handleIsLiked2 = (event) => {
+ 
+
+  handleIsLiked2 = (user) => {
   
     const urlParams = new URLSearchParams(window.location.search);
     
-    const user = urlParams.get('username');
     const id = urlParams.get('id');
     
     fetch('/api/get_is_liked/', {
@@ -180,6 +184,21 @@ export default class ImageCard extends Component {
       });
   }
 
+  fetchUser2 = () => {
+    
+    // Fetch more posts from the API and append them to the existing posts
+ 
+    fetch("/api/get_logged_in_user/")
+      .then((response) => response.json())
+      .then((data) => {
+    
+        this.setState({ user: data.username });
+        this.handleIsLiked2(data.username);
+      })
+      .catch((error) => {
+        console.error('Error loading more posts:', error);
+      });
+  };
   
   render() {
     const { imageHeight, isReporting, reportReason, reportDescription, reportSubmitted } = this.state;
@@ -187,7 +206,7 @@ export default class ImageCard extends Component {
     const urlParams = new URLSearchParams(window.location.search);
     const size = urlParams.get('size');
     const image = urlParams.get('image');
-    const username = urlParams.get('username');
+    
     const id = urlParams.get('id');
     const description = urlParams.get('description');
     const { descriptionWithHashtags, hashtags } = extractHashtagsAndDescriptionFromURL();
@@ -197,20 +216,19 @@ export default class ImageCard extends Component {
     const isLiked  = this.state.isLiked;
 
 
-
-
+   
 
     const handleButtonClicked = (event) => {
 
       event.stopPropagation(); // Evita la propagación del clic al contenedor
-      const user = username;
+    
       fetch('/api/likes/', {
       
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ username: user, post_id: id }),
+        body: JSON.stringify({ username: this.state.user, post_id: id }),
       })
         .then(response => {
           // Manejar la respuesta del servidor si es necesario
@@ -223,7 +241,7 @@ export default class ImageCard extends Component {
 
         
     }
-    
+   
     const handleIsLiked = (event) => {
   
       
@@ -232,7 +250,7 @@ export default class ImageCard extends Component {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ username: username, post_id: id }),
+        body: JSON.stringify({ username: this.state.user, post_id: id }),
       })
         .then(response => response.json())
         .then(result => {
