@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import Card from './Card.js';
+import Card_NoAuth from './Card_NoAuth.js';
 import Swal from 'sweetalert2';
 
 function PinterestLayout_NoAuth() {
@@ -94,7 +94,7 @@ function PinterestLayout_NoAuth() {
   return (
     <div style={styles.pin_container}>
       {posts.map((post, index) => (
-        <Card
+        <Card_NoAuth
           key={index}
           size={post.image_size}
           image={post.image_url}
