@@ -50,9 +50,12 @@ export default class ImageCard extends Component {
       reportDescription: '',
       reportSubmitted: false,
       postOwner: '',
+      user:"",
+
     };
 
     this.imageRef = React.createRef();
+    this.fetchUser2();  
   }
 
   getOwnerOfPost = () => {
@@ -70,6 +73,7 @@ export default class ImageCard extends Component {
       .then(response => response.json())
       .then(result => {
         this.setState({ postOwner: result.message });
+        this.handleIsFollowing(result.message);
       })
       .catch(error => {
         console.error('Error:', error);
@@ -82,7 +86,6 @@ export default class ImageCard extends Component {
       const height = this.imageRef.current.clientHeight;
       this.setState({ imageHeight: height });
       this.getOwnerOfPost();
-      this.handleIsFollowing();
     };
 
   };
@@ -93,15 +96,14 @@ export default class ImageCard extends Component {
   callBackendToggleFollow = () => {
     // Realiza la llamada al backend aquí
     // Puedes usar axios para hacer una solicitud POST o GET al servidor
-    const urlParams = new URLSearchParams(window.location.search);
-    const user = urlParams.get('username');
+    
 
     fetch('/api/follow/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ username: user, user: this.state.postOwner }),
+      body: JSON.stringify({ username: this.state.user, user: this.state.postOwner }),
     })
       .then(response => {
         // Manejar la respuesta del servidor si es necesario
@@ -115,15 +117,13 @@ export default class ImageCard extends Component {
 
 
   handleIsFollowing = () => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const user = urlParams.get('username');
-
+  
     fetch('/api/get_is_user_following/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ username: user, user: this.state.postOwner }),
+      body: JSON.stringify({ username: this.state.user, user: this.state.postOwner }),
     })
       .then(response => response.json())
       .then(result => {
@@ -199,7 +199,22 @@ export default class ImageCard extends Component {
       );
     }
   }
-
+  fetchUser2 = () => {
+    
+    // Fetch more posts from the API and append them to the existing posts
+ 
+    fetch("/api/get_logged_in_user/")
+      .then((response) => response.json())
+      .then((data) => {
+    
+        this.setState({ user: data.username });
+        //this.handleIsFollowing(data.username);
+      })
+      .catch((error) => {
+        console.error('Error loading more posts:', error);
+      });
+  };
+  
 
   render() {
     const { imageHeight, isReporting, reportReason, reportDescription, reportSubmitted } = this.state;
@@ -257,10 +272,8 @@ export default class ImageCard extends Component {
                   style={{ width: '100%' }}
                 />
               </div>
-
             </div>
             <div div style={styles.imageleft}>
-
               <Flex marginLeft="10px" marginRight='10px' justifyContent="space-between" >
                 <Box width='100%'>
                   <Box >
@@ -275,12 +288,9 @@ export default class ImageCard extends Component {
                     backgroundColor: isFollowing ? 'black' : 'red',
                     color: 'white',
                   }}>
-
                     {followButtonText}
                   </Button>
-
                 </Box >
-
               </div>
             </div>
           </div>

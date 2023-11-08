@@ -255,13 +255,13 @@ def like(request):
         post_id = post_data.get('post_id')
         post = Post.objects.get(id=post_id)
         if user_profile.likes.filter(id=post.id).exists():
-
             user_profile.likes.remove(post)
+            user_profile.save()
             return HttpResponse(status=201)
         
         else:
-            
             user_profile.likes.add(post)
+            user_profile.save()
             return HttpResponse(status=201)
         
     return HttpResponse(status=400)
@@ -311,10 +311,17 @@ def follow(request):
 
         if user_profile.following.filter(username=user.username).exists():
             user_profile.following.remove(user)
+            unfollow = FollowersCount.objects.get(follower=user_username, user = user_name)
+            unfollow.delete()
+            user_profile.save()
+            unfollow.save()
             return HttpResponse(status=201)
         
         else:
             user_profile.following.add(user)
+            follow = FollowersCount.objects.create(user = user_name, follower = user_username)
+            user_profile.save()
+            follow.save()
             return HttpResponse(status=201)
         
     return HttpResponse(status=400)
