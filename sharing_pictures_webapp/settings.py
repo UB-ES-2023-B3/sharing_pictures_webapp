@@ -28,7 +28,7 @@ SECRET_KEY = 'django-insecure-yc3f!qn++h2_y8f)8jbs30p8hfw!=+q*n8x1y51tk0gf)p^zcm
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['sharing-pictures.azurewebsites.net', 'localhost']
+ALLOWED_HOSTS = ['sharing-pictures.azurewebsites.net', 'localhost', '127.0.0.1']
 
 
 # Application definition

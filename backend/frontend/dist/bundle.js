@@ -1,2 +1,0 @@
-/*! For license information please see bundle.js.LICENSE.txt */
-(()=>{var __webpack_modules__={"./src/index.js":()=>{eval("throw new Error(\"Module parse failed: Unexpected token (5:16)\\nYou may need an appropriate loader to handle this file type, currently no loaders are configured to process this file. See https://webpack.js.org/concepts#loaders\\n| import App from './App';\\n| \\n> ReactDOM.render(<App />, document.getElementById('root'));\\n| \");\n\n//# sourceURL=webpack://frontend/./src/index.js?")}},__webpack_exports__={};__webpack_modules__["./src/index.js"]()})();
