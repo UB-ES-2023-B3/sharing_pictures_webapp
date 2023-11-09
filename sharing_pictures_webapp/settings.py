@@ -40,8 +40,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django_advanced_password_validation', #US1.1
-    'backend.main_app', #US1.1, US2.1
+    'django_advanced_password_validation',
+    'backend.main_app',
     'backend.frontend.apps.FrontendConfig'
 ]
 
@@ -155,7 +155,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR_FRONT/'src', 'staticfiles')
 
-LOGIN_URL = 'login' #US2.1
+LOGIN_URL = 'login'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field

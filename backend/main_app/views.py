@@ -8,9 +8,6 @@ from .forms import RegistrationForm, LoginForm
 from .decorators import user_not_authenticated
 from .models import Post
 from .models import CustomUser
-
-#US1.1
-
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect
@@ -21,9 +18,6 @@ from django.core.cache import cache
 from django.core.serializers import serialize
 import os
 
-
-
-#US1.1
 #@user_not_authenticated
 def register(request):
     if request.method == 'POST':
@@ -44,10 +38,8 @@ def register(request):
         form = RegistrationForm()
         return render(request, 'register', {'form': form})
 
-#US2.1
 
-
-#USX.X (logout)
+#TODO logout
 @login_required
 def log_out(request):
     logout(request)
@@ -55,7 +47,6 @@ def log_out(request):
     return redirect("/")
         
 
-#US2.1
 #@user_not_authenticated
 def log_in(request):
     if request.method == "POST":
@@ -80,7 +71,7 @@ def log_in(request):
         print("400-2")
         return HttpResponse(status=400)
 
-#USX.X (logout)
+#TODO logout
 #@login_required
 def log_out(request):
     logout(request)

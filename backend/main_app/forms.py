@@ -20,7 +20,6 @@ class RegistrationForm(UserCreationForm):
 
         return user
 
-# US2.1
 class LoginForm(AuthenticationForm):
     def __init__(self, *args, **kwargs):
         super(LoginForm, self).__init__(*args, **kwargs)

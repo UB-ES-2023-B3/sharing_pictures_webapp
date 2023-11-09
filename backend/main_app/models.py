@@ -3,7 +3,6 @@ from django.db import models
 from datetime import datetime
 import uuid
 
-#US1.1, US2.1
 class CustomUser(AbstractUser):
     email = models.EmailField(unique=True)
     USERNAME_FIELD = 'email'
