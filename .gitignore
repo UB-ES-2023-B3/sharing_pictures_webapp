@@ -28,6 +28,7 @@
 ehthumbs.db
 Thumbs.db
 .vscode
+.idea
 
 # Cache files #
 ######################
