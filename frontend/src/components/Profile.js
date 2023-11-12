@@ -280,7 +280,7 @@ const myPosts = profileData.uploaded_pictures ? (
     <div className="text-center">No posts available.</div>
   );
 
-  const likedPostsSection = likedPosts && likedPosts.length > 0 ? (
+  const likedPostsSection = profileData.is_own_profile && likedPosts && likedPosts.length > 0 ? (
     <div style={styles.pin_container}>
         {likedPosts.map((picture, index) => (
             <Card
@@ -291,9 +291,9 @@ const myPosts = profileData.uploaded_pictures ? (
             />
         ))}
     </div>
-) : (
+) : profileData.is_own_profile ? (
     <div className="text-center">No liked posts available.</div>
-);
+) : null;
 
 
 
@@ -400,6 +400,7 @@ return (
                             Posts
                         </button>
                     </li>
+                    {profileData.is_own_profile && (
                     <li role="presentation">
                         <button
                             className={`inline-block p-4 border-b-2 rounded-t-lg ${
@@ -413,6 +414,7 @@ return (
                             Liked
                         </button>
                     </li>
+                    )}
                 </ul>
             </div>
         </div>
