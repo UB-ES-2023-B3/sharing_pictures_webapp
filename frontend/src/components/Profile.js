@@ -288,6 +288,8 @@ const myPosts = profileData.uploaded_pictures ? (
                 size={picture.image_size}
                 image={picture.image_url}
                 description={picture.description}
+                id={picture.post_id}
+                user={username}
             />
         ))}
     </div>
