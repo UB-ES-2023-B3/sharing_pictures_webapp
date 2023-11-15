@@ -263,6 +263,8 @@ const myPosts = profileData.uploaded_pictures ? (
           size={picture.image_size}
           image={`/media/${picture.fields.image}`}
           description={picture.fields.description}
+          id = {picture.pk}
+          user = {username}
         />
       ))}
     </div>
