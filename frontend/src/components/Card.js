@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import ImageCard from './ImageCard';
 import { useHistory } from 'react-router-dom';
 import {
@@ -13,7 +13,8 @@ function Card(props) {
     const [isMouseOverHeart, setIsMouseOverHeart] = useState(false);
     const [posts, setPosts] = useState([]);
     const [isClicked, setisClicked] = useState(false)
-    
+    const [username, setUsername] = useState("");
+
     // const { key, size, image, description } = props;
     var typeCard = "small";
     if (props.size > 250000) {
@@ -21,6 +22,22 @@ function Card(props) {
     } else if (props.size < 250000 && props.size > 100000) {
         typeCard = "medium";
     }
+    const fetchUser = () => {
+    
+        // Fetch more posts from the API and append them to the existing posts
+        fetch("../api/get_logged_in_user/")
+          .then((response) => response.json())
+          .then((data) => {
+            setUsername(data.username);
+          })
+          .catch((error) => {
+            console.error('Error :', error);
+          });
+      };
+      useEffect(() => {
+        
+        fetchUser();
+      }, []);
     const extractHashtags = (description) => {
         // Expresión regular para encontrar hashtags (#)
         const hashtagRegex = /#(\w+)/g;
@@ -42,7 +59,7 @@ function Card(props) {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ username: props.user, post_id: props.id }),
+            body: JSON.stringify({ username: username, post_id: props.id }),
         })
             .then(response => {
                 // Manejar la respuesta del servidor si es necesario
@@ -59,13 +76,14 @@ function Card(props) {
     }
     const handleIsLiked = (event) => {
         const apiUrl = '../api/get_is_liked/'
-        
+        //console.log(props.user)
+        //console.log(username)
         fetch(apiUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ username: props.user, post_id: props.id }),
+            body: JSON.stringify({ username: username, post_id: props.id }),
         })
             .then(response => response.json())
             .then(result => {
