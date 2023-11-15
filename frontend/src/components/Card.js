@@ -8,10 +8,12 @@ import { FiHeart } from "react-icons/fi";
 import axios from 'axios';
 
 function Card(props) {
+    
     const [isMouseOver, setIsMouseOver] = useState(false);
     const [isMouseOverHeart, setIsMouseOverHeart] = useState(false);
     const [posts, setPosts] = useState([]);
     const [isClicked, setisClicked] = useState(false)
+    
     // const { key, size, image, description } = props;
     var typeCard = "small";
     if (props.size > 250000) {
@@ -34,8 +36,8 @@ function Card(props) {
     const handleButtonClicked = (event) => {
 
         event.stopPropagation(); // Evita la propagación del clic al contenedor
-
-        fetch('api/likes/', {
+        const apiUrl = '../api/likes/'
+        fetch(apiUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -56,10 +58,9 @@ function Card(props) {
         setisClicked(!isClicked);
     }
     const handleIsLiked = (event) => {
-
-       
-
-        fetch('api/get_is_liked/', {
+        const apiUrl = '../api/get_is_liked/'
+        
+        fetch(apiUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
