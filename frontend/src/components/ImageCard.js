@@ -38,6 +38,7 @@ export default class ImageCard extends Component {
       reportSubmitted: false,
       postOwner: '',
       user: "",
+      avatarURL:"",
       comments: [], // Inicializa 'comments' como un array vacío
       newCommentText: '', // Estado para almacenar el texto del nuevo comentario
 
