@@ -7,6 +7,7 @@ from django.http import JsonResponse, HttpResponse
 from .forms import RegistrationForm, LoginForm
 from .decorators import user_not_authenticated
 from .models import Post
+from .models import Comment
 from .models import CustomUser
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse, HttpResponse
@@ -407,5 +408,40 @@ def update_profile_picture(request):
             return JsonResponse(response_data, status=201)
         else:
             return JsonResponse({'error': 'No profileimg provided in the request'}, status=400)
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=400)
+
+
+def create_comment(request):
+    if request.method == 'POST':
+        post_data = json.loads(request.body)
+        content = post_data.get('content')
+        user = request.user
+
+        if content:
+            # Crea un nuevo comentario
+            new_comment = Comment.objects.create(user=user, content=content)
+            new_comment.save()
+            return JsonResponse({"status": "success"})
+        else:
+            return JsonResponse({"status": "error", "message": "Content of the comment is missing"}, status=400)
+    else:
+        return JsonResponse({"status": "error", "message": "Invalid request method"}, status=400)
+
+def upload_comment(request):
+    if request.method == 'POST':
+        post_id = request.POST.get('post_id')
+        comment_text = request.POST.get('comment')
+        user = request.user
+
+        if post_id and comment_text:
+            # Aquí guardas el comentario en tu base de datos usando el post_id, el usuario y el texto del comentario
+            # Ejemplo de guardado en la base de datos utilizando el modelo Comment:
+            comment = Comment(post_id=post_id, user=user, text=comment_text)
+            comment.save()
+
+            return JsonResponse({'message': 'Comment uploaded successfully'})
+        else:
+            return JsonResponse({'error': 'Incomplete data provided'}, status=400)
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=400)

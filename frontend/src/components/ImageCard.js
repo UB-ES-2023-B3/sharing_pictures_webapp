@@ -23,20 +23,6 @@ import { FiHeart } from "react-icons/fi";
 import axios from 'axios';
 import { ExternalLinkIcon, LinkIcon, DownloadIcon, StarIcon } from '@chakra-ui/icons'
 
-function extractHashtagsAndDescriptionFromURL() {
-  // Obtener la descripción y los hashtags de la URL
-  const urlParams = new URLSearchParams(window.location.search);
-  const descriptionWithoutHashtags = urlParams.get('description');
-  const hashtags = urlParams.getAll('hashtags'); // Utilizamos getAll para obtener todos los valores para la clave 'hashtags'
-
-  // Vuelve a unir los hashtags con la descripción sin hashtags
-  const descriptionWithHashtags = descriptionWithoutHashtags + ' ' + hashtags.map(tag => `#${tag}`).join(' ');
-
-  return {
-    descriptionWithHashtags,
-    hashtags,
-  };
-}
 
 export default class ImageCard extends Component {
   constructor(props) {
@@ -51,12 +37,15 @@ export default class ImageCard extends Component {
       reportDescription: '',
       reportSubmitted: false,
       postOwner: '',
-      user:"",
- 
+      user: "",
+      comments: [], // Inicializa 'comments' como un array vacío
+      newCommentText: '', // Estado para almacenar el texto del nuevo comentario
+
+
     };
 
     this.imageRef = React.createRef();
-    this.fetchUser2();  
+    this.fetchUser2();
   }
 
   getOwnerOfPost = () => {
@@ -88,7 +77,7 @@ export default class ImageCard extends Component {
       this.setState({ imageHeight: height });
       this.getOwnerOfPost();
     };
-   
+
   }
 
   toggleFollow = () => {
@@ -97,7 +86,7 @@ export default class ImageCard extends Component {
   callBackendToggleFollow = () => {
     // Realiza la llamada al backend aquí
     // Puedes usar axios para hacer una solicitud POST o GET al servidor
-    
+
 
     fetch('/api/follow/', {
       method: 'POST',
@@ -118,7 +107,7 @@ export default class ImageCard extends Component {
 
 
   handleIsFollowing = () => {
-  
+
     fetch('/api/get_is_user_following/', {
       method: 'POST',
       headers: {
@@ -202,14 +191,14 @@ export default class ImageCard extends Component {
       );
     }
   }
- 
+
 
   handleIsLiked2 = (user) => {
-  
+
     const urlParams = new URLSearchParams(window.location.search);
-    
+
     const id = urlParams.get('id');
-    
+
     fetch('/api/get_is_liked/', {
       method: 'POST',
       headers: {
@@ -221,11 +210,11 @@ export default class ImageCard extends Component {
       .then(result => {
         if (result.message === 'Sacar like') {
           // Si el mensaje es "Sacar like", establece isClicked en false
-          this.setState({isLiked : true});
+          this.setState({ isLiked: true });
         } else if (result.message === 'añadir like') {
           // Si el mensaje es "añadir like", establece isClicked en true
-          this.setState({isLiked : false})
-      
+          this.setState({ isLiked: false })
+
         }
 
       })
@@ -234,14 +223,89 @@ export default class ImageCard extends Component {
       });
   }
 
+  
+  renderComments = () => {
+    const { comments } = this.state;
+  
+    if (!comments || !Array.isArray(comments) || comments.length === 0) {
+      return (
+        <div style={styles.commentsContainer}>
+          <p>No hay comentarios aún.</p>
+        </div>
+      );
+    }
+  
+    return (
+      <div style={{ ...styles.commentsContainer, maxHeight: '200px', overflowY: 'auto', padding: '10px' }}>
+        {/* Iterar sobre los comentarios y mostrarlos */}
+        {comments.map((comment, index) => (
+          <div key={index} style={styles.comment}>
+            {/* Avatar del usuario */}
+            <Avatar src={comment.avatar} alt={`User ${index + 1}`} style={styles.commentAvatar} />
+            {/* Contenido del comentario */}
+            <Textarea
+              value={comment.content}
+              isReadOnly
+              size="sm"
+              resize="none"
+              border="none"
+              borderRadius="md"
+              maxWidth="100%"
+              maxHeight="80px"
+              overflow="auto"
+            />
+          </div>
+        ))}
+      </div>
+    );
+  };
+  handleCommentSubmit = () => {
+    const urlParams = new URLSearchParams(window.location.search);
+
+    const id = urlParams.get('id');
+
+
+    const newComment = {
+      avatar: 'https://via.placeholder.com/150', // URL de ejemplo de una imagen genérica
+      content: this.state.newCommentText,
+    };
+  
+    // Enviar el comentario al backend
+    fetch('/api/upload_comment/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        post_id: id, // Obtén el ID del post actual
+        username: this.state.user,
+        comment: newComment.content,
+      }),
+    })
+    .then(response => response.json())
+    .then(result => {
+      // Manejar la respuesta del backend si es necesario
+      // Por ejemplo, puedes actualizar el estado de los comentarios en la tarjeta
+      // Ejemplo:
+      const updatedComments = [...this.state.comments, newComment];
+      this.setState({ comments: updatedComments, newCommentText: '' });
+    })
+    .catch(error => {
+      // Manejar errores si la solicitud falla
+      console.error('Error en la solicitud al backend:', error);
+    });
+  };
+  handleCommentTextChange = (event) => {
+    this.setState({ newCommentText: event.target.value });
+  };
   fetchUser2 = () => {
-    
+
     // Fetch more posts from the API and append them to the existing posts
- 
+
     fetch("/api/get_logged_in_user/")
       .then((response) => response.json())
       .then((data) => {
-    
+
         this.setState({ user: data.username });
         this.handleIsLiked2(data.username);
       })
@@ -249,32 +313,32 @@ export default class ImageCard extends Component {
         console.error('Error loading more posts:', error);
       });
   };
-  
+
   render() {
     const { imageHeight, isReporting, reportReason, reportDescription, reportSubmitted } = this.state;
     const { isLarge } = this.props;
     const urlParams = new URLSearchParams(window.location.search);
     const size = urlParams.get('size');
     const image = urlParams.get('image');
-    
+
     const id = urlParams.get('id');
     const description = urlParams.get('description');
     const username = urlParams.get('username');
-    const { descriptionWithHashtags, hashtags } = extractHashtagsAndDescriptionFromURL();
+
 
     const { isFollowing } = this.state;
     const followButtonText = isFollowing ? 'Seguint' : 'Seguir';
-    const isLiked  = this.state.isLiked;
+    const isLiked = this.state.isLiked;
 
 
-   
+
 
     const handleButtonClicked = (event) => {
 
       event.stopPropagation(); // Evita la propagación del clic al contenedor
-    
+
       fetch('/api/likes/', {
-      
+
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -290,12 +354,12 @@ export default class ImageCard extends Component {
           console.error('Error en la solicitud al backend:');
         });
 
-        
+
     }
-   
+
     const handleIsLiked = (event) => {
-  
-      
+
+
       fetch('/api/get_is_liked/', {
         method: 'POST',
         headers: {
@@ -310,7 +374,7 @@ export default class ImageCard extends Component {
             this.setState({ isLiked: true })
           } else if (result.message === 'añadir like') {
             // Si el mensaje es "añadir like", establece isClicked en true
-            this.setState({isLiked : false})
+            this.setState({ isLiked: false })
           }
 
         })
@@ -385,10 +449,27 @@ export default class ImageCard extends Component {
                     <IconButton size='lg' borderRadius='30' variant='ghost' icon={<DownloadIcon />} onClick={handleDownload} />
                     <IconButton size='lg' borderRadius='30' variant='ghost' icon={<LinkIcon />} onClick={handleCopyUrl} />
                   </Box>
+                  {this.renderComments()}
+                  {/* Formulario para agregar comentarios */}
+                  <div style={styles.commentInput}>
+                    <Input
+                      value={this.state.newCommentText}
+                      onChange={this.handleCommentTextChange}
+                      placeholder="Agrega un comentario..."
+                      style={styles.commentInputField}
+                    />
+                    <Button
+                      onClick={this.handleCommentSubmit}
+                      style={styles.commentSendButton}
+                    >
+                      Enviar
+                    </Button>
+                  </div>
+
                 </Box>
               </Flex>
               <div div style={styles.imageleft}>
-              {this.state.postOwner === this.state.user ?<Box/> : <Box padding="5%">
+                {this.state.postOwner === this.state.user ? <Box /> : <Box padding="5%">
                   <Button borderRadius="30" size="lg" ml="auto" marginRight="0" onClick={this.toggleFollow} style={{
                     backgroundColor: isFollowing ? 'black' : 'red',
                     color: 'white',
