@@ -417,9 +417,12 @@ def load_liked_pictures(request):
     posts = user_profile.likes.all()
     picture_data = []
 
-    #shuffle the posts to get a random order
+    
     posts = list(posts)
-    random.shuffle(posts)
+    
+    #put the posts in order by date the most recent first
+    posts.sort(key=lambda x: x.created_at, reverse=True)
+    
   
     for post in posts:
         picture_data.append({
