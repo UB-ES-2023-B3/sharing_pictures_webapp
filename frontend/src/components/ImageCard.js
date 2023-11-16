@@ -38,12 +38,13 @@ export default class ImageCard extends Component {
       reportDescription: '',
       reportSubmitted: false,
       postOwner: '',
-      user:"",
- 
+      user: "",
+      showFullDescription: false,
+
     };
 
     this.imageRef = React.createRef();
-    this.fetchUser2();  
+    this.fetchUser2();
   }
 
   getOwnerOfPost = () => {
@@ -75,7 +76,7 @@ export default class ImageCard extends Component {
       this.setState({ imageHeight: height });
       this.getOwnerOfPost();
     };
-   
+
   }
 
   toggleFollow = () => {
@@ -84,7 +85,7 @@ export default class ImageCard extends Component {
   callBackendToggleFollow = () => {
     // Realiza la llamada al backend aquí
     // Puedes usar axios para hacer una solicitud POST o GET al servidor
-    
+
 
     fetch('/api/follow/', {
       method: 'POST',
@@ -105,7 +106,7 @@ export default class ImageCard extends Component {
 
 
   handleIsFollowing = () => {
-  
+
     fetch('/api/get_is_user_following/', {
       method: 'POST',
       headers: {
@@ -168,21 +169,59 @@ export default class ImageCard extends Component {
   renderDescription(description) {
 
     //const urlParams = new URLSearchParams(window.location.search);
-    
+
     //const description = urlParams.get('description');
     const trimmedDescription = description.trim();
-  
+    const { showFullDescription } = this.state;
+
+
     if (trimmedDescription !== "") {
       const capitalizedDescription = trimmedDescription.charAt(0).toUpperCase() + trimmedDescription.slice(1);
-      return (
-        
-          <Text fontSize='2xl' >
+      const words = capitalizedDescription.split(' ');
+
+      if (words.length > 100 && !showFullDescription) {
+
+        const limitedDescription = words.slice(0, 100).join(' '); // Tomar solo las primeras 100 palabras
+        const remainingContent = words.slice(100).join(' ');
+
+        const handleShowMore = () => {
+          this.setState({ showFullDescription: true });
+        };
+
+        return (
+
+          <Text fontSize='2xl'>
           <strong style={{ fontSize: '1em' }}>Description</strong>
-            <p style={{ fontSize: '0.7em' }}>{capitalizedDescription}</p>
+          <p style={{ fontSize: '0.7em', maxHeight: showFullDescription ? 'unset' : '100px', overflowY: showFullDescription ? 'auto' : 'hidden' }}>
+
+            {showFullDescription ? capitalizedDescription : limitedDescription}
             
+            {!showFullDescription && (
+              <span>
+                {remainingContent}
+                {' '}
+                <button onClick={handleShowMore} style={{ fontSize: '0.7em', border: 'none', background: 'none', color: 'blue', cursor: 'pointer' }}>Ver más</button>
+
+              </span>
+            )}
+          </p>
+        </Text>
+  
+
+        );
+      } else {
+        const limitedDescription = words.slice(0, 100).join(' '); // Tomar solo las primeras 100 palabras
+        return (
+          
+
+          <Text fontSize='2xl' >
+            <strong style={{ fontSize: '1em' }}>Description</strong>
+            <p style={{ fontSize: '0.7em' }}>{limitedDescription}</p>
+
           </Text>
-   
-      );
+
+        );
+      }
     } else {
       return (
         <Box style={styles.boxStyle}>
@@ -190,16 +229,17 @@ export default class ImageCard extends Component {
         </Box>
       );
     }
+
   }
-  
- 
+
+
 
   handleIsLiked2 = (user) => {
-  
+
     const urlParams = new URLSearchParams(window.location.search);
-    
+
     const id = urlParams.get('id');
-    
+
     fetch('/api/get_is_liked/', {
       method: 'POST',
       headers: {
@@ -211,11 +251,11 @@ export default class ImageCard extends Component {
       .then(result => {
         if (result.message === 'Sacar like') {
           // Si el mensaje es "Sacar like", establece isClicked en false
-          this.setState({isLiked : true});
+          this.setState({ isLiked: true });
         } else if (result.message === 'añadir like') {
           // Si el mensaje es "añadir like", establece isClicked en true
-          this.setState({isLiked : false})
-      
+          this.setState({ isLiked: false })
+
         }
 
       })
@@ -225,13 +265,13 @@ export default class ImageCard extends Component {
   }
 
   fetchUser2 = () => {
-    
+
     // Fetch more posts from the API and append them to the existing posts
- 
+
     fetch("/api/get_logged_in_user/")
       .then((response) => response.json())
       .then((data) => {
-    
+
         this.setState({ user: data.username });
         this.handleIsLiked2(data.username);
       })
@@ -239,32 +279,32 @@ export default class ImageCard extends Component {
         console.error('Error loading more posts:', error);
       });
   };
-  
+
   render() {
     const { imageHeight, isReporting, reportReason, reportDescription, reportSubmitted } = this.state;
     const { isLarge } = this.props;
     const urlParams = new URLSearchParams(window.location.search);
     const size = urlParams.get('size');
     const image = urlParams.get('image');
-    
+
     const id = urlParams.get('id');
     const description = urlParams.get('description');
     const username = urlParams.get('username');
-   
+
 
     const { isFollowing } = this.state;
     const followButtonText = isFollowing ? 'Seguint' : 'Seguir';
-    const isLiked  = this.state.isLiked;
+    const isLiked = this.state.isLiked;
 
 
-   
+
 
     const handleButtonClicked = (event) => {
 
       event.stopPropagation(); // Evita la propagación del clic al contenedor
-    
+
       fetch('/api/likes/', {
-      
+
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -280,12 +320,12 @@ export default class ImageCard extends Component {
           console.error('Error en la solicitud al backend:');
         });
 
-        
+
     }
-   
+
     const handleIsLiked = (event) => {
-  
-      
+
+
       fetch('/api/get_is_liked/', {
         method: 'POST',
         headers: {
@@ -300,7 +340,7 @@ export default class ImageCard extends Component {
             this.setState({ isLiked: true })
           } else if (result.message === 'añadir like') {
             // Si el mensaje es "añadir like", establece isClicked en true
-            this.setState({isLiked : false})
+            this.setState({ isLiked: false })
           }
 
         })
@@ -374,11 +414,11 @@ export default class ImageCard extends Component {
                   <Box >
                     <IconButton size='lg' borderRadius='30' variant='ghost' icon={<DownloadIcon />} onClick={handleDownload} />
                     <IconButton size='lg' borderRadius='30' variant='ghost' icon={<LinkIcon />} onClick={handleCopyUrl} />
-                    {this.renderDescription(description)} 
+                    {this.renderDescription(description)}
                   </Box>
-                
+
                 </Box>
-                
+
               </Flex>
               <div div style={styles.imageleft}>
                 <Box padding="5%">
