@@ -177,7 +177,7 @@ export default class ImageCard extends Component {
       return (
         
           <Text fontSize='2xl' >
-          <strong style={{ fontSize: '1em' }}>Descripción</strong>
+          <strong style={{ fontSize: '1em' }}>Description</strong>
             <p style={{ fontSize: '0.7em' }}>{capitalizedDescription}</p>
             
           </Text>
@@ -186,7 +186,7 @@ export default class ImageCard extends Component {
     } else {
       return (
         <Box style={styles.boxStyle}>
-          <Text fontSize='2xl'>Ningúna descripción añadida</Text>
+          <Text fontSize='2xl'>No description added</Text>
         </Box>
       );
     }
