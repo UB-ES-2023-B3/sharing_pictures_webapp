@@ -23,20 +23,7 @@ import { FiHeart } from "react-icons/fi";
 import axios from 'axios';
 import { ExternalLinkIcon, LinkIcon, DownloadIcon, StarIcon } from '@chakra-ui/icons'
 
-function extractHashtagsAndDescriptionFromURL() {
-  // Obtener la descripción y los hashtags de la URL
-  const urlParams = new URLSearchParams(window.location.search);
-  const descriptionWithoutHashtags = urlParams.get('description');
-  const hashtags = urlParams.getAll('hashtags'); // Utilizamos getAll para obtener todos los valores para la clave 'hashtags'
 
-  // Vuelve a unir los hashtags con la descripción sin hashtags
-  const descriptionWithHashtags = descriptionWithoutHashtags + ' ' + hashtags.map(tag => `#${tag}`).join(' ');
-
-  return {
-    descriptionWithHashtags,
-    hashtags,
-  };
-}
 
 export default class ImageCard extends Component {
   constructor(props) {
@@ -178,30 +165,33 @@ export default class ImageCard extends Component {
       this.closeReportModal();
     }, 2000); // Cierra el cuadro de diálogo después de 2 segundos
   };
-  renderDescription(descriptionWithHashtags, hashtags) {
-    if (descriptionWithHashtags && descriptionWithHashtags.trim() !== "") {
-      const words = descriptionWithHashtags.split(' ');
+  renderDescription(description) {
+
+    //const urlParams = new URLSearchParams(window.location.search);
+    
+    //const description = urlParams.get('description');
+    const trimmedDescription = description.trim();
+  
+    if (trimmedDescription !== "") {
+      const capitalizedDescription = trimmedDescription.charAt(0).toUpperCase() + trimmedDescription.slice(1);
       return (
-        <Box style={styles.boxStyle}>
-          <Text fontSize='2xl' paddingTop="5%">
-            {words.map((word, index) => (
-              word.startsWith('#') ? (
-                <strong key={index}>{word} </strong>
-              ) : (
-                <span key={index}>{word} </span>
-              )
-            ))}
+        
+          <Text fontSize='2xl' >
+          <strong style={{ fontSize: '1em' }}>Descripción</strong>
+            <p style={{ fontSize: '0.7em' }}>{capitalizedDescription}</p>
+            
           </Text>
-        </Box>
+   
       );
     } else {
       return (
         <Box style={styles.boxStyle}>
-          <Text fontSize='2xl' paddingTop="5%">Ningúna descripción añadida</Text>
+          <Text fontSize='2xl'>Ningúna descripción añadida</Text>
         </Box>
       );
     }
   }
+  
  
 
   handleIsLiked2 = (user) => {
@@ -260,7 +250,7 @@ export default class ImageCard extends Component {
     const id = urlParams.get('id');
     const description = urlParams.get('description');
     const username = urlParams.get('username');
-    const { descriptionWithHashtags, hashtags } = extractHashtagsAndDescriptionFromURL();
+   
 
     const { isFollowing } = this.state;
     const followButtonText = isFollowing ? 'Seguint' : 'Seguir';
@@ -384,8 +374,11 @@ export default class ImageCard extends Component {
                   <Box >
                     <IconButton size='lg' borderRadius='30' variant='ghost' icon={<DownloadIcon />} onClick={handleDownload} />
                     <IconButton size='lg' borderRadius='30' variant='ghost' icon={<LinkIcon />} onClick={handleCopyUrl} />
+                    {this.renderDescription(description)} 
                   </Box>
+                
                 </Box>
+                
               </Flex>
               <div div style={styles.imageleft}>
                 <Box padding="5%">
