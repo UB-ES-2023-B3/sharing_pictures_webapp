@@ -19,6 +19,6 @@ jobs:
     - name: Tag Docker image
       run: docker tag ub-es-2023-b3 ${{ secrets.DOCKER_HUB_USERNAME }}/ub-es-2023-b3:3.0
     - name: Docker Hub login
-      run: docker login -u ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }} -p ${{ secrets.DOCKER_HUB_USERNAME }}
+      run: docker login -u ${{ secrets.DOCKER_HUB_USERNAME }} -p ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
     - name: Push Docker image
       run: docker push quimlr/ub-es-2023-b3:3.0
