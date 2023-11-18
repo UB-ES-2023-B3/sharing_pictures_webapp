@@ -49,26 +49,25 @@ def log_out(request):
 
 #@user_not_authenticated
 def log_in(request):
+    
     if request.method == "POST":
         form = LoginForm(request=request, data=request.POST)
-        print(form.data)
+        
         if form.is_valid():
+            
             user = authenticate(
                 username=form.cleaned_data["username"],
                 password=form.cleaned_data["password"],
             )
             if user is not None:
                 login(request, user)
-                print("201")
                 return HttpResponse(status=201)
 
         else:
             for error in list(form.errors.values()):
                 messages.error(request, error)
-            print("400-1")
             return HttpResponse(status=400)
     else:
-        print("400-2")
         return HttpResponse(status=400)
 
 #TODO logout
@@ -126,10 +125,6 @@ def search(request):
     profiles_containing_query = Profile.objects.filter(user__username__icontains=query).exclude(pk__in=profiles_starting_with_query.values('pk'))
     combined_profiles = (list(profiles_starting_with_query) + list(profiles_containing_query))
     profile_data = [{'id': profile.id, 'username': profile.user.username, 'profileimg': profile.profileimg.url} for profile in combined_profiles]
-    
-    # # If no profiles match the search query
-    # if not profile_data:
-    #     return JsonResponse({'error': 'No users found.'}, status=404)
     
     return JsonResponse({'profiles': profile_data}, safe=False)
 
