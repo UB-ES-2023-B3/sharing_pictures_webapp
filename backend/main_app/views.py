@@ -299,13 +299,12 @@ def follow(request):
         user = CustomUser.objects.get(username=user_username)
         if not user:
             return HttpResponse(status=404, content="User2 not found")
-
         if user_profile.following.filter(username=user.username).exists():
             user_profile.following.remove(user)
             unfollow = FollowersCount.objects.get(follower=user_username, user = user_name)
             unfollow.delete()
             user_profile.save()
-            unfollow.save()
+            #unfollow.save()
             return HttpResponse(status=201)
         
         else:
