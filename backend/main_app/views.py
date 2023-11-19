@@ -420,7 +420,6 @@ def load_liked_pictures(request):
     
     posts = list(posts)
 
-    #random order
     random.shuffle(posts)
  
   
