@@ -411,7 +411,7 @@ def update_profile_picture(request):
         return JsonResponse({'error': 'Invalid request method'}, status=400)
     
 def load_liked_pictures(request):
-    import random #import random module
+    import random
     user_object = CustomUser.objects.get(username=request.user.username)
     user_profile = Profile.objects.get(user=user_object)
     posts = user_profile.likes.all()
@@ -419,10 +419,10 @@ def load_liked_pictures(request):
 
     
     posts = list(posts)
-    
-    #put the posts in order by date the most recent first
-    posts.sort(key=lambda x: x.created_at, reverse=True)
-    
+
+    #random order
+    random.shuffle(posts)
+ 
   
     for post in posts:
         picture_data.append({
