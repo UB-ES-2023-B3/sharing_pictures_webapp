@@ -1,6 +1,6 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-from datetime import datetime
+from django.utils import timezone
 import uuid
 
 class CustomUser(AbstractUser):
@@ -16,7 +16,7 @@ class Post(models.Model):
     image = models.ImageField(upload_to='post_images')
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     description = models.TextField(default='')
-    created_at = models.DateTimeField(default=datetime.now)
+    created_at = models.DateTimeField(default=timezone.now)
 
 class Profile(models.Model):
 
