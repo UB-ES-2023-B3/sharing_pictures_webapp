@@ -195,12 +195,13 @@ export default class ImageCard extends Component {
           <p style={{ fontSize: '0.7em', maxHeight: showFullDescription ? 'unset' : '100px', overflowY: showFullDescription ? 'auto' : 'hidden' }}>
 
             {showFullDescription ? capitalizedDescription : limitedDescription}
-            
+            <button onClick={handleShowMore} style={{ fontSize: '0.7em', border: 'none', background: 'none', color: 'blue', cursor: 'pointer' }}>Ver más</button>
             {!showFullDescription && (
               <span>
+                <button onClick={handleShowMore} style={{ fontSize: '0.7em', border: 'none', background: 'none', color: 'blue', cursor: 'pointer' }}>Ver más</button>
                 {remainingContent}
                 {' '}
-                <button onClick={handleShowMore} style={{ fontSize: '0.7em', border: 'none', background: 'none', color: 'blue', cursor: 'pointer' }}>Ver más</button>
+                
 
               </span>
             )}
