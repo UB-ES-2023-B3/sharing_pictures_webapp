@@ -18,4 +18,5 @@ urlpatterns = [
     path('getOwnerPost/', views.getOwnerPost, name='getOwnerPost'),
     path('update_profile/', views.update_profile, name='update_profile'),
     path('update_profile_picture/', views.update_profile_picture, name='update_profile_picture'),
+    path('load_following_pictures/', views.load_following_pictures, name='load_following_pictures'),
     ]
