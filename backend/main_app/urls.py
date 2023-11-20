@@ -8,7 +8,7 @@ urlpatterns = [
     path('load_pictures/', views.load_pictures, name='load_more_pictures'),
     path('upload/', views.upload_picture, name='upload_picture'),
     path('search/', views.search, name='search'),
-    path('search_pictures/', views.search_pictures),
+    path('search_pictures/', views.search_pictures,name='search_pictures'),
     path('profile/<str:pk>', views.profile, name='profile'),
     path('likes/', views.like, name='likes'),
     path('get_logged_in_user/', views.get_logged_in_user, name='get_logged_in_user'),
@@ -20,5 +20,6 @@ urlpatterns = [
     path('update_profile_picture/', views.update_profile_picture, name='update_profile_picture'),
     path('upload_comment/', views.upload_comment, name='upload_comment'),
     path('getCommentsOfPost/', views.getCommentsOfPost, name='getCommentsOfPost'),
-    path('deleteCommentPost/', views.delete_comment, name="deleteCommentPost")
+    path('deleteCommentPost/', views.delete_comment, name="deleteCommentPost"),
+    path('load_liked_pictures/', views.load_liked_pictures, name='load_liked_pictures')
     ]

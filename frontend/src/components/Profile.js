@@ -6,6 +6,7 @@ import axios from 'axios';
 
 function Profile() {
 const [profileData, setProfileData] = useState(null);
+const [likedPosts, setLikedPosts] = useState(null);
 const [activeTab, setActiveTab] = useState('my-posts');
 const { username } = useParams();
 const [isHoveringProfilePicture, setIsHoveringProfilePicture] = useState(false);
@@ -62,11 +63,20 @@ fetch(apiUrl)
         user_following: data.user_following,
         is_own_profile: data.is_own_profile,
         uploaded_pictures: data.uploaded_posts,
+        
     };
-
-    console.log('profileData: ', profileData);
-    setProfileData(profileData);
+    
+    fetch(`/api/load_liked_pictures`)
+    .then((response) => response.json())
+    .then((likedData) => {
+        // Ensure likedData.pictures exists and is an array
+        setLikedPosts(likedData.pictures || []);
+        console.log(likedData.pictures);
     })
+    .catch((error) => console.error('Error fetching liked posts: ', error));
+
+setProfileData(profileData);
+})
     .catch((error) => {
     console.error('Error fetching profile data: ', error);
     Swal.fire({
@@ -272,6 +282,23 @@ const myPosts = profileData.uploaded_pictures ? (
     <div className="text-center">No posts available.</div>
   );
 
+  const likedPostsSection = profileData.is_own_profile && likedPosts && likedPosts.length > 0 ? (
+    <div style={styles.pin_container}>
+        {likedPosts.map((picture, index) => (
+            <Card
+                key={index}
+                size={picture.image_size}
+                image={picture.image_url}
+                description={picture.description}
+                id={picture.post_id}
+                user={username}
+            />
+        ))}
+    </div>
+) : profileData.is_own_profile ? (
+    <div className="text-center">No liked posts available.</div>
+) : null;
+
 
 
 return (
@@ -377,11 +404,27 @@ return (
                             Posts
                         </button>
                     </li>
+                    {profileData.is_own_profile && (
+                    <li role="presentation">
+                        <button
+                            className={`inline-block p-4 border-b-2 rounded-t-lg ${
+                                activeTab === 'liked-posts'
+                                    ? 'border-red-600 text-red-600'
+                                    : 'hover:text-red-600'
+                            }`}
+                            type="button"
+                            onClick={() => setActiveTab('liked-posts')}
+                        >
+                            Liked
+                        </button>
+                    </li>
+                    )}
                 </ul>
             </div>
         </div>
         <div id="myTabContent">
             {activeTab === 'my-posts' ? myPosts : null}
+            {activeTab === 'liked-posts' ? likedPostsSection : null}
         </div>
     </div>
 </div>

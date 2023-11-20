@@ -50,26 +50,25 @@ def log_out(request):
 
 #@user_not_authenticated
 def log_in(request):
+    
     if request.method == "POST":
         form = LoginForm(request=request, data=request.POST)
-        print(form.data)
+        
         if form.is_valid():
+            
             user = authenticate(
                 username=form.cleaned_data["username"],
                 password=form.cleaned_data["password"],
             )
             if user is not None:
                 login(request, user)
-                print("201")
                 return HttpResponse(status=201)
 
         else:
             for error in list(form.errors.values()):
                 messages.error(request, error)
-            print("400-1")
             return HttpResponse(status=400)
     else:
-        print("400-2")
         return HttpResponse(status=400)
 
 #TODO logout
@@ -127,10 +126,6 @@ def search(request):
     profiles_containing_query = Profile.objects.filter(user__username__icontains=query).exclude(pk__in=profiles_starting_with_query.values('pk'))
     combined_profiles = (list(profiles_starting_with_query) + list(profiles_containing_query))
     profile_data = [{'id': profile.id, 'username': profile.user.username, 'profileimg': profile.profileimg.url} for profile in combined_profiles]
-    
-    # # If no profiles match the search query
-    # if not profile_data:
-    #     return JsonResponse({'error': 'No users found.'}, status=404)
     
     return JsonResponse({'profiles': profile_data}, safe=False)
 
@@ -410,7 +405,30 @@ def update_profile_picture(request):
             return JsonResponse({'error': 'No profileimg provided in the request'}, status=400)
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=400)
+    
+def load_liked_pictures(request):
+    import random
+    user_object = CustomUser.objects.get(username=request.user.username)
+    user_profile = Profile.objects.get(user=user_object)
+    posts = user_profile.likes.all()
+    picture_data = []
 
+    
+    posts = list(posts)
+
+    random.shuffle(posts)
+
+
+    for post in posts:
+        picture_data.append({
+                    'image_url': post.image.url,
+                    'description': post.description,
+                    'created_at': post.created_at.strftime('%F %d, %Y'),
+                    'image_size': post.image.size,
+                    'post_id' : post.id,
+                })
+
+    return JsonResponse({'pictures': picture_data}, safe=False)
 
 def upload_comment(request):
     if request.method == 'POST':
