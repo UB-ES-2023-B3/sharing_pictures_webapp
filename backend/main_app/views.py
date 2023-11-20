@@ -404,3 +404,27 @@ def update_profile_picture(request):
             return JsonResponse({'error': 'No profileimg provided in the request'}, status=400)
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=400)
+    
+def load_liked_pictures(request):
+    import random
+    user_object = CustomUser.objects.get(username=request.user.username)
+    user_profile = Profile.objects.get(user=user_object)
+    posts = user_profile.likes.all()
+    picture_data = []
+
+    
+    posts = list(posts)
+
+    random.shuffle(posts)
+ 
+  
+    for post in posts:
+        picture_data.append({
+                    'image_url': post.image.url,
+                    'description': post.description,
+                    'created_at': post.created_at.strftime('%F %d, %Y'),
+                    'image_size': post.image.size,
+                    'post_id' : post.id,
+                })
+
+    return JsonResponse({'pictures': picture_data}, safe=False)
