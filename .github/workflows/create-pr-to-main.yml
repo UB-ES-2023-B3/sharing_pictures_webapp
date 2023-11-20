@@ -29,3 +29,5 @@ jobs:
         git checkout -b $new_branch_name
         git push -u origin $new_branch_name
         gh pr create --base main --head $new_branch_name --title "Feature ${new_branch_name}" --body "Automatically created feature branch from dev."
+      env:
+        GITHUB_TOKEN: ${{ secrets.WORKFLOW_CI }}
