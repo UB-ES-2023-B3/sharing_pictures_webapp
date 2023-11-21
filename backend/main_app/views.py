@@ -295,8 +295,8 @@ def follow(request):
     
         user_profile = Profile.objects.get(user=user_object)
 
-        user_name = post_data.get('user')
-        user = CustomUser.objects.get(username=user_username)
+        user_name = post_data['user']
+        user = CustomUser.objects.get(username=user_name)
         if not user:
             return HttpResponse(status=404, content="User2 not found")
 
@@ -329,8 +329,8 @@ def get_is_user_following(request):
     
         user_profile = Profile.objects.get(user=user_object)
 
-        user_name = post_data.get('user')
-        user = CustomUser.objects.get(username=user_username)
+        user_name = post_data['user']
+        user = CustomUser.objects.get(username=user_name)
         if not user:
             return HttpResponse(status=404, content="User2 not found")
         if user_profile.following.filter(username=user.username).exists():
