@@ -7,6 +7,7 @@ from django.http import JsonResponse, HttpResponse
 from .forms import RegistrationForm, LoginForm
 from .decorators import user_not_authenticated
 from .models import Post
+from .models import Comment
 from .models import CustomUser
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse, HttpResponse
@@ -49,26 +50,25 @@ def log_out(request):
 
 #@user_not_authenticated
 def log_in(request):
+    
     if request.method == "POST":
         form = LoginForm(request=request, data=request.POST)
-        print(form.data)
+        
         if form.is_valid():
+            
             user = authenticate(
                 username=form.cleaned_data["username"],
                 password=form.cleaned_data["password"],
             )
             if user is not None:
                 login(request, user)
-                print("201")
                 return HttpResponse(status=201)
 
         else:
             for error in list(form.errors.values()):
                 messages.error(request, error)
-            print("400-1")
             return HttpResponse(status=400)
     else:
-        print("400-2")
         return HttpResponse(status=400)
 
 #TODO logout
@@ -126,10 +126,6 @@ def search(request):
     profiles_containing_query = Profile.objects.filter(user__username__icontains=query).exclude(pk__in=profiles_starting_with_query.values('pk'))
     combined_profiles = (list(profiles_starting_with_query) + list(profiles_containing_query))
     profile_data = [{'id': profile.id, 'username': profile.user.username, 'profileimg': profile.profileimg.url} for profile in combined_profiles]
-    
-    # # If no profiles match the search query
-    # if not profile_data:
-    #     return JsonResponse({'error': 'No users found.'}, status=404)
     
     return JsonResponse({'profiles': profile_data}, safe=False)
 
@@ -299,13 +295,12 @@ def follow(request):
         user = CustomUser.objects.get(username=user_name)
         if not user:
             return HttpResponse(status=404, content="User2 not found")
-
         if user_profile.following.filter(username=user.username).exists():
             user_profile.following.remove(user)
             unfollow = FollowersCount.objects.get(follower=user_username, user = user_name)
             unfollow.delete()
             user_profile.save()
-            unfollow.save()
+            #unfollow.save()
             return HttpResponse(status=201)
         
         else:
@@ -421,7 +416,7 @@ def load_following_pictures(request):
 
     #order the posts by date the most recent first
     posts = posts.order_by('-created_at')
-  
+    
     for post in posts:
         picture_data.append({
                     'image_url': post.image.url,
@@ -434,3 +429,93 @@ def load_following_pictures(request):
     print(picture_data)
 
     return JsonResponse({'pictures': picture_data}, safe=False)
+    
+def load_liked_pictures(request):
+    import random
+    user_object = CustomUser.objects.get(username=request.user.username)
+    user_profile = Profile.objects.get(user=user_object)
+    posts = user_profile.likes.all()
+    picture_data = []
+
+    
+    posts = list(posts)
+
+    random.shuffle(posts)
+
+
+    for post in posts:
+        picture_data.append({
+                    'image_url': post.image.url,
+                    'description': post.description,
+                    'created_at': post.created_at.strftime('%F %d, %Y'),
+                    'image_size': post.image.size,
+                    'post_id' : post.id,
+                })
+        
+
+    return JsonResponse({'pictures': picture_data}, safe=False)
+
+
+def upload_comment(request):
+    if request.method == 'POST':
+        post_data = json.loads(request.body.decode('utf-8'))
+        post_id = post_data['post_id']
+        comment_text = post_data['comment']
+        user = post_data['username']
+        user_object = CustomUser.objects.get(username=user) 
+        if not user_object:
+            return HttpResponse(status=404, content="User not found")
+        
+        post = Post.objects.get(id=post_id)
+        comment = Comment.objects.create(user=user_object, content=comment_text)
+        post.comments.add(comment)
+        comment.save()
+        post.save()
+        return JsonResponse({'message': 'Comment uploaded successfully'})
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=400)
+    
+def getCommentsOfPost(request):
+    if request.method == 'POST':
+        post_data = json.loads(request.body.decode('utf-8'))
+        post_id = post_data['post_id']
+        post = Post.objects.get(id=post_id)
+        # Obtener los comentarios del post
+        comments = post.comments.all()
+
+        # Crear una lista de diccionarios con la información de cada comentario
+        comments_list = []
+        for comment in comments:
+            user = comment.user.username
+            user_object = CustomUser.objects.get(username=user) 
+            user_profile = Profile.objects.get(user=user_object)
+            comment_info = {
+                'id': comment.id,
+                'user': user,
+                'content': comment.content,
+                'created_at': comment.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+                'avatar': user_profile.profileimg.name
+            }
+            comments_list.append(comment_info)
+
+        # Devolver la lista de comentarios en la respuesta JSON
+        return JsonResponse({'comments': comments_list})
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=400)
+    
+def delete_comment(request):
+    if request.method == 'POST':
+        post_data = json.loads(request.body.decode('utf-8'))
+        post_id = post_data['post_id']
+        comment_id = post_data['comment_id']
+        post = Post.objects.get(id=post_id)
+        comment = Comment.objects.get(id=comment_id)
+        if post.comments.filter(id=comment.id).exists():
+            post.comments.remove(comment)
+            post.save()
+            comment.delete()
+            return JsonResponse({'message': 'Comment delete successfully'}, status=201)
+        else:
+            return JsonResponse({'error': 'No exist the comment on this post'}, status=400)
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=400)
