@@ -388,14 +388,14 @@ export default class ImageCard extends Component {
                 </Box>
               </Flex>
               <div div style={styles.imageleft}>
-                <Box padding="5%">
+              {this.state.postOwner === this.state.user ?<Box/> : <Box padding="5%">
                   <Button borderRadius="30" size="lg" ml="auto" marginRight="0" onClick={this.toggleFollow} style={{
                     backgroundColor: isFollowing ? 'black' : 'red',
                     color: 'white',
                   }}>
                     {followButtonText}
                   </Button>
-                </Box >
+                </Box >}
               </div>
             </div>
           </div>
