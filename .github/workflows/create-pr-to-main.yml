@@ -1,0 +1,36 @@
+name: Create PR to Main
+
+on:
+  workflow_run:
+    workflows: ["Run Tests on Dev"]
+    types:
+      - completed
+      
+permissions:
+  contents: write
+  
+jobs:
+  create_pr_to_main:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+
+    - name: Set up Git
+      run: |
+        git config --global user.name "Francesc"
+        git config --global user.email "fparcerisasv@gmail.com"
+
+    - name: Create PR to Main
+      if: ${{ success() && github.event.workflow_run.conclusion == 'success' }}
+      run: |
+        git pull
+        git checkout dev2
+        git pull origin dev2
+        new_branch_name="feature-${{ github.run_id }}"
+        git checkout -b $new_branch_name
+        git push -u origin $new_branch_name
+        gh pr create --base main --head $new_branch_name --title "Feature ${new_branch_name}" --body "Automatically created feature branch from dev."
+      env:
+        GITHUB_TOKEN: ${{ secrets.WORKFLOW_CI }}
