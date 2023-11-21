@@ -20,6 +20,11 @@ jobs:
       run: python manage.py makemigrations
     - name: Apply migrations
       run: python manage.py migrate
+    - name: Run build frontend
+      run: |
+        cd frontend
+        npm run build
+        cd ..
     - name: Build Docker image
       run: docker build -t ub-es-2023-b3 .
     - name: Tag Docker image
