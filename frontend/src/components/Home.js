@@ -6,15 +6,18 @@ import { Component } from 'react';
 import { render } from "react-dom";
 import UploadFloating from './UploadFloating.js';
 import SearchBar from './SearchBar.js';
+import NavBar from './NavBar.js';
 function Home (){
   
     return (
      
         
         <div>
-          <SearchBar/>
+          <ChakraProvider>
+          <NavBar />
           <PinterestLayout />
           <UploadFloating />
+          </ChakraProvider>
         </div>
 
       
