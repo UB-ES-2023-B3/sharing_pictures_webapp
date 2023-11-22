@@ -30,8 +30,10 @@ jobs:
       uses: docker/build-push-action@v3
       with:
         push: true
-        tags: index.docker.io/${{ secrets.AzureAppService_ContainerUsername_316964246a3e4586a4e4e5d470a53671 }}/quimlr/ub-es-2023-b3:${{ github.sha }}
+        tags: quimlr/ub-es-2023-b3:${{ github.sha }}
         file: ./Dockerfile
+        DOCKER_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
+        DOCKER_PASSWORD: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
   deploy:
     runs-on: ubuntu-latest
