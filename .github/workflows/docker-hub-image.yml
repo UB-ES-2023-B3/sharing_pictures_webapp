@@ -1,10 +1,10 @@
-name: Build and Deploy Docker Image on Docker Hub
+name: Build and Deploy Docker Image on Docker Hub [DEPRACATED]
 
 on:
   push:
-    branches: [ "main" ]
+    branches: []
   pull_request:
-    branches: [ "main" ]
+    branches: []
 
 jobs:
 
