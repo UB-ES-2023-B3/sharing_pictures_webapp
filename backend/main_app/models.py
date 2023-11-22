@@ -1,6 +1,6 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-from datetime import datetime
+from django.utils import timezone
 import uuid
 
 class CustomUser(AbstractUser):
@@ -10,13 +10,24 @@ class CustomUser(AbstractUser):
 
     def __str__(self):
         return self.username
+    
+
+class Comment(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return f'{self.user.username} - {self.content}'    
 
 class Post(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     image = models.ImageField(upload_to='post_images')
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     description = models.TextField(default='')
-    created_at = models.DateTimeField(default=datetime.now)
+    
+    comments = models.ManyToManyField(Comment, related_name='post_comments')
+    created_at = models.DateTimeField(default=timezone.now)
 
 class Profile(models.Model):
 
@@ -38,3 +49,4 @@ class FollowersCount(models.Model):
 
     def __str__(self):
         return self.user
+    
