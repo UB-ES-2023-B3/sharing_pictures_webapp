@@ -1,4 +1,7 @@
-name: Build and deploy container app to Azure Web App
+# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
+# More GitHub Actions for Azure: https://github.com/Azure/actions
+
+name: Build and deploy container app to Azure Web App - sharing-pictures
 
 on:
   push:
@@ -7,9 +10,7 @@ on:
   workflow_dispatch:
 
 jobs:
-
   build:
-  
     runs-on: 'ubuntu-latest'
 
     steps:
@@ -22,20 +23,17 @@ jobs:
       uses: docker/login-action@v2
       with:
         registry: https://index.docker.io/v1/
-        username: ${{ secrets.AzureAppService_ContainerUsername_316964246a3e4586a4e4e5d470a53671 }}
-        password: ${{ secrets.AzureAppService_ContainerPassword_e382e98e205545c4a2c3a53cc10c027c }}
+        username: ${{ secrets.AzureAppService_ContainerUsername_8ad7f13dfd704afc89f3ffa4cefffb33 }}
+        password: ${{ secrets.AzureAppService_ContainerPassword_67e707994b4144a78bfeea7cdb54a97b }}
 
     - name: Build and push container image to registry
       uses: docker/build-push-action@v3
       with:
         push: true
-        tags: quimlr/ub-es-2023-b3:${{ github.sha }}
+        tags: index.docker.io/${{ secrets.AzureAppService_ContainerUsername_8ad7f13dfd704afc89f3ffa4cefffb33 }}/ub-es-2023-b3:${{ github.sha }}
         file: ./Dockerfile
-        DOCKER_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
-        DOCKER_PASSWORD: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
   deploy:
-  
     runs-on: ubuntu-latest
     needs: build
     environment:
@@ -49,5 +47,5 @@ jobs:
       with:
         app-name: 'sharing-pictures'
         slot-name: 'production'
-        publish-profile: ${{ secrets.AzureAppService_PublishProfile_7439146f06544acbaac34cf2058b4e60 }}
-        images: 'index.docker.io/${{ secrets.AzureAppService_ContainerUsername_316964246a3e4586a4e4e5d470a53671 }}/quimlr/ub-es-2023-b3:${{ github.sha }}'
+        publish-profile: ${{ secrets.AzureAppService_PublishProfile_fd7248c58de84cbeb6c9c3880f41ae10 }}
+        images: 'index.docker.io/${{ secrets.AzureAppService_ContainerUsername_8ad7f13dfd704afc89f3ffa4cefffb33 }}/ub-es-2023-b3:${{ github.sha }}'
