@@ -25,6 +25,7 @@ import { ExternalLinkIcon, LinkIcon, DownloadIcon, StarIcon } from '@chakra-ui/i
 
 
 
+
 export default class ImageCard extends Component {
   constructor(props) {
     super(props);
@@ -178,12 +179,10 @@ export default class ImageCard extends Component {
     if (trimmedDescription !== "") {
       const capitalizedDescription = trimmedDescription.charAt(0).toUpperCase() + trimmedDescription.slice(1);
       const words = capitalizedDescription.split(' ');
-
-      if (words.length > 100 && !showFullDescription) {
-
-        const limitedDescription = words.slice(0, 100).join(' '); // Tomar solo las primeras 100 palabras
-        const remainingContent = words.slice(100).join(' ');
-
+      if (words.length > 30 && !showFullDescription) {
+        console.log(this.state.showFullDescription)
+        const limitedDescription = words.slice(0, 30).join(' '); // Tomar solo las primeras 100 palabras
+        const restDescription = words.slice(30).join(' ');
         const handleShowMore = () => {
           this.setState({ showFullDescription: true });
         };
@@ -191,36 +190,29 @@ export default class ImageCard extends Component {
         return (
 
           <Text fontSize='2xl'>
-          <strong style={{ fontSize: '1em' }}>Description</strong>
-          <p style={{ fontSize: '0.7em', maxHeight: showFullDescription ? 'unset' : '100px', overflowY: showFullDescription ? 'auto' : 'hidden' }}>
+            <strong style={{ fontSize: '1em' }}>Description</strong>
 
-            {showFullDescription ? capitalizedDescription : limitedDescription}
-            <button onClick={handleShowMore} style={{ fontSize: '0.7em', border: 'none', background: 'none', color: 'blue', cursor: 'pointer' }}>Ver más</button>
-            {!showFullDescription && (
-              <span>
-                <button onClick={handleShowMore} style={{ fontSize: '0.7em', border: 'none', background: 'none', color: 'blue', cursor: 'pointer' }}>Ver más</button>
-                {remainingContent}
-                {' '}
-                
+            <p style={{ fontSize: '0.7em', maxHeight: showFullDescription ? 'unset' : '100px', overflowY: showFullDescription ? 'auto' : 'hidden' }}>
 
-              </span>
-            )}
-          </p>
-        </Text>
-  
+              {limitedDescription}
+              <Button onClick={handleShowMore} style={{ fontSize: '0.7em', border: 'none', background: 'none', color: 'blue', cursor: 'pointer' }}> . . . </Button>
+
+            </p>
+          </Text>
 
         );
       } else {
         const limitedDescription = words.slice(0, 100).join(' '); // Tomar solo las primeras 100 palabras
         return (
-          
+          <Box>
+            <Text fontSize='2xl' style={{ maxHeight: '200px', overflowY: 'auto' }}>
+              <strong style={{ fontSize: '1em' }}>Description</strong>
+            </Text>
+            <Text fontSize='2xl' style={{ maxHeight: '200px', overflowY: 'auto' }}>
 
-          <Text fontSize='2xl' >
-            <strong style={{ fontSize: '1em' }}>Description</strong>
-            <p style={{ fontSize: '0.7em' }}>{limitedDescription}</p>
-
-          </Text>
-
+              <p style={{ fontSize: '0.7em' }}>{capitalizedDescription}</p>
+            </Text>
+          </Box>
         );
       }
     } else {
