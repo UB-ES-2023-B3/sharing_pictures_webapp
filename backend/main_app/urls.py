@@ -19,4 +19,5 @@ urlpatterns = [
     path('update_profile/', views.update_profile, name='update_profile'),
     path('update_profile_picture/', views.update_profile_picture, name='update_profile_picture'),
     path('load_liked_pictures/', views.load_liked_pictures, name='load_liked_pictures'),
+    path('get_avatar/', views.get_avatar, name='get_avatar'),
     ]

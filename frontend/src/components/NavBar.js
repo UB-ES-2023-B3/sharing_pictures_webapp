@@ -28,31 +28,66 @@ function NavBar() {
     const [inicio, setinicio] = useState(true);
     const [isLoggedIn, setisLoggedIn] = useState(false);
     const [explorar, setexplorar] = useState(false);
+    const [userFetched,setUserFetched] = useState(false);
+    const [username,setUsername]=useState("");
+    const [email,setEmail]=useState("");
+    const [logo, setLogo]=useState("");
     //useEffect(() => onChangeValue({alarm }), [alarm])
 
     const handleLogout = () => {
-        fetch('/api/logout/', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          // Puedes incluir datos en el cuerpo si es necesario para el logout
-          // body: JSON.stringify({}),
-        })
+        fetch('/api/logout/')
           .then(response => {
-            if (response.ok) {
-              // Si la solicitud de logout fue exitosa, puedes realizar alguna acción adicional en el frontend
-              console.log('Sesión cerrada exitosamente');
-              // Ejemplo de redirección o actualización de la interfaz de usuario
-              // window.location.href = '/'; // Redirige a la página principal después de cerrar sesión
-            } else {
-              console.error('Error al cerrar sesión');
-            }
+            window.location.href="/";
           })
           .catch(error => {
             console.error('Error en la solicitud al backend:', error);
           });
       };
+      const fetchUser = () => {
+    
+        // Fetch more posts from the API and append them to the existing posts
+        fetch("api/get_logged_in_user/")
+          .then((response) => response.json())
+          .then((data) => {
+            setUsername(data.username);
+            avatarprofile(data.username);
+            setUserFetched(true);
+          })
+          .catch((error) => {
+            console.error('Error loading more posts:', error);
+          });
+      };
+
+      const avatarprofile = (user) => {
+      
+        fetch('/api/get_avatar/', {
+        
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ username: user}),
+
+        })
+        .then((response) => response.json())
+        .then((data) => {
+          setEmail(data.email);
+          setLogo(data.avatar);
+        })
+        .catch((error) => {
+          console.error('Error loading more posts:', error);
+        });
+  
+          
+      }
+      useEffect(() => {
+        
+        if(!userFetched){
+          fetchUser();
+        }
+        
+      }, []);
+     
     return (
         <div>
             
@@ -68,8 +103,9 @@ function NavBar() {
                 </Box>
                 <Spacer />
                 <>
-
-                    <Avatar name='Dan Abrahmov' size='sm' />
+                    <a href={`/profile/${username}`}>
+                    <Avatar name='Dan Abrahmov' size='sm' src={`../media/profile_images/${logo}`}/>
+                    </a>
                 </>
 
                 <Menu>
@@ -80,11 +116,12 @@ function NavBar() {
                         <>
                             <MenuGroup title='Actualmente en' display='flex' flexDirection='row' alignItems='center'>
                                 <Box display="flex" alignItems="center">
-                                    <Avatar size='lg' name='Kola Tioluwani' src='https://bit.ly/tioluwani-kolawole' />
+                                  <a href={`/profile/${username}`}>
+                                    <Avatar size='lg' name='Kola Tioluwani' src={`../media/profile_images/${logo}`}/>
+                                    </a>
                                     <Box marginLeft='4'>
-                                        <Text as='b'>Name</Text>
-                                        <Text>Type</Text>
-                                        <Text>Email</Text>
+                                        <Text as='b'>{username}</Text>
+                                        <Text>{email}</Text>
                                     </Box>
                                 </Box>
                             </MenuGroup>

@@ -4,8 +4,9 @@ import Swal from 'sweetalert2';
 
 function PinterestLayout() {
   const [posts, setPosts] = useState([]);
+  const [postNotEmpty, setPostNotEmpty] = useState(false);
   const [username, setUsername] = useState("");
-
+  const [userFetched,setUserFetched] = useState(false);
   const sentinelRef = useRef(null);
   const maxLoadCount = 10000; // Maximum number of pictures to load
   let loadCount = 0; // Counter to keep track of loaded pictures
@@ -26,6 +27,7 @@ function PinterestLayout() {
           setPosts((prevPosts) => [...prevPosts, ...newPosts]);
           loadCount += newPosts.length; // Update the load count
         }
+        setPostNotEmpty(true);
       })
       .catch((error) => {
         console.error('Error loading more posts:', error);
@@ -38,6 +40,7 @@ function PinterestLayout() {
       .then((response) => response.json())
       .then((data) => {
         setUsername(data.username);
+        setUserFetched(true);
       })
       .catch((error) => {
         console.error('Error loading more posts:', error);
@@ -52,10 +55,15 @@ function PinterestLayout() {
   };
 
   useEffect(() => {
-    fetchPostData(); // Initial data load
-    fetchUser();
+    if (!postNotEmpty){
+      fetchPostData(); // Initial data load
+    }
+    if(!userFetched){
+      fetchUser();
+    }
+    
   }, []);
-
+  /*
   useEffect(() => {
     const options = {
       root: null,
@@ -75,7 +83,7 @@ function PinterestLayout() {
       }
     };
   }, []);
-  
+  */
   return (
     <div style={styles.pin_container}>
       {posts.map((post, index) => (

@@ -74,8 +74,7 @@ def log_in(request):
 #@login_required
 def log_out(request):
     logout(request)
-    messages.info(request, "Logged out successfully")
-    return redirect("/")
+    return JsonResponse({"status": "success"}) 
 
 def load_pictures(request):
     import random #import random module
@@ -428,3 +427,22 @@ def load_liked_pictures(request):
                 })
 
     return JsonResponse({'pictures': picture_data}, safe=False)
+
+
+def get_avatar(request):
+
+    if request.method == 'POST':
+        post_data = json.loads(request.body)
+        user_username =post_data['username']
+        user_object = CustomUser.objects.get(username=user_username) 
+
+        if not user_object:
+            return HttpResponse(status=404, content="User1 not found")
+    
+        user_profile = Profile.objects.get(user=user_object)
+
+
+        return JsonResponse({'avatar':user_profile.profileimg.name,
+                             'email': user_object.email})
+    else:
+        return HttpResponse(status=400)
