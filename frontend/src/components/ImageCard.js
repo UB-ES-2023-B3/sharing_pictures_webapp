@@ -337,7 +337,8 @@ export default class ImageCard extends Component {
           {comments.map((comment, index) => (
             <div key={index} style={styles.comment}>
               {/* Avatar del usuario */}
-              <Avatar src={'/media/profile_images/' + comment.avatar} alt={`User ${index + 1}`} style={styles.commentAvatar} />
+             { console.log('ddd' + comment.avatar)}
+              <Avatar src={'../media/' + comment.avatar} alt={`User ${index + 1}`} style={styles.commentAvatar} />
               {/* Contenido del comentario */}
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: 'calc(100% - 48px)', marginTop: '15px' }}>
                 <div>

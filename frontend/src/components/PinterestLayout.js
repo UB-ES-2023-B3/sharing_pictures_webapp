@@ -2,9 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import Card from './Card.js';
 
 function PinterestLayout() {
-  const [posts, setPosts] = useState([]); 
-  const [postNotEmpty, setPostNotEmpty] = useState(false);
-  const [userFetched,setUserFetched] = useState(false);
   const [explorePosts, setExplorePosts] = useState([]); // State for explore posts
   const [followingPosts, setFollowingPosts] = useState([]); // State for following posts
   const [username, setUsername] = useState("");
@@ -13,28 +10,7 @@ function PinterestLayout() {
   const sentinelRef = useRef(null);
   const maxLoadCount = 10000; // Maximum number of pictures to load
   let loadCount = 0; // Counter to keep track of loaded pictures
-  const fetchPostData = () => {
-    
-    // Fetch more posts from the API and append them to the existing posts
-    fetch("api/load_pictures/")
-      .then((response) => response.json())
-      .then((data) => {
-        const newPosts = data.pictures;
 
-        if (loadCount + newPosts.length > maxLoadCount) {
-          const remainingPosts = maxLoadCount - loadCount;
-          setPosts((prevPosts) => [...prevPosts, ...newPosts.slice(0, remainingPosts)]);
-          loadCount = maxLoadCount; // Update loadCount
-        } else {
-          setPosts((prevPosts) => [...prevPosts, ...newPosts]);
-          loadCount += newPosts.length; // Update the load count
-        }
-        setPostNotEmpty(true);
-      })
-      .catch((error) => {
-        console.error('Error loading more posts:', error);
-      });
-  };
   const fetchFollowingPictures = () => {
     fetch("api/load_following_pictures/")
       .then(response => response.json())
@@ -59,7 +35,6 @@ function PinterestLayout() {
           setExplorePosts((prevPosts) => [...prevPosts, ...newPosts]);
           loadCount += newPosts.length;
         }
-        setPostNotEmpty(true);
       })
       .catch((error) => {
         console.error('Error loading explore posts:', error);
@@ -71,7 +46,6 @@ function PinterestLayout() {
       .then((response) => response.json())
       .then((data) => {
         setUsername(data.username);
-        setUserFetched(true);
       })
       .catch((error) => {
         console.error('Error loading user data:', error);
@@ -85,15 +59,6 @@ function PinterestLayout() {
   };
 
   useEffect(() => {
-    if (!postNotEmpty){
-      fetchPostData(); // Initial data load
-    }
-    if(!userFetched){
-      fetchUser();
-    }
-    
-  }, []);
-  /*
     if (activeTab === 'following') {
       fetchFollowingPictures();
     } else {
@@ -120,8 +85,8 @@ function PinterestLayout() {
         observer.unobserve(sentinelRef.current);
       }
     };
-  }, []);
-  */
+  }, [sentinelRef, activeTab]);
+
   return (
     <div className="container mx-auto px-4 sm:px-8 max-w-3xl">
       <div className="text-center mt-6">
