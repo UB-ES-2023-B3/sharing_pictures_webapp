@@ -75,8 +75,7 @@ def log_in(request):
 #@login_required
 def log_out(request):
     logout(request)
-    messages.info(request, "Logged out successfully")
-    return redirect("/")
+    return JsonResponse({"status": "success"}) 
 
 def load_pictures(request):
     import random #import random module
@@ -456,6 +455,23 @@ def load_liked_pictures(request):
     return JsonResponse({'pictures': picture_data}, safe=False)
 
 
+def get_avatar(request):
+
+    if request.method == 'POST':
+        post_data = json.loads(request.body)
+        user_username =post_data['username']
+        user_object = CustomUser.objects.get(username=user_username) 
+
+        if not user_object:
+            return HttpResponse(status=404, content="User1 not found")
+    
+        user_profile = Profile.objects.get(user=user_object)
+
+
+        return JsonResponse({'avatar':user_profile.profileimg.name,
+                             'email': user_object.email})
+    else:
+        return HttpResponse(status=400)
 def upload_comment(request):
     if request.method == 'POST':
         post_data = json.loads(request.body.decode('utf-8'))
@@ -517,5 +533,24 @@ def delete_comment(request):
             return JsonResponse({'message': 'Comment delete successfully'}, status=201)
         else:
             return JsonResponse({'error': 'No exist the comment on this post'}, status=400)
-    else:
+    else: 
         return JsonResponse({'error': 'Invalid request method'}, status=400)
+
+
+def get_avatar(request):
+
+    if request.method == 'POST':
+        post_data = json.loads(request.body)
+        user_username =post_data['username']
+        user_object = CustomUser.objects.get(username=user_username) 
+
+        if not user_object:
+            return HttpResponse(status=404, content="User1 not found")
+    
+        user_profile = Profile.objects.get(user=user_object)
+
+
+        return JsonResponse({'avatar':user_profile.profileimg.name,
+                             'email': user_object.email})
+    else:
+        return HttpResponse(status=400)
