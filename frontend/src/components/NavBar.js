@@ -104,7 +104,7 @@ function NavBar() {
                 <Spacer />
                 <>
                     <a href={`/profile/${username}`}>
-                    <Avatar name='Dan Abrahmov' size='sm' src={`../media/profile_images/${logo}`}/>
+                    <Avatar name='Dan Abrahmov' size='sm' src={`../media/${logo}`}/>
                     </a>
                 </>
 
@@ -117,7 +117,7 @@ function NavBar() {
                             <MenuGroup title='Actualmente en' display='flex' flexDirection='row' alignItems='center'>
                                 <Box display="flex" alignItems="center">
                                   <a href={`/profile/${username}`}>
-                                    <Avatar size='lg' name='Kola Tioluwani' src={`../media/profile_images/${logo}`}/>
+                                    <Avatar size='lg' name='Kola Tioluwani' src={`../media/${logo}`}/>
                                     </a>
                                     <Box marginLeft='4'>
                                         <Text as='b'>{username}</Text>
