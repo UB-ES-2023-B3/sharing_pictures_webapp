@@ -41,9 +41,10 @@ export default class ImageCard extends Component {
       reportSubmitted: false,
       postOwner: '',
       user: "",
+      showFullDescription: false,
       avatarURL: "",
       comments: [], // Inicializa 'comments' como un array vacío
-      newCommentText: '', // Estado para almacenar el texto del nuevo comentario
+      newCommentText: '' // Estado para almacenar el texto del nuevo comentario
 
 
     };
@@ -228,30 +229,64 @@ export default class ImageCard extends Component {
       this.closeReportModal();
     }, 2000); // Cierra el cuadro de diálogo después de 2 segundos
   };
-  renderDescription(descriptionWithHashtags, hashtags) {
-    if (descriptionWithHashtags && descriptionWithHashtags.trim() !== "") {
-      const words = descriptionWithHashtags.split(' ');
-      return (
-        <Box style={styles.boxStyle}>
-          <Text fontSize='2xl' paddingTop="5%">
-            {words.map((word, index) => (
-              word.startsWith('#') ? (
-                <strong key={index}>{word} </strong>
-              ) : (
-                <span key={index}>{word} </span>
-              )
-            ))}
+  renderDescription(description) {
+
+    //const urlParams = new URLSearchParams(window.location.search);
+
+    //const description = urlParams.get('description');
+    const trimmedDescription = description.trim();
+    const { showFullDescription } = this.state;
+
+
+    if (trimmedDescription !== "") {
+      const capitalizedDescription = trimmedDescription.charAt(0).toUpperCase() + trimmedDescription.slice(1);
+      const words = capitalizedDescription.split(' ');
+      if (words.length > 30 && !showFullDescription) {
+        console.log(this.state.showFullDescription)
+        const limitedDescription = words.slice(0, 30).join(' '); // Tomar solo las primeras 100 palabras
+        const restDescription = words.slice(30).join(' ');
+        const handleShowMore = () => {
+          this.setState({ showFullDescription: true });
+        };
+
+        return (
+
+          <Text fontSize='2xl'>
+            <strong style={{ fontSize: '1em' }}>Description</strong>
+
+            <p style={{ fontSize: '0.7em', maxHeight: showFullDescription ? 'unset' : '100px', overflowY: showFullDescription ? 'auto' : 'hidden' }}>
+
+              {limitedDescription}
+              <Button onClick={handleShowMore} style={{ fontSize: '0.7em', border: 'none', background: 'none', color: 'blue', cursor: 'pointer' }}> . . . </Button>
+
+            </p>
           </Text>
-        </Box>
-      );
+
+        );
+      } else {
+        const limitedDescription = words.slice(0, 100).join(' '); // Tomar solo las primeras 100 palabras
+        return (
+          <Box>
+            <Text fontSize='2xl' style={{ maxHeight: '200px', overflowY: 'auto' }}>
+              <strong style={{ fontSize: '1em' }}>Description</strong>
+            </Text>
+            <Text fontSize='2xl' style={{ maxHeight: '200px', overflowY: 'auto' }}>
+
+              <p style={{ fontSize: '0.7em' }}>{capitalizedDescription}</p>
+            </Text>
+          </Box>
+        );
+      }
     } else {
       return (
         <Box style={styles.boxStyle}>
-          <Text fontSize='2xl' paddingTop="5%">Ningúna descripción añadida</Text>
+          <Text fontSize='2xl'>No description added</Text>
         </Box>
       );
     }
+
   }
+
 
 
   handleIsLiked2 = (user) => {
@@ -502,6 +537,10 @@ export default class ImageCard extends Component {
                     }
 
                   />
+                  <Box >
+                       {this.renderDescription(description)}
+                  </Box>
+
                   <Box>
                     <div div style={styles.imageleft}>
                       {this.state.postOwner === this.state.user ? <Box /> : <Box padding="5%">
@@ -541,6 +580,7 @@ export default class ImageCard extends Component {
                     </InputGroup>
                   </div>
                 </Box>
+
               </Flex>
             </div>
           </div>
