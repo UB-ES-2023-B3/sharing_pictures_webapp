@@ -20,4 +20,9 @@ urlpatterns = [
     path('update_profile_picture/', views.update_profile_picture, name='update_profile_picture'),
     path('load_liked_pictures/', views.load_liked_pictures, name='load_liked_pictures'),
     path('get_avatar/', views.get_avatar, name='get_avatar'),
+    path('load_following_pictures/', views.load_following_pictures, name='load_following_pictures'),
+    path('upload_comment/', views.upload_comment, name='upload_comment'),
+    path('getCommentsOfPost/', views.getCommentsOfPost, name='getCommentsOfPost'),
+    path('deleteCommentPost/', views.delete_comment, name="deleteCommentPost"),
+    path('load_liked_pictures/', views.load_liked_pictures, name='load_liked_pictures')
     ]

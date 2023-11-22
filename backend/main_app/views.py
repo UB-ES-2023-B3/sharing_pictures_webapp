@@ -7,6 +7,7 @@ from django.http import JsonResponse, HttpResponse
 from .forms import RegistrationForm, LoginForm
 from .decorators import user_not_authenticated
 from .models import Post
+from .models import Comment
 from .models import CustomUser
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse, HttpResponse
@@ -289,8 +290,8 @@ def follow(request):
     
         user_profile = Profile.objects.get(user=user_object)
 
-        user_name = post_data.get('user')
-        user = CustomUser.objects.get(username=user_username)
+        user_name = post_data['user']
+        user = CustomUser.objects.get(username=user_name)
         if not user:
             return HttpResponse(status=404, content="User2 not found")
         if user_profile.following.filter(username=user.username).exists():
@@ -322,8 +323,8 @@ def get_is_user_following(request):
     
         user_profile = Profile.objects.get(user=user_object)
 
-        user_name = post_data.get('user')
-        user = CustomUser.objects.get(username=user_username)
+        user_name = post_data['user']
+        user = CustomUser.objects.get(username=user_name)
         if not user:
             return HttpResponse(status=404, content="User2 not found")
         if user_profile.following.filter(username=user.username).exists():
@@ -403,6 +404,30 @@ def update_profile_picture(request):
             return JsonResponse({'error': 'No profileimg provided in the request'}, status=400)
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=400)
+
+def load_following_pictures(request):
+    
+    user_object = CustomUser.objects.get(username=request.user.username)
+    user_profile = Profile.objects.get(user=user_object)
+    following = user_profile.following.all()
+    posts = Post.objects.filter(user__in=following)
+    picture_data = []
+
+    #order the posts by date the most recent first
+    posts = posts.order_by('-created_at')
+    
+    for post in posts:
+        picture_data.append({
+                    'image_url': post.image.url,
+                    'description': post.description,
+                    'created_at': post.created_at.strftime('%F %d, %Y'),
+                    'image_size': post.image.size,
+                    'post_id' : post.id,
+                })
+        
+    print(picture_data)
+
+    return JsonResponse({'pictures': picture_data}, safe=False)
     
 def load_liked_pictures(request):
     import random
@@ -415,8 +440,8 @@ def load_liked_pictures(request):
     posts = list(posts)
 
     random.shuffle(posts)
- 
-  
+
+
     for post in posts:
         picture_data.append({
                     'image_url': post.image.url,
@@ -425,8 +450,91 @@ def load_liked_pictures(request):
                     'image_size': post.image.size,
                     'post_id' : post.id,
                 })
+        
 
     return JsonResponse({'pictures': picture_data}, safe=False)
+
+
+def get_avatar(request):
+
+    if request.method == 'POST':
+        post_data = json.loads(request.body)
+        user_username =post_data['username']
+        user_object = CustomUser.objects.get(username=user_username) 
+
+        if not user_object:
+            return HttpResponse(status=404, content="User1 not found")
+    
+        user_profile = Profile.objects.get(user=user_object)
+
+
+        return JsonResponse({'avatar':user_profile.profileimg.name,
+                             'email': user_object.email})
+    else:
+        return HttpResponse(status=400)
+def upload_comment(request):
+    if request.method == 'POST':
+        post_data = json.loads(request.body.decode('utf-8'))
+        post_id = post_data['post_id']
+        comment_text = post_data['comment']
+        user = post_data['username']
+        user_object = CustomUser.objects.get(username=user) 
+        if not user_object:
+            return HttpResponse(status=404, content="User not found")
+        
+        post = Post.objects.get(id=post_id)
+        comment = Comment.objects.create(user=user_object, content=comment_text)
+        post.comments.add(comment)
+        comment.save()
+        post.save()
+        return JsonResponse({'message': 'Comment uploaded successfully'})
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=400)
+    
+def getCommentsOfPost(request):
+    if request.method == 'POST':
+        post_data = json.loads(request.body.decode('utf-8'))
+        post_id = post_data['post_id']
+        post = Post.objects.get(id=post_id)
+        # Obtener los comentarios del post
+        comments = post.comments.all()
+
+        # Crear una lista de diccionarios con la información de cada comentario
+        comments_list = []
+        for comment in comments:
+            user = comment.user.username
+            user_object = CustomUser.objects.get(username=user) 
+            user_profile = Profile.objects.get(user=user_object)
+            comment_info = {
+                'id': comment.id,
+                'user': user,
+                'content': comment.content,
+                'created_at': comment.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+                'avatar': user_profile.profileimg.name
+            }
+            comments_list.append(comment_info)
+
+        # Devolver la lista de comentarios en la respuesta JSON
+        return JsonResponse({'comments': comments_list})
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=400)
+    
+def delete_comment(request):
+    if request.method == 'POST':
+        post_data = json.loads(request.body.decode('utf-8'))
+        post_id = post_data['post_id']
+        comment_id = post_data['comment_id']
+        post = Post.objects.get(id=post_id)
+        comment = Comment.objects.get(id=comment_id)
+        if post.comments.filter(id=comment.id).exists():
+            post.comments.remove(comment)
+            post.save()
+            comment.delete()
+            return JsonResponse({'message': 'Comment delete successfully'}, status=201)
+        else:
+            return JsonResponse({'error': 'No exist the comment on this post'}, status=400)
+    else: 
+        return JsonResponse({'error': 'Invalid request method'}, status=400)
 
 
 def get_avatar(request):
