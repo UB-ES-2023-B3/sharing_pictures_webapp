@@ -325,7 +325,7 @@ export default class ImageCard extends Component {
     if (!comments || !Array.isArray(comments) || comments.length === 0) {
       return (
         <div style={styles.commentsContainer}>
-          <p>No hay comentarios aún.</p>
+          <p>There are no comments yet.</p>
         </div>
       );
     }
@@ -419,7 +419,7 @@ export default class ImageCard extends Component {
 
 
     const { isFollowing } = this.state;
-    const followButtonText = isFollowing ? 'Seguint' : 'Seguir';
+    const followButtonText = isFollowing ? 'Following' : 'Follow';
     const isLiked = this.state.isLiked;
     const ownerPost = this.state.postOwner;
 
