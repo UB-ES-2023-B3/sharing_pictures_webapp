@@ -10,6 +10,7 @@ const [likedPosts, setLikedPosts] = useState(null);
 const [activeTab, setActiveTab] = useState('my-posts');
 const { username } = useParams();
 const [isHoveringProfilePicture, setIsHoveringProfilePicture] = useState(false);
+const [isFollowing, setIsFollowing] = useState(false);
 
 const styles = {
     pin_container: {
@@ -63,19 +64,32 @@ fetch(apiUrl)
         user_following: data.user_following,
         is_own_profile: data.is_own_profile,
         uploaded_pictures: data.uploaded_posts,
+        button_text: data.button_text,
         
     };
-    
-    fetch(`/api/load_liked_pictures`)
-    .then((response) => response.json())
-    .then((likedData) => {
-        // Ensure likedData.pictures exists and is an array
-        setLikedPosts(likedData.pictures || []);
-        console.log(likedData.pictures);
-    })
-    .catch((error) => console.error('Error fetching liked posts: ', error));
 
-setProfileData(profileData);
+
+    if (!profileData.is_own_profile) {
+        if (profileData.button_text === 'Unfollow') {
+            setIsFollowing(true);
+        } else {
+            setIsFollowing(false);
+        }
+    }
+
+    // set the button text to follow or unfollow depending on the user
+    // button 
+    fetch(`/api/load_liked_pictures`)
+        .then((response) => response.json())
+        .then((likedData) => {
+            // Ensure likedData.pictures exists and is an array
+            setLikedPosts(likedData.pictures || []);
+            console.log(likedData.pictures);
+        })
+        .catch((error) => console.error('Error fetching liked posts: ', error));
+
+    setProfileData(profileData);
+
 })
     .catch((error) => {
     console.error('Error fetching profile data: ', error);
@@ -86,13 +100,16 @@ setProfileData(profileData);
         confirmButtonText: 'Back',
         confirmButtonColor: '#d33',
         allowOutsideClick: false,
+        
     }).then((result) => {
         if (result.isConfirmed) {
         window.history.back();
         }
     });
     });
+
 }, [username]);
+
 
 const handleProfileEditError = () => {
 
@@ -262,6 +279,61 @@ const handleProfilePictureUpload = (selectedFile) => {
         });
     }
     };
+
+    
+     
+
+const handleFollowUser = () => {
+    const getLoggedInUser = () => {
+        fetch('/api/get_logged_in_user/')
+            .then(response => response.json())
+            .then(data => {
+                
+                followUser(data.username);
+            })
+            .catch(error => {
+                console.error('Error in getting logged-in user:', error);
+            });
+    };
+      
+
+    const followUser = (loggedInUser) => {
+        fetch('/api/follow/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                username: loggedInUser,
+                user: profileData.user_object.username
+            }),
+        })
+            .then(() => {
+                // Update the button text
+                setProfileData((prevData) => ({
+                    ...prevData,
+                    button_text: profileData.button_text === 'Follow' ? 'Unfollow' : 'Follow',
+                }));
+
+                // Update the number of followers
+                setProfileData((prevData) => ({
+                    ...prevData,
+                    user_followers: profileData.button_text === 'Follow' ? profileData.user_followers + 1 : profileData.user_followers - 1,
+                }));
+
+                setIsFollowing(!isFollowing);
+            })
+            .catch((error) => {
+                // Handle errors if the request fails
+                console.error('Error in the backend request:', error);
+            });
+    };
+
+    // Call the function to get the logged-in user and follow
+    getLoggedInUser();  
+
+
+};
     
 
 
@@ -367,15 +439,25 @@ return (
                     {profileData.user_profile.bio}
                 </div>
                 {profileData.is_own_profile ? (
-                    <div className="flex justify-center mt-4 space-x-4">
-                        <button
-                            className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:text-red-300"
-                            onClick={handleEditProfile}
-                        >
-                            Edit Profile
-                        </button>
-                    </div>
-                ) : null}
+                <div className="flex justify-center mt-4 space-x-4">
+                    <button
+                        className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:text-red-300"
+                        onClick={handleEditProfile}
+                    >
+                        Edit Profile
+                    </button>
+                </div>
+            ) : (
+                <div className="flex justify-center mt-4 space-x-4">
+                    <button
+                        id="follow-button"
+                        className={`bg-${isFollowing ? 'gray' : 'red'}-600 text-${isFollowing ? 'white' : 'white'} px-4 py-2 rounded-lg hover:bg-${isFollowing ? 'gray' : 'red'}-700`}
+                        onClick={handleFollowUser}
+                    >
+                        {profileData.button_text}
+                    </button>
+                </div>
+            )}
             </div>
         </div>
         <div className="text-center mt-6">
