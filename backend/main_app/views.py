@@ -18,7 +18,7 @@ from .models import Post, Profile, FollowersCount, CustomUser
 from django.core.cache import cache
 from django.core.serializers import serialize
 import os
-
+import uuid
 #@user_not_authenticated
 def register(request):
     if request.method == 'POST':
@@ -78,24 +78,39 @@ def log_out(request):
     return JsonResponse({"status": "success"}) 
 
 def load_pictures(request):
-    import random #import random module
-    posts = Post.objects.all()
+    viewed_posts = request.COOKIES.get('viewed_posts', '').split(',')
+    # Convert each valid UUID string in viewed_posts to a UUID object
+    viewed_posts_uuids = []
+    for vp in viewed_posts:
+        try:
+            # Attempt to convert each string to a UUID
+            viewed_uuid = uuid.UUID(vp)
+            viewed_posts_uuids.append(viewed_uuid)
+        except ValueError:
+            # Ignore invalid UUID strings
+            continue
+
+    posts = Post.objects.exclude(id__in=viewed_posts_uuids).order_by('?')[:12]
     picture_data = []
 
-    #shuffle the posts to get a random order
-    posts = list(posts)
-    random.shuffle(posts)
-  
+    if not posts:
+        response = JsonResponse({'pictures': picture_data}, safe=False)
+        response.set_cookie('viewed_posts', ','.join([]))
+        return response
+        
+
     for post in posts:
         picture_data.append({
-                    'image_url': post.image.url,
-                    'description': post.description,
-                    'created_at': post.created_at.strftime('%F %d, %Y'),
-                    'image_size': post.image.size,
-                    'post_id' : post.id,
-                })
+            'image_url': post.image.url,
+            'description': post.description,
+            'created_at': post.created_at.strftime('%F %d, %Y'),
+            'image_size': post.image.size,
+            'post_id': post.id,  # Assuming post.id is a UUID
+        })
 
-    return JsonResponse({'pictures': picture_data}, safe=False)
+    response = JsonResponse({'pictures': picture_data}, safe=False)
+    response.set_cookie('viewed_posts', ','.join([str(post.id) for post in posts]))
+    return response
 
 def upload_picture(request):
     if request.method == 'POST':

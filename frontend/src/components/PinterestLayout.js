@@ -6,6 +6,7 @@ function PinterestLayout() {
   const [followingPosts, setFollowingPosts] = useState([]); // State for following posts
   const [username, setUsername] = useState("");
   const [activeTab, setActiveTab] = useState('explore'); // State to manage the active tab
+  const [viewedPosts, setViewedPosts] = useState([]);
 
   const sentinelRef = useRef(null);
   const maxLoadCount = 10000; // Maximum number of pictures to load
@@ -23,23 +24,38 @@ function PinterestLayout() {
   };
 
   const fetchExplorePosts = () => {
+    const viewedPostsCookie = document.cookie.split('; ').find(row => row.startsWith('viewed_posts='));
+    let viewedPosts = viewedPostsCookie ? viewedPostsCookie.split('=')[1].split(',') : [];
+
     fetch("api/load_pictures/")
       .then((response) => response.json())
       .then((data) => {
         const newPosts = data.pictures;
-        if (loadCount + newPosts.length > maxLoadCount) {
-          const remainingPosts = maxLoadCount - loadCount;
-          setExplorePosts((prevPosts) => [...prevPosts, ...newPosts.slice(0, remainingPosts)]);
-          loadCount = maxLoadCount;
+        const filteredPosts = newPosts.filter((post) => !viewedPosts.includes(post.post_id.toString()));
+
+        if (filteredPosts.length === 0) {
+          // If there are no new posts, consider resetting the cookie and making a new fetch call only if necessary
+          // Here, you might want to handle this scenario differently
         } else {
-          setExplorePosts((prevPosts) => [...prevPosts, ...newPosts]);
-          loadCount += newPosts.length;
+          if (loadCount + filteredPosts.length > maxLoadCount) {
+            const remainingPosts = maxLoadCount - loadCount;
+            setExplorePosts((prevPosts) => [...prevPosts, ...filteredPosts.slice(0, remainingPosts)]);
+            loadCount = maxLoadCount;
+          } else {
+            setExplorePosts((prevPosts) => [...prevPosts, ...filteredPosts]);
+            loadCount += filteredPosts.length;
+          }
+          // Update the 'viewedPosts' array and cookie
+          viewedPosts = [...viewedPosts, ...filteredPosts.map((post) => post.post_id.toString())];
+          document.cookie = `viewed_posts=${viewedPosts.join(',')}; path=/`;
         }
       })
       .catch((error) => {
-        console.error('Error loading explore posts:', error);
-      });
-  };
+        console.error('Error loading explore pictures:', error);
+    });
+};
+
+  
 
   const fetchUser = () => {
     fetch("api/get_logged_in_user/")
