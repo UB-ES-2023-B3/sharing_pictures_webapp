@@ -14,10 +14,11 @@ from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from .forms import RegistrationForm, LoginForm, UploadPostForm
-from .models import Post, Profile, FollowersCount, CustomUser
+from .models import Post, Profile, FollowersCount, CustomUser, Reports, Comment
 from django.core.cache import cache
 from django.core.serializers import serialize
 import os
+
 
 #@user_not_authenticated
 def register(request):
@@ -554,3 +555,30 @@ def get_avatar(request):
                              'email': user_object.email})
     else:
         return HttpResponse(status=400)
+    
+
+def report_picture(request):
+    if request.method == 'POST':
+        
+        post_data = json.loads(request.body.decode('utf-8'))
+        post_id = post_data['post_id']
+        description = post_data['description']
+        user = request.user.username
+        user_object = CustomUser.objects.get(username=user) 
+        if not user_object:
+            return HttpResponse(status=404, content="User not found")
+        
+        
+        print("llega a report_picture")
+        post = Post.objects.get(id=post_id)
+
+        # CHECK IF THE USER HAS ALREADY REPORTED THIS POST
+        if Reports.objects.filter(user=user_object, post=post).exists():
+            return JsonResponse({'error': 'You have already reported this post'}, status=409)
+        
+        report = Reports.objects.create(user=user_object, post=post, description=description)
+        
+        report.save()
+        return JsonResponse({'message': 'Report uploaded successfully'})
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=400)
