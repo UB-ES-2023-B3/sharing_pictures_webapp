@@ -1,0 +1,46 @@
+name: Build and Deploy Docker Image on Docker Hub
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+
+  build-and-deploy-docker-hub:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Update pip
+      run: pip install --upgrade pip
+    
+    - name: Install requirements
+      run: pip install -r requirements.txt
+      
+    - name: Create migrations
+      run: python manage.py makemigrations
+      
+    - name: Apply migrations
+      run: python manage.py migrate
+      
+    - name: Run build frontend
+      run: |
+        cd frontend
+        npm run build
+        cd ..
+        
+    - name: Docker Hub login
+      run: docker login -u ${{ secrets.DOCKER_HUB_USERNAME }} -p ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+    
+    - name: Build Docker image
+      run: docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/ub-es-2023-b3:4.1 .
+      
+    - name: Tag Docker image
+      run: docker tag ${{ secrets.DOCKER_HUB_USERNAME }}/ub-es-2023-b3:4.1 ${{ secrets.DOCKER_HUB_USERNAME }}/ub-es-2023-b3:4.1
+   
+    - name: Push Docker image
+      run: docker push ${{ secrets.DOCKER_HUB_USERNAME }}/ub-es-2023-b3:4.1
