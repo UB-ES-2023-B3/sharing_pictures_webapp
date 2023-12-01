@@ -38,7 +38,7 @@
 .search-bar button {
     padding: 10px 20px;
     border: none;
-    background-color: red;
+    background-color: lightpink;
     color: #fff;
     cursor: pointer;
     transition: background-color 0.3s ease;
@@ -51,7 +51,7 @@
 }
 
 .search-bar button:hover {
-    background-color: #0056b3;
+    background-color: #f56565;
 }
 
 .search-bar button:disabled {

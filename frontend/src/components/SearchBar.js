@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState , useEffect} from 'react';
 import axios from 'axios'; 
 import './SearchBar.css';
 
@@ -9,21 +9,45 @@ function SearchBar() {
     const [error, setError] = useState(null); // to hold error messages
     const [searched, setSearched] = useState(false);
 
-    const handleShowMore = () => {
-        window.location.href = `/search_results?q=${query}`;
+    const debounce = (func, delay) => {
+        let debounceTimer;
+        return function() {
+            const context = this;
+            const args = arguments;
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => func.apply(context, args), delay);
+        };
     };
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        
-        axios.get(`/api/search/?q=${query}`).then(response => {           
+    const search = (searchQuery) => {
+        axios.get(`/api/search/?q=${searchQuery}`).then(response => {           
             setResults(response.data);
             setError(null);
             setSearched(true);
         }).catch(error => {
-            setError(error.response.data.error);
+            setError(error.response?.data?.error || 'An error occurred');
             setSearched(true);
         });
+    };
+
+    const debouncedSearch = debounce(() => search(query), 100);
+
+    useEffect(() => {
+        if (query.trim() !== '') {
+            debouncedSearch();
+        } else {
+            setResults({ profiles: [] });
+            setSearched(false);
+        }
+    }, [query]);
+
+    const handleChange = (e) => {
+        setQuery(e.target.value);
+    };
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        search(query);
     };
 
     return (
@@ -33,9 +57,9 @@ function SearchBar() {
                     type="text"
                     value={query}
                     placeholder="Search for users or posts..."
-                    onChange={(e) => setQuery(e.target.value)}
+                    onChange={handleChange}
                 />
-                <button type="submit" disabled={!query.trim()}>Search</button>
+                <button type="submit" onClick={() => window.location.href = `/search_results?q=${query}`} disabled={!query.trim()}>Search</button>
             </form>
     
             {/* Display errors if they exist */}
@@ -60,17 +84,11 @@ function SearchBar() {
                     ))
                 ) : (
                     <div className="no-results">
-                        No users found.
+                              No users found.
                     </div>
                 )
             )}
-    
-            {/* Display 'Show More' link if there are results */}
-            {searched && (
-                <div className="show-more" onClick={handleShowMore}>
-                    Show more results and posts
-                </div>
-            )}
+
         </div>
     );
 }
