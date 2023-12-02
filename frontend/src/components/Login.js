@@ -138,7 +138,7 @@ export default class Login extends Component {
 
       Swal.fire({
         icon: 'error',
-        title: 'Registration Failed',
+        title: 'Login Failed: Invalid user or password',
       });
 
 		  }
