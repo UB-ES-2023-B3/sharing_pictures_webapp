@@ -9,6 +9,7 @@ import {
   Button,
   Select,
   Divider,
+  Spacer,
   Input,
   InputGroup,
   InputRightElement,
@@ -45,9 +46,9 @@ export default class ImageCard extends Component {
       showFullDescription: false,
       avatarURL: "",
       comments: [], // Inicializa 'comments' como un array vacío
-      newCommentText: '' // Estado para almacenar el texto del nuevo comentario
-
-
+      newCommentText: '', // Estado para almacenar el texto del nuevo comentario
+      avatar: "",
+      email: "",
     };
 
     this.imageRef = React.createRef();
@@ -71,6 +72,7 @@ export default class ImageCard extends Component {
         const ownerPost = result.message;
         this.setState({ postOwner: result.message });
         this.handleIsFollowing(result.message);
+        this.avatarprofile(result.message);
       })
       .catch(error => {
         console.error('Error:', error);
@@ -134,6 +136,7 @@ export default class ImageCard extends Component {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({ username: this.state.user, user: ownerPost }),
+
         })
           .then(response => {
             // Manejar la respuesta del servidor si es necesario
@@ -147,6 +150,28 @@ export default class ImageCard extends Component {
       .catch(error => {
         console.error('Error:', error);
       });
+  }
+  avatarprofile = (user) => {
+
+    fetch('/api/get_avatar/', {
+
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ username: user }),
+
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        this.setState({ email: data.email })
+        this.setState({ avatar: data.avatar })
+      })
+      .catch((error) => {
+        console.error('Error loading more posts:', error);
+      });
+
+
   }
 
 
@@ -243,7 +268,7 @@ export default class ImageCard extends Component {
       const capitalizedDescription = trimmedDescription.charAt(0).toUpperCase() + trimmedDescription.slice(1);
       const words = capitalizedDescription.split(' ');
       if (words.length > 30 && !showFullDescription) {
-        console.log(this.state.showFullDescription)
+
         const limitedDescription = words.slice(0, 30).join(' '); // Tomar solo las primeras 100 palabras
         const restDescription = words.slice(30).join(' ');
         const handleShowMore = () => {
@@ -338,7 +363,7 @@ export default class ImageCard extends Component {
           {comments.map((comment, index) => (
             <div key={index} style={styles.comment}>
               {/* Avatar del usuario */}
-             { console.log('ddd' + comment.avatar)}
+
               <Avatar src={'../media/' + comment.avatar} alt={`User ${index + 1}`} style={styles.commentAvatar} />
               {/* Contenido del comentario */}
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: 'calc(100% - 48px)', marginTop: '15px' }}>
@@ -561,9 +586,11 @@ export default class ImageCard extends Component {
             <div div style={styles.imageleft}>
               <Flex marginLeft="10px" marginRight='10px' justifyContent="space-between" >
                 <Box width='100%'>
+
                   <IconButton size='lg' borderRadius='30' variant='ghost' icon={<DownloadIcon />} onClick={handleDownload} />
                   <IconButton size='lg' borderRadius='30' variant='ghost' icon={<LinkIcon />} onClick={handleCopyUrl} />
                   <IconButton size='lg' borderRadius='30' variant='ghost' icon={<WarningIcon />} onClick={handleReportSubmit} />
+
                   <IconButton size='lg' borderRadius='30' variant='ghost' marginRight="0"
                     ml="auto"
                     onClick={handleButtonClicked}
@@ -579,23 +606,51 @@ export default class ImageCard extends Component {
                     }
 
                   />
+
                   <Box >
-                       {this.renderDescription(description)}
+                    {this.renderDescription(description)}
                   </Box>
 
                   <Box>
-                    <div div style={styles.imageleft}>
-                      {this.state.postOwner === this.state.user ? <Box /> : <Box padding="5%">
-                        <Button borderRadius="30" size="lg" ml="auto" marginRight="0" onClick={this.toggleFollow} style={{
-                          backgroundColor: isFollowing ? 'black' : 'red',
-                          color: 'white',
-                        }}>
-                          {followButtonText}
-                        </Button>
 
-                      </Box >}
+
+
+                    <div div style={styles.imageleft}>
+
+
+                      {
+                        this.state.postOwner === this.state.user ? (
+                          <Box />
+                        ) : (
+                          <Box padding="5%" display="flex" alignItems="center" width="100%">
+                            <a href={`/profile/${this.state.postOwner}`}>
+                              <Avatar size="md" src={`../media/${this.state.avatar}`} />
+                            </a>
+                            <strong>{this.state.postOwner}</strong>
+                            <Box flex="1" /> {/* Este div se expandirá y empujará el botón hacia la derecha */}
+                            <Button
+                              borderRadius="30"
+                              size="lg"
+                              ml="auto"
+                              mr="4"
+                              onClick={this.toggleFollow}
+                              style={{
+                                backgroundColor: isFollowing ? 'black' : 'red',
+                                color: 'white',
+                              }}
+                            >
+                              {followButtonText}
+                            </Button>
+                          </Box>
+                        )
+                      }
+
+
+
+
 
                     </div>
+
                   </Box>
                   {this.renderComments()}
                   {/* Formulario para agregar comentarios */}
@@ -611,7 +666,7 @@ export default class ImageCard extends Component {
                         <IconButton
                           onClick={this.handleCommentSubmit}
                           style={styles.commentSendButton}
-                          borderRadius='30' 
+                          borderRadius='30'
                           variant='ghost'
                           isDisabled={!(this.state.newCommentText.length > 0 && this.state.newCommentText.length <= 100)}
                           icon={<MdSend />}
@@ -739,8 +794,8 @@ const styles = {
     margin: '10px 0',
   },
   commentAvatar: {
-    width: '30px',
-    height: '30px',
+    width: '10px ',
+    height: '10px',
     borderRadius: '50%',
     marginRight: '10px',
   },
@@ -828,7 +883,7 @@ const styles = {
     borderRadius: '5px',
   },
   commentSendButton: {
-   
+
 
     padding: '5px 10px',
     border: 'none',

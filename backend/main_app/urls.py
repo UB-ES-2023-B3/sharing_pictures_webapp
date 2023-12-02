@@ -24,5 +24,6 @@ urlpatterns = [
     path('upload_comment/', views.upload_comment, name='upload_comment'),
     path('getCommentsOfPost/', views.getCommentsOfPost, name='getCommentsOfPost'),
     path('deleteCommentPost/', views.delete_comment, name="deleteCommentPost"),
-    path('load_liked_pictures/', views.load_liked_pictures, name='load_liked_pictures')
+    path('load_liked_pictures/', views.load_liked_pictures, name='load_liked_pictures'),
+    path('report_post/', views.report_picture, name='report_post'),
     ]

@@ -50,3 +50,12 @@ class FollowersCount(models.Model):
     def __str__(self):
         return self.user
     
+class Reports(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    description = models.TextField(default='')
+    created_at = models.DateTimeField(default=timezone.now)
+    
+    def __str__(self):
+        return f'{self.user.username} - {self.post.id}'
+    
