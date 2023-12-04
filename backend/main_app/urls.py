@@ -26,4 +26,7 @@ urlpatterns = [
     path('deleteCommentPost/', views.delete_comment, name="deleteCommentPost"),
     path('load_liked_pictures/', views.load_liked_pictures, name='load_liked_pictures'),
     path('report_post/', views.report_picture, name='report_post'),
+    path('moderation_panel/', views.moderation_panel, name='moderation_panel'),
+    path('delete_post/<str:post_id>/', views.delete_post, name='delete_post'),
+    path('delete_rep/<str:post_id>/', views.delete_report, name='delete_report')
     ]
