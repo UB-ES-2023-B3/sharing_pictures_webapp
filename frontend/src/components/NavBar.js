@@ -46,7 +46,7 @@ function NavBar() {
       const fetchUser = () => {
     
         // Fetch more posts from the API and append them to the existing posts
-        fetch("api/get_logged_in_user/")
+        fetch("/api/get_logged_in_user/")
           .then((response) => response.json())
           .then((data) => {
             setUsername(data.username);
