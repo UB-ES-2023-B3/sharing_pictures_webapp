@@ -71,24 +71,25 @@ function SearchBar() {
     
             {/* Display up to 5 search results or a 'no results' message */}
             {searched && !error && (
-                results.profiles.length > 0 ? (
-                    results.profiles.slice(0, 5).map((profile) => (
-                        <button 
-                            key={profile.id} 
-                            className="search-result-button"
-                            onClick={() => window.location.href = `/profile/${profile.username}`} 
-                            >
-                            <img src={profile.profileimg} alt={profile.username} className="profile-image" />
-                            {profile.username}
-                        </button>
-                    ))
-                ) : (
-                    <div className="no-results">
-                              No users found.
-                    </div>
-                )
+                <div className="search-results-container">
+                    {results.profiles.length > 0 ? (
+                        results.profiles.slice(0, 5).map((profile) => (
+                            <button 
+                                key={profile.id} 
+                                className="search-result-button"
+                                onClick={() => window.location.href = `/profile/${profile.username}`} 
+                                >
+                                <img src={profile.profileimg} alt={profile.username} className="profile-image" />
+                                {profile.username}
+                            </button>
+                        ))
+                    ) : (
+                        <div className="no-results">
+                                No users found.
+                        </div>
+                    )}
+                </div>
             )}
-
         </div>
     );
 }
