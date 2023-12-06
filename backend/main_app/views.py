@@ -596,3 +596,51 @@ def report_picture(request):
         return JsonResponse({'message': 'Report uploaded successfully'})
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=400)
+    
+
+def moderation_panel(request):
+    if request.method == 'GET':
+
+        if not request.user.is_superuser:
+            return JsonResponse({'error': 'You are not allowed to access this page'}, status=403)
+        # Get all the reported posts
+        reported_posts = Reports.objects.all().order_by('-created_at')
+        reported_posts_list = []
+        for report in reported_posts:
+            reported_post = {
+                'id': report.id,
+                'user': report.user.username,
+                'post_id': report.post.id,
+                'uploader': report.post.user.username,  # The user who uploaded the post
+                'image_url': report.post.image.url,
+                'description': report.post.description,
+                'created_at': report.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+            }
+            reported_posts_list.append(reported_post)
+        return JsonResponse({'reported_posts': reported_posts_list})
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=400)
+    
+def delete_post(request, post_id):
+    if request.method == 'DELETE':
+        try:
+            post = Post.objects.get(id=post_id)
+            post.delete()
+            Reports.objects.filter(post=post).delete()
+
+            return JsonResponse({'message': 'Post deleted successfully'}, status=201)
+        except Post.DoesNotExist:
+            return JsonResponse({'error': 'Post not found'}, status=404)
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=400)
+    
+def delete_report(request, post_id):
+    if request.method == 'DELETE':
+        try:
+            post = Post.objects.get(id=post_id)
+            Reports.objects.filter(post=post).delete()
+            return JsonResponse({'message': 'Reports deleted successfully'}, status=201)
+        except Post.DoesNotExist:
+            return JsonResponse({'error': 'Post not found'}, status=404)
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=400)

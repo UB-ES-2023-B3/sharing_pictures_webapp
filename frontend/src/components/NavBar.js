@@ -91,7 +91,7 @@ function NavBar() {
     return (
         <div>
             
-            <Flex  width="full" align="center" justifyContent="center" >
+            <Flex  width="full" align="center" justifyContent="center" position="relative">
                 <div align="left" >
                     <a href="/"><img src="../media/logo/logo-removebg.png" width='100' // Cambiar el tamaño del logo
                         height='100' // Cambiar el tamaño del logo
