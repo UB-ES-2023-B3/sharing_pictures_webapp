@@ -11,6 +11,7 @@ import Register from './Register.js';
 import ImageCard from './ImageCard.js';
 import Profile from './Profile.js';
 import { ChakraProvider } from '@chakra-ui/react'
+import ModerationPanel from './ModerationPanel.js';
 
 import {
 	BrowserRouter as Router,
@@ -42,6 +43,7 @@ export default class App extends Component {
 					</Route>
 					<Route exact path="viewImage/" element={<ImageCard />}>
 					</Route> 
+					<Route exact path="/moderation_panel" element={<ModerationPanel />} />
 				</Routes> 
 			</Router>
 			</ChakraProvider>
@@ -50,7 +52,4 @@ export default class App extends Component {
 
 	}
 }
-/*
-const root = createRoot(document.getElementById('app'));
-root.render(<App />);
-*/
+
