@@ -1,4 +1,4 @@
-name: Run Selenium Tests
+name: Django Tests
 
 on:
   pull_request:
@@ -6,61 +6,23 @@ on:
       - dev2
 
 jobs:
-  start-services:
+  test:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
+    - name: Checkout repository
+      uses: actions/checkout@v2
 
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.8
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
 
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
 
-      - name: Create migrations
-        run: python manage.py makemigrations
-
-      - name: Apply migrations
-        run: python manage.py migrate
-
-      - name: Start Django server
-        run: python manage.py runserver 0.0.0.0:8000
-        background: true
-
-      - name: Run frontend
-        run: |
-          cd frontend
-          npm run dev
-        background: true
-
-      - name: Wait for services to start
-        run: sleep 10
-
-  run-selenium-tests:
-    runs-on: ubuntu-latest
-    needs: start-services
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.8
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-
-      - name: Run Selenium tests
-        run: |
-          cd frontend
-          npm test
+    - name: Run Django tests
+      run: |
+        python manage.py test
