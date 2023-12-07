@@ -35,9 +35,9 @@ describe('Login Page', () => {
     }
 
     // Continue with your login test
-    await driver.get('http://127.0.0.1:8000/api/logout/');
+    await driver.get('http://0.0.0.0:8000/api/logout/');
 
-    await driver.get('http://127.0.0.1:8000/login');
+    await driver.get('http://0.0.0.0:8000/login');
 
     // Find and interact with the email and password input fields using CSS selectors
     const emailInput = await driver.findElement(By.css('input[type="email"]'));
@@ -52,16 +52,16 @@ describe('Login Page', () => {
     await submitButton.click();
 
     // Wait for the login to complete and check if the user is redirected to the expected page
-    await driver.wait(until.urlIs('http://127.0.0.1:8000/'), 10000);
+    await driver.wait(until.urlIs('http://0.0.0.0:8000/'), 10000);
 
     // You can add assertions or further verifications here if needed
   });
   test('User sees Swal alert for failed login with invalid credentials', async () => {
     // Continue with your login test
     
-    await driver.get('http://127.0.0.1:8000/api/logout/');
+    await driver.get('http://0.0.0.0:8000/api/logout/');
 
-    await driver.get('http://127.0.0.1:8000/login');
+    await driver.get('http://0.0.0.0:8000/login');
 
     // Find and interact with the email and password input fields using CSS selectors
     const emailInput = await driver.findElement(By.css('input[type="email"]'));
