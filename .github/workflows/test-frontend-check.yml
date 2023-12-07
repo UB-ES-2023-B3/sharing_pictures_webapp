@@ -42,6 +42,5 @@ jobs:
 
       - name: Run Selenium tests
         run: |
-          cd ..
           cd frontend
           npm test
