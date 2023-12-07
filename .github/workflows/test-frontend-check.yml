@@ -17,19 +17,19 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: 3.8
-      - name: Install Chrome
+      - name: Install Chrome and ChromeDriver
         run: |
-          wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-          sudo dpkg -i google-chrome-stable_current_amd64.deb
-          sudo apt-get install -f
-  
-      - name: Install ChromeDriver
-        run: |
-          wget https://chromedriver.storage.googleapis.com/$(curl -sS https://chromedriver.storage.googleapis.com/LATEST_RELEASE)/chromedriver_linux64.zip
-          unzip chromedriver_linux64.zip
-          sudo mv chromedriver /usr/local/bin/
-          sudo chmod +x /usr/local/bin/chromedriver
-
+            sudo apt-get update
+            sudo apt-get install -y unzip
+            sudo apt-get install -y libnss3
+            wget -N https://chromedriver.storage.googleapis.com/$(curl -sS chromedriver.storage.googleapis.com/LATEST_RELEASE)/chromedriver_linux64.zip
+            unzip chromedriver_linux64.zip
+            sudo mv chromedriver /usr/local/bin/
+            sudo chmod +x /usr/local/bin/chromedriver
+            sudo apt-get install -y google-chrome-stable
+      - name: Update WebDriver Manager
+        run: npx webdriver-manager update
+           
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
@@ -56,3 +56,9 @@ jobs:
         run: |
           cd frontend
           npm test
+      - name: Stop Django server
+        run: pkill -f "python manage.py runserver"
+        
+      - name: Stop frontend server
+        run: pkill -f "npm run dev"
+        

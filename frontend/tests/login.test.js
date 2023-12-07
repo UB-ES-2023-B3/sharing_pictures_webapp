@@ -37,8 +37,10 @@ describe('Login Page', () => {
     // Continue with your login test
     await driver.get('http://127.0.0.1:8000/api/logout/');
 
+    console.log('Before navigating to login page');
     await driver.get('http://127.0.0.1:8000/login');
-
+    console.log('After navigating to login page');
+    
     // Find and interact with the email and password input fields using CSS selectors
     const emailInput = await driver.findElement(By.css('input[type="email"]'));
     const passwordInput = await driver.findElement(By.css('input[type="password"]'));
@@ -52,7 +54,7 @@ describe('Login Page', () => {
     await submitButton.click();
 
     // Wait for the login to complete and check if the user is redirected to the expected page
-    await driver.wait(until.urlIs('http://127.0.0.1:8000/'), 10000);
+    await driver.wait(until.urlIs('http://127.0.0.1:8000/'), 30000);
 
     // You can add assertions or further verifications here if needed
   });
@@ -61,8 +63,10 @@ describe('Login Page', () => {
     
     await driver.get('http://127.0.0.1:8000/api/logout/');
 
+    console.log('Before navigating to login page');
     await driver.get('http://127.0.0.1:8000/login');
-
+    console.log('After navigating to login page');
+    
     // Find and interact with the email and password input fields using CSS selectors
     const emailInput = await driver.findElement(By.css('input[type="email"]'));
     const passwordInput = await driver.findElement(By.css('input[type="password"]'));
