@@ -20,6 +20,7 @@ import {
 import { Tooltip } from '@chakra-ui/react'
 import '../../static/css/styles.css';
 axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
+
 axios.defaults.xsrfCookieName = "csrftoken";
 
 export default class Register extends Component {
