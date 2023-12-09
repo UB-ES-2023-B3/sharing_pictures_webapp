@@ -9,7 +9,6 @@ urlpatterns = [
     path('',index),
     path('login/',index),
     path('search_results/',index),
-    path('viewImage/',index)
-  
-
+    path('viewImage/',index),
+    path('moderation_panel/',index),
 ]
