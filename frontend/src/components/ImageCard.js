@@ -570,13 +570,13 @@ export default class ImageCard extends Component {
                     {this.renderDescription(description)}
                   </Box>
                     <Spacer/>
-                  <Box paddingTop="5%">
+                  <Box paddingTop="6%">
                     <div>
                       {
                         this.state.postOwner === this.state.user ? (
                           <Box />
                         ) : (
-                          <Box padding="5%" display="flex" alignItems="center" width="100%">
+                          <Box padding="6%" display="flex" alignItems="center" width="100%">
                             <a href={`/profile/${this.state.postOwner}`}>
                               <Avatar size="md" src={`../media/${this.state.avatar}`} />
                             </a>
@@ -601,10 +601,8 @@ export default class ImageCard extends Component {
                     </div>
                   </Box>
                   <Spacer/>
-                  <Box paddingTop='35%'>
+                  <Box paddingTop='15%'>
                   <div style={styles.commentsSection}>
-                  {this.renderComments()}
-                  {/* Formulario para agregar comentarios */}
                   <div>
                     <InputGroup size='md' >
                       <Input
@@ -628,6 +626,9 @@ export default class ImageCard extends Component {
                     </InputGroup>
                   
                   </div>
+                  {this.renderComments()}
+                  {/* Formulario para agregar comentarios */}
+                  
                   </div>
                   </Box>
                 </Box>
