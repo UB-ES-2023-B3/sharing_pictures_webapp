@@ -1,4 +1,4 @@
-name: Django Tests
+name: Django Tests with Coverage
 
 on:
   pull_request:
@@ -13,16 +13,42 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
 
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.8
-
+    - name: Update pip
+      run: pip install --upgrade pip
+    
     - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
+      run: pip install -r requirements.txt
 
-    - name: Run Django tests
+    - name: Checkout pull request branch
+      run: git checkout -B ${{ github.event.pull_request.head.ref }}
+
+    - name: Create migrations
+      run: python manage.py makemigrations
+      
+    - name: Apply migrations
+      run: python manage.py migrate
+      
+    - name: Run build frontend
       run: |
-        python manage.py test
+        cd frontend
+        npm run build
+        cd ..
+
+    - name: Install coverage
+      run: pip install coverage
+
+    - name: Run Django tests with coverage
+      run: |
+        coverage run manage.py test
+
+    - name: Display coverage report
+      run: coverage report
+
+    - name: Generate HTML coverage report
+      run: coverage html
+
+    - name: Upload coverage artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: coverage-report
+        path: htmlcov
