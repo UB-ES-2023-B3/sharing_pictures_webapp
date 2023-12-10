@@ -154,6 +154,7 @@ const handleEditProfile = () => {
         `,
         showCancelButton: true,
         confirmButtonText: 'Save',
+        confirmButtonColor: '#d33',
         cancelButtonText: 'Cancel',
         focusConfirm: false,
         showLoaderOnConfirm: true,
