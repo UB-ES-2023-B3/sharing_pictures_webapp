@@ -14,7 +14,7 @@ from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from .forms import RegistrationForm, LoginForm, UploadPostForm
-from .models import Post, Profile, FollowersCount, CustomUser, Reports, Comment
+from .models import Post, Profile, FollowersCount, CustomUser, Reports, Comment, UserReports
 from django.core.cache import cache
 from django.core.serializers import serialize
 import os
@@ -642,5 +642,27 @@ def delete_report(request, post_id):
             return JsonResponse({'message': 'Reports deleted successfully'}, status=201)
         except Post.DoesNotExist:
             return JsonResponse({'error': 'Post not found'}, status=404)
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=400)
+    
+
+def report_user(request):
+    if request.method == 'POST':
+        post_data = json.loads(request.body.decode('utf-8'))
+        user = request.user.username
+        user_object = CustomUser.objects.get(username=user) 
+        if not user_object:
+            return HttpResponse(status=404, content="User not found")
+        reported_user = post_data['reported_user']
+        description = post_data['description']
+        reported_user_object = CustomUser.objects.get(username=reported_user)
+        if not reported_user_object:
+            return HttpResponse(status=404, content="Reported user not found")
+        # CHECK IF THE USER HAS ALREADY REPORTED THIS USER
+        if UserReports.objects.filter(user=user_object, reported_user=reported_user_object).exists():
+            return JsonResponse({'error': 'You have already reported this user'}, status=409)
+        report = UserReports.objects.create(user=user_object, reported_user=reported_user_object, description=description)
+        report.save()
+        return JsonResponse({'message': 'Report uploaded successfully'})
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=400)
