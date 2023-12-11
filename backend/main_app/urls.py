@@ -28,5 +28,6 @@ urlpatterns = [
     path('report_post/', views.report_picture, name='report_post'),
     path('moderation_panel/', views.moderation_panel, name='moderation_panel'),
     path('delete_post/<str:post_id>/', views.delete_post, name='delete_post'),
-    path('delete_rep/<str:post_id>/', views.delete_report, name='delete_report')
+    path('delete_rep/<str:post_id>/', views.delete_report, name='delete_report'),
+    path('report_user/', views.report_user, name='report_user')
     ]
