@@ -79,8 +79,7 @@ fetch(apiUrl)
         }
     }
 
-    // set the button text to follow or unfollow depending on the user
-    // button 
+    // set the button text to follow or unfollow depending on the user button  
     fetch(`/api/load_liked_pictures`)
         .then((response) => response.json())
         .then((likedData) => {
