@@ -1,0 +1,65 @@
+name: Run Selenium Tests
+
+on:
+  pull_request:
+    branches:
+      - dev2
+
+jobs:
+  run-selenium-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - name: Install Chrome and ChromeDriver
+        run: |
+            sudo apt-get update
+            sudo apt-get install -y unzip
+            sudo apt-get install -y libnss3
+            wget -N https://chromedriver.storage.googleapis.com/$(curl -sS chromedriver.storage.googleapis.com/LATEST_RELEASE)/chromedriver_linux64.zip
+            unzip chromedriver_linux64.zip
+            sudo mv chromedriver /usr/local/bin/
+            sudo chmod +x /usr/local/bin/chromedriver
+            sudo apt-get install -y google-chrome-stable
+      - name: Update WebDriver Manager
+        run: npx webdriver-manager update
+           
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Create migrations
+        run: python manage.py makemigrations
+
+      - name: Apply migrations
+        run: python manage.py migrate
+
+      - name: Start Django server
+        run: python manage.py runserver 127.0.0.1:8000 &
+        
+      - name: Run frontend
+        run: |
+          cd frontend
+          npm run dev &
+
+      - name: Wait for services to start
+        run: sleep 10
+
+      - name: Run Selenium tests
+        run: |
+          cd frontend
+          CHROME_BIN=/usr/bin/google-chrome npm test
+
+      - name: Stop Django server
+        run: pkill -f "python manage.py runserver"
+        
+      - name: Stop frontend server
+        run: pkill -f "npm run dev"
+        
