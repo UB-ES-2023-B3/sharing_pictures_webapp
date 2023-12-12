@@ -157,13 +157,14 @@ const handleReportProfile = () => {
                 if (response.ok) {
                     return response.json();
                 } else {
-                    throw new Error('Failed to report user');
+                    return response.json().then(data => {
+                        throw new Error(data.error || 'Failed to report user');
+                    });
                 }
             })
             .catch(error => {
-                Swal.showValidationMessage(
-                    `Request failed: ${error.response.data.error}`
-                );
+                const errorMessage = error?.response?.data?.error || error.message || 'An unexpected error occurred';
+                Swal.showValidationMessage(`Request failed: ${errorMessage}`);
             });
         }
     }).then((result) => {
