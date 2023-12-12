@@ -114,7 +114,7 @@ function NavBar() {
                     </MenuButton>
                     <MenuList>
                         <>
-                            <MenuGroup title='Actualmente en' display='flex' flexDirection='row' alignItems='center'>
+                            <MenuGroup title='Actually in' display='flex' flexDirection='row' alignItems='center'>
                                 <Box display="flex" alignItems="center">
                                   <a href={`/profile/${username}`}>
                                     <Avatar size='lg' name='Kola Tioluwani' src={`../media/${logo}`}/>
@@ -125,9 +125,9 @@ function NavBar() {
                                     </Box>
                                 </Box>
                             </MenuGroup>
-                            <MenuGroup title='Mas opciones'>
+                            <MenuGroup title='More options'>
                               
-                                <MenuItem borderRadius={15} onClick={handleLogout}>Cerrar sessión </MenuItem>
+                                <MenuItem borderRadius={15} onClick={handleLogout}>Log Out </MenuItem>
                             </MenuGroup>
                         </>
                     </MenuList>
