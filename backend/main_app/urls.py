@@ -29,5 +29,7 @@ urlpatterns = [
     path('moderation_panel/', views.moderation_panel, name='moderation_panel'),
     path('delete_post/<str:post_id>/', views.delete_post, name='delete_post'),
     path('delete_rep/<str:post_id>/', views.delete_report, name='delete_report'),
-    path('report_user/', views.report_user, name='report_user')
+    path('report_user/', views.report_user, name='report_user'),
+    path('delete_user/<str:user_id>/', views.delete_user, name='delete_user'),
+    path('delete_rep_user/<str:user_id>/', views.delete_user_report, name='delete_user_report'),
     ]
