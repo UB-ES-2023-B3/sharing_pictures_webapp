@@ -605,6 +605,8 @@ def moderation_panel(request):
             return JsonResponse({'error': 'You are not allowed to access this page'}, status=403)
         # Get all the reported posts
         reported_posts = Reports.objects.all().order_by('-created_at')
+        reported_users = UserReports.objects.all().order_by('-created_at')
+        
         reported_posts_list = []
         for report in reported_posts:
             reported_post = {
@@ -617,7 +619,20 @@ def moderation_panel(request):
                 'created_at': report.created_at.strftime('%Y-%m-%d %H:%M:%S'),
             }
             reported_posts_list.append(reported_post)
-        return JsonResponse({'reported_posts': reported_posts_list})
+
+        reported_users_list = []
+        for report in reported_users:
+            profile = Profile.objects.get(user=report.reported_user)
+            reported_user = {
+                'id': report.id,
+                'user': report.user.username,
+                'reported_user': report.reported_user.username,
+                'description': report.description,
+                'created_at': report.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+                'avatar': profile.profileimg.url,
+            }
+            reported_users_list.append(reported_user)
+        return JsonResponse({'reported_posts': reported_posts_list, 'reported_users': reported_users_list}, safe=False)
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=400)
     
@@ -664,5 +679,28 @@ def report_user(request):
         report = UserReports.objects.create(user=user_object, reported_user=reported_user_object, description=description)
         report.save()
         return JsonResponse({'message': 'Report uploaded successfully'})
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=400)
+    
+def delete_user_report(request, user_id):
+    if request.method == 'DELETE':
+        try:
+            user = CustomUser.objects.get(id=user_id)
+            UserReports.objects.filter(reported_user=user).delete()
+            return JsonResponse({'message': 'Reports deleted successfully'}, status=201)
+        except CustomUser.DoesNotExist:
+            return JsonResponse({'error': 'User not found'}, status=404)
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=400)
+    
+def delete_user(request, user_id):
+    if request.method == 'DELETE':
+        try:
+            user = CustomUser.objects.get(id=user_id)
+            user.delete()
+            UserReports.objects.filter(reported_user=user).delete()
+            return JsonResponse({'message': 'User deleted successfully'}, status=201)
+        except CustomUser.DoesNotExist:
+            return JsonResponse({'error': 'User not found'}, status=404)
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=400)
