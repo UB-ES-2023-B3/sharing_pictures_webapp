@@ -524,6 +524,8 @@ export default class ImageCard extends Component {
               title: 'Report sent successfully',
               text: 'Thanks for making Sharing pictures a better place!',
               showCloseButton: true,
+              //close button color red
+              confirmButtonColor: '#d33',
               })
           } else {
             // Handle error
@@ -532,6 +534,8 @@ export default class ImageCard extends Component {
               title: 'Oops...',
               text: 'It seems... ' + result.error,
               showCloseButton: true,
+              //close button color red
+              confirmButtonColor: '#d33',
               })
 
           }

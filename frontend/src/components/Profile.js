@@ -3,6 +3,8 @@ import { useParams } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import Card from './Card';
 import axios from 'axios';
+import { IconButton } from '@chakra-ui/react';
+import { WarningIcon } from '@chakra-ui/icons';
 
 function Profile() {
 const [profileData, setProfileData] = useState(null);
@@ -77,8 +79,7 @@ fetch(apiUrl)
         }
     }
 
-    // set the button text to follow or unfollow depending on the user
-    // button 
+    // set the button text to follow or unfollow depending on the user button  
     fetch(`/api/load_liked_pictures`)
         .then((response) => response.json())
         .then((likedData) => {
@@ -121,6 +122,76 @@ const handleProfileEditError = () => {
     });
 }
 
+const handleReportProfile = () => {
+    Swal.fire({
+        title: 'Report Profile',
+        html: `
+        <div style="text-align: center; overflow-x: hidden;">
+        <div class="w-full max-w-md mx-auto">
+            <div style="display: flex; flex-direction: column; align-items: center;">
+                <br>
+                <label for="swal-report-description" class="block text-sm font-medium text-gray-700">Description</label>
+                <textarea id="swal-report-description" class="swal2-textarea w-full border border-gray-300 rounded-lg" placeholder="Description"></textarea>
+            </div>
+        </div>
+        </div>`,
+        showCancelButton: true,
+        confirmButtonText: 'Report',
+        confirmButtonColor: '#d33',
+        cancelButtonText: 'Cancel',
+        focusConfirm: false,
+        preConfirm: () => {
+            const description = Swal.getPopup().querySelector('#swal-report-description').value;
+
+            if (description.length > 100){
+                Swal.showValidationMessage(
+                    `Description cannot be longer than 100 characters.`
+                );
+            }
+
+            return reportUser({
+                reported_user: profileData.user_object.username,
+                description: description
+            })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    throw new Error('Failed to report user');
+                }
+            })
+            .catch(error => {
+                Swal.showValidationMessage(
+                    `Request failed: ${error.response.data.error}`
+                );
+            });
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            Swal.fire(
+                'Reported!',
+                'The user has been reported.',
+                'success'
+            );
+        }
+    });
+};
+
+const reportUser = (requestData) => {
+    return fetch('/api/report_user/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(requestData)
+    });
+};
+
+  
+    
+        
+
+
 const handleEditProfile = () => {
     Swal.fire({
         title: 'Edit Profile',
@@ -154,6 +225,7 @@ const handleEditProfile = () => {
         `,
         showCancelButton: true,
         confirmButtonText: 'Save',
+        confirmButtonColor: '#d33',
         cancelButtonText: 'Cancel',
         focusConfirm: false,
         showLoaderOnConfirm: true,
@@ -448,15 +520,23 @@ return (
                     </button>
                 </div>
             ) : (
-                <div className="flex justify-center mt-4 space-x-4">
-                    <button
-                        id="follow-button"
-                        className={`bg-${isFollowing ? 'gray' : 'red'}-600 text-${isFollowing ? 'white' : 'white'} px-4 py-2 rounded-lg hover:bg-${isFollowing ? 'gray' : 'red'}-700`}
-                        onClick={handleFollowUser}
-                    >
-                        {profileData.button_text}
-                    </button>
+                <div className="flex justify-center mt-4">
+                    <div style={{ position: 'relative', display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
+                        <button
+                            id="follow-button"
+                            className={`bg-${isFollowing ? 'gray' : 'red'}-600 text-white px-4 py-2 rounded-lg hover:bg-${isFollowing ? 'gray' : 'red'}-700`}
+                            onClick={handleFollowUser}
+                        >
+                            {profileData.button_text}
+                        </button>
+
+                        <div style={{ position: 'absolute', left: '50%', marginLeft: '40px' }}>
+                            <IconButton size='lg' borderRadius='30' variant='ghost' icon={<WarningIcon />} onClick={handleReportProfile} />
+                        </div>
+                    </div>
                 </div>
+
+
             )}
             </div>
         </div>
