@@ -28,6 +28,7 @@ import axios from 'axios';
 import { ExternalLinkIcon, LinkIcon, DownloadIcon, WarningIcon } from '@chakra-ui/icons'
 import { MdSend } from "react-icons/md";
 import Swal from 'sweetalert2';
+import NavBar from './NavBar';
 
 export default class ImageCard extends Component {
   constructor(props) {
@@ -570,6 +571,9 @@ export default class ImageCard extends Component {
     };
     return (
       <ChakraProvider>
+        <div>
+        <NavBar />
+        </div>
         <div style={styles.centeredContainer}>
           <div
             style={{
@@ -697,7 +701,7 @@ const styles = {
     justifyContent: 'center',
     alignItems: 'center',
     height: '100vh', // Esto ocupa el 100% del alto de la pantalla
-    paddingTop: "10%",
+    
 
   },
 
