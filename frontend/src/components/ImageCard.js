@@ -673,7 +673,7 @@ const styles = {
     flexDirection: 'row', // Cambia a fila para alinear elementos horizontalmente
     overflow: 'hidden',
     width: '60%', // Ajusta el ancho de la tarjeta según tus necesidades
-    height: '800px',
+    height: '95%',
   },
   commentsContainer: {
     display: 'flex',
