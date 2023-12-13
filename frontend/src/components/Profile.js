@@ -5,28 +5,29 @@ import Card from './Card';
 import axios from 'axios';
 import { IconButton } from '@chakra-ui/react';
 import { WarningIcon } from '@chakra-ui/icons';
+import NavBar from './NavBar';
 
 function Profile() {
-const [profileData, setProfileData] = useState(null);
-const [likedPosts, setLikedPosts] = useState(null);
-const [activeTab, setActiveTab] = useState('my-posts');
-const { username } = useParams();
-const [isHoveringProfilePicture, setIsHoveringProfilePicture] = useState(false);
-const [isFollowing, setIsFollowing] = useState(false);
+    const [profileData, setProfileData] = useState(null);
+    const [likedPosts, setLikedPosts] = useState(null);
+    const [activeTab, setActiveTab] = useState('my-posts');
+    const { username } = useParams();
+    const [isHoveringProfilePicture, setIsHoveringProfilePicture] = useState(false);
+    const [isFollowing, setIsFollowing] = useState(false);
 
-const styles = {
-    pin_container: {
-    margin: 0,
-    padding: 0,
-    width: '90vw',
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
-    gridAutoRows: '10px',
-    position: 'absolute',
-    left: '50%',
-    transform: 'translateX(-50%)',
-    justifyContent: 'center',
-    },
+    const styles = {
+        pin_container: {
+            margin: 0,
+            padding: 0,
+            width: '90vw',
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
+            gridAutoRows: '10px',
+            position: 'absolute',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            justifyContent: 'center',
+        },
     };
     const overlayButtonStyle = {
         position: 'absolute',
@@ -44,88 +45,88 @@ const styles = {
         transition: 'opacity 0.3s', // Add a smooth transition effect
         maxWidth: '100%', // Ensures the overlay doesn't exceed the image width
         maxHeight: '100%', // Ensures the overlay doesn't exceed the image height
-        };
-
-useEffect(() => {
-const apiUrl = `/api/profile/${username}`;
-
-fetch(apiUrl)
-    .then((response) => response.json())
-    .then((data) => {
-    const profileData = {
-        user_object: {
-        first_name: data.user_object.fields.first_name,
-        last_name: data.user_object.fields.last_name,
-        username: data.user_object.fields.username,
-        },
-        user_profile: {
-        profileimg: data.profile_image,
-        bio: data.user_profile.fields.bio,
-        },
-        user_followers: data.user_followers,
-        user_following: data.user_following,
-        is_own_profile: data.is_own_profile,
-        uploaded_pictures: data.uploaded_posts,
-        button_text: data.button_text,
-        
     };
 
+    useEffect(() => {
+        const apiUrl = `/api/profile/${username}`;
 
-    if (!profileData.is_own_profile) {
-        if (profileData.button_text === 'Unfollow') {
-            setIsFollowing(true);
-        } else {
-            setIsFollowing(false);
-        }
+        fetch(apiUrl)
+            .then((response) => response.json())
+            .then((data) => {
+                const profileData = {
+                    user_object: {
+                        first_name: data.user_object.fields.first_name,
+                        last_name: data.user_object.fields.last_name,
+                        username: data.user_object.fields.username,
+                    },
+                    user_profile: {
+                        profileimg: data.profile_image,
+                        bio: data.user_profile.fields.bio,
+                    },
+                    user_followers: data.user_followers,
+                    user_following: data.user_following,
+                    is_own_profile: data.is_own_profile,
+                    uploaded_pictures: data.uploaded_posts,
+                    button_text: data.button_text,
+
+                };
+
+
+                if (!profileData.is_own_profile) {
+                    if (profileData.button_text === 'Unfollow') {
+                        setIsFollowing(true);
+                    } else {
+                        setIsFollowing(false);
+                    }
+                }
+
+                // set the button text to follow or unfollow depending on the user button  
+                fetch(`/api/load_liked_pictures`)
+                    .then((response) => response.json())
+                    .then((likedData) => {
+                        // Ensure likedData.pictures exists and is an array
+                        setLikedPosts(likedData.pictures || []);
+                        console.log(likedData.pictures);
+                    })
+                    .catch((error) => console.error('Error fetching liked posts: ', error));
+
+                setProfileData(profileData);
+
+            })
+            .catch((error) => {
+                console.error('Error fetching profile data: ', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: "404 Profile doesn't exist",
+                    text: 'The profile you are looking for does not exist, please go back and try again.',
+                    confirmButtonText: 'Back',
+                    confirmButtonColor: '#d33',
+                    allowOutsideClick: false,
+
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.history.back();
+                    }
+                });
+            });
+
+    }, [username]);
+
+
+    const handleProfileEditError = () => {
+
+        Swal.fire({
+            icon: 'error',
+            title: 'Oops... Something went wrong updating your profile!',
+            text: 'Please check that your first name, last name and bio are not longer than 30, 30 and 100 characters respectively.',
+
+        });
     }
 
-    // set the button text to follow or unfollow depending on the user button  
-    fetch(`/api/load_liked_pictures`)
-        .then((response) => response.json())
-        .then((likedData) => {
-            // Ensure likedData.pictures exists and is an array
-            setLikedPosts(likedData.pictures || []);
-            console.log(likedData.pictures);
-        })
-        .catch((error) => console.error('Error fetching liked posts: ', error));
-
-    setProfileData(profileData);
-
-})
-    .catch((error) => {
-    console.error('Error fetching profile data: ', error);
-    Swal.fire({
-        icon: 'error',
-        title: "404 Profile doesn't exist",
-        text: 'The profile you are looking for does not exist, please go back and try again.',
-        confirmButtonText: 'Back',
-        confirmButtonColor: '#d33',
-        allowOutsideClick: false,
-        
-    }).then((result) => {
-        if (result.isConfirmed) {
-        window.history.back();
-        }
-    });
-    });
-
-}, [username]);
-
-
-const handleProfileEditError = () => {
-
-    Swal.fire({
-        icon: 'error',
-        title: 'Oops... Something went wrong updating your profile!',
-        text: 'Please check that your first name, last name and bio are not longer than 30, 30 and 100 characters respectively.',
-
-    });
-}
-
-const handleReportProfile = () => {
-    Swal.fire({
-        title: 'Report Profile',
-        html: `
+    const handleReportProfile = () => {
+        Swal.fire({
+            title: 'Report Profile',
+            html: `
         <div style="text-align: center; overflow-x: hidden;">
         <div class="w-full max-w-md mx-auto">
             <div style="display: flex; flex-direction: column; align-items: center;">
@@ -135,36 +136,38 @@ const handleReportProfile = () => {
             </div>
         </div>
         </div>`,
-        showCancelButton: true,
-        confirmButtonText: 'Report',
-        confirmButtonColor: '#d33',
-        cancelButtonText: 'Cancel',
-        focusConfirm: false,
-        preConfirm: () => {
-            const description = Swal.getPopup().querySelector('#swal-report-description').value;
+            showCancelButton: true,
+            confirmButtonText: 'Report',
+            confirmButtonColor: '#d33',
+            cancelButtonText: 'Cancel',
+            focusConfirm: false,
+            preConfirm: () => {
+                const description = Swal.getPopup().querySelector('#swal-report-description').value;
 
-            if (description.length > 100){
-                Swal.showValidationMessage(
-                    `Description cannot be longer than 100 characters.`
-                );
-            }
+                if (description.length > 100) {
+                    Swal.showValidationMessage(
+                        `Description cannot be longer than 100 characters.`
+                    );
+                }
 
+               
+ 
             return reportUser({
                 reported_user: profileData.user_object.username,
                 description: description
-            })
+            }) 
             .then(response => {
                 if (response.ok) {
                     return response.json();
                 } else {
                     return response.json().then(data => {
                         throw new Error(data.error || 'Failed to report user');
-                    });
+                    }); 
                 }
             })
             .catch(error => {
                 const errorMessage = error?.response?.data?.error || error.message || 'An unexpected error occurred';
-                Swal.showValidationMessage(`Request failed: ${errorMessage}`);
+                Swal.showValidationMessage(`Request failed: ${errorMessage}`); 
             });
         }
     }).then((result) => {
@@ -183,20 +186,24 @@ const reportUser = (requestData) => {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
-        },
+        }, 
         body: JSON.stringify(requestData)
     });
 };
 
-  
+   
     
         
 
 
-const handleEditProfile = () => {
-    Swal.fire({
-        title: 'Edit Profile',
-        html: `
+
+
+
+
+    const handleEditProfile = () => {
+        Swal.fire({
+            title: 'Edit Profile',
+            html: `
         <div style="text-align: center; overflow-x: hidden;">
         <div class="w-full max-w-md mx-auto">
             <div style="display: flex; flex-direction: column; align-items: center;">
@@ -224,231 +231,233 @@ const handleEditProfile = () => {
     </div>
     
         `,
-        showCancelButton: true,
-        confirmButtonText: 'Save',
-        confirmButtonColor: '#d33',
-        cancelButtonText: 'Cancel',
-        focusConfirm: false,
-        showLoaderOnConfirm: true,
-        preConfirm: () => {
-        const firstName = Swal.getPopup().querySelector('#swal-first-name').value;
-        const lastName = Swal.getPopup().querySelector('#swal-last-name').value;
-        const bio = Swal.getPopup().querySelector('#swal-bio').value;
-    
-        console.log('firstName:', firstName);
-        console.log('lastName:', lastName);
-        console.log('bio:', bio);
-    
-        return { firstName, lastName, bio };
-        },
-    }).then((result) => {
-        if (result.isConfirmed) {
-        const { firstName, lastName, bio } = result.value;
+            showCancelButton: true,
+            confirmButtonText: 'Save',
+            confirmButtonColor: '#d33',
+            cancelButtonText: 'Cancel',
+            focusConfirm: false,
+            showLoaderOnConfirm: true,
+            preConfirm: () => {
+                const firstName = Swal.getPopup().querySelector('#swal-first-name').value;
+                const lastName = Swal.getPopup().querySelector('#swal-last-name').value;
+                const bio = Swal.getPopup().querySelector('#swal-bio').value;
 
-        if (firstName.length > 30 || lastName.length > 30 || bio.length > 100){
-            handleProfileEditError();
+                console.log('firstName:', firstName);
+                console.log('lastName:', lastName);
+                console.log('bio:', bio);
+
+                return { firstName, lastName, bio };
+            },
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const { firstName, lastName, bio } = result.value;
+
+                if (firstName.length > 30 || lastName.length > 30 || bio.length > 100) {
+                    handleProfileEditError();
+                    return;
+                }
+
+                setProfileData((prevData) => ({
+                    ...prevData,
+                    user_object: {
+                        ...prevData.user_object,
+                        first_name: firstName,
+                        last_name: lastName,
+                    },
+                    user_profile: {
+                        ...prevData.user_profile,
+                        bio: bio,
+                    },
+                }));
+
+                axios
+                    .post('/api/update_profile/', {
+                        first_name: firstName,
+                        last_name: lastName,
+                        bio: bio,
+                    }, { headers: { 'Content-Type': 'application/json' } })
+                    .then((response) => {
+                        console.log(response);
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Profile Updated',
+                        });
+                    })
+                    .catch((error) => {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops... Something went wrong updating your profile!',
+                            text: error.response.data.message,
+                        });
+                    });
+            }
+        });
+    };
+
+    if (!profileData) {
+        return <div>Loading...</div>;
+    }
+
+    const handleProfilePictureSelect = (event) => {
+        const file = event.target.files[0];
+        //check if file is an image and less than 4mb
+        // and also if its png jpg or jpeg
+        if (
+            file.type !== 'image/jpeg' &&
+            file.type !== 'image/jpg' &&
+            file.type !== 'image/png'
+        ) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'Only JPG, JPEG and PNG files are allowed!',
+            });
             return;
         }
-
-        setProfileData((prevData) => ({
-            ...prevData,
-            user_object: {
-            ...prevData.user_object,
-            first_name: firstName,
-            last_name: lastName,
-            },
-            user_profile: {
-            ...prevData.user_profile,
-            bio: bio,
-            },
-        }));
-        
-        axios
-            .post('/api/update_profile/', {
-            first_name: firstName,
-            last_name: lastName,
-            bio: bio,
-            }, { headers: { 'Content-Type': 'application/json' } })
-            .then((response) => {
-            console.log(response);
+        if (file.size > 4 * 1024 * 1024) {
             Swal.fire({
-                icon: 'success',
-                title: 'Profile Updated',
+                icon: 'error',
+                title: 'Oops...',
+                text: 'File size cannot exceed 4MB!',
             });
-            })
-            .catch((error) => {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Oops... Something went wrong updating your profile!',
-                    text: error.response.data.message,
+            return;
+        };
+
+        handleProfilePictureUpload(file);
+
+    };
+
+    const handleProfilePictureUpload = (selectedFile) => {
+        if (selectedFile) {
+            const formData = new FormData();
+            formData.append('profileimg', selectedFile);
+
+            axios
+                .post('/api/update_profile_picture/', formData)
+                .then((response) => {
+                    console.log(response);
+
+                    setProfileData((prevData) => ({
+                        ...prevData,
+                        user_profile: {
+                            ...prevData.user_profile,
+                            profileimg: response.data.profileimg,
+                        },
+                    }));
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Profile Picture Updated',
+                    });
+                })
+                .catch((error) => {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops... Something went wrong updating your profile picture!',
+                        text: error.response.data.message,
+                    });
                 });
-            });
         }
-    });
     };
 
-if (!profileData) {
-return <div>Loading...</div>;
-}
 
-const handleProfilePictureSelect = (event) => {
-    const file = event.target.files[0];
-    //check if file is an image and less than 4mb
-    // and also if its png jpg or jpeg
-    if (
-        file.type !== 'image/jpeg' &&
-        file.type !== 'image/jpg' &&
-        file.type !== 'image/png'
-        ) {
-        Swal.fire({
-            icon: 'error',
-            title: 'Oops...',
-            text: 'Only JPG, JPEG and PNG files are allowed!',
-        });
-        return;
-    }
-    if (file.size > 4 * 1024 * 1024) {
-        Swal.fire({
-            icon: 'error',
-            title: 'Oops...',
-            text: 'File size cannot exceed 4MB!',
-        });
-        return;
-    };
 
-    handleProfilePictureUpload(file);
 
-};
+    const handleFollowUser = () => {
+        const getLoggedInUser = () => {
+            fetch('/api/get_logged_in_user/')
+                .then(response => response.json())
+                .then(data => {
 
-const handleProfilePictureUpload = (selectedFile) => {
-    if (selectedFile) {
-        const formData = new FormData();
-        formData.append('profileimg', selectedFile);
-    
-        axios
-        .post('/api/update_profile_picture/', formData)
-        .then((response) => {
-            console.log(response);
-    
-            setProfileData((prevData) => ({
-            ...prevData,
-            user_profile: {
-                ...prevData.user_profile,
-                profileimg: response.data.profileimg,
-            },
-            }));
-    
-            Swal.fire({
-            icon: 'success',
-            title: 'Profile Picture Updated',
-            });
-        })
-        .catch((error) => {
-            Swal.fire({
-            icon: 'error',
-            title: 'Oops... Something went wrong updating your profile picture!',
-            text: error.response.data.message,
-            });
-        });
-    }
-    };
+                    followUser(data.username);
+                })
+                .catch(error => {
+                    console.error('Error in getting logged-in user:', error);
+                });
+        };
 
-    
-     
 
-const handleFollowUser = () => {
-    const getLoggedInUser = () => {
-        fetch('/api/get_logged_in_user/')
-            .then(response => response.json())
-            .then(data => {
-                
-                followUser(data.username);
+        const followUser = (loggedInUser) => {
+            fetch('/api/follow/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    username: loggedInUser,
+                    user: profileData.user_object.username
+                }),
             })
-            .catch(error => {
-                console.error('Error in getting logged-in user:', error);
-            });
-    };
-      
+                .then(() => {
+                    // Update the button text
+                    setProfileData((prevData) => ({
+                        ...prevData,
+                        button_text: profileData.button_text === 'Follow' ? 'Unfollow' : 'Follow',
+                    }));
 
-    const followUser = (loggedInUser) => {
-        fetch('/api/follow/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                username: loggedInUser,
-                user: profileData.user_object.username
-            }),
-        })
-            .then(() => {
-                // Update the button text
-                setProfileData((prevData) => ({
-                    ...prevData,
-                    button_text: profileData.button_text === 'Follow' ? 'Unfollow' : 'Follow',
-                }));
+                    // Update the number of followers
+                    setProfileData((prevData) => ({
+                        ...prevData,
+                        user_followers: profileData.button_text === 'Follow' ? profileData.user_followers + 1 : profileData.user_followers - 1,
+                    }));
 
-                // Update the number of followers
-                setProfileData((prevData) => ({
-                    ...prevData,
-                    user_followers: profileData.button_text === 'Follow' ? profileData.user_followers + 1 : profileData.user_followers - 1,
-                }));
+                    setIsFollowing(!isFollowing);
+                })
+                .catch((error) => {
+                    // Handle errors if the request fails
+                    console.error('Error in the backend request:', error);
+                });
+        };
 
-                setIsFollowing(!isFollowing);
-            })
-            .catch((error) => {
-                // Handle errors if the request fails
-                console.error('Error in the backend request:', error);
-            });
+        // Call the function to get the logged-in user and follow
+        getLoggedInUser();
+
+
     };
 
-    // Call the function to get the logged-in user and follow
-    getLoggedInUser();  
 
 
-};
+    const myPosts = profileData.uploaded_pictures ? (
+        <div style={styles.pin_container}>
+            {profileData.uploaded_pictures.map((picture, index) => (
+                <Card
+                    key={index}
+                    size={picture.image_size}
+                    image={`/media/${picture.fields.image}`}
+                    description={picture.fields.description}
+                    id={picture.pk}
+                    user={username}
+                />
+            ))}
+        </div>
+    ) : (
+        <div className="text-center">No posts available.</div>
+    );
+
+    const likedPostsSection = profileData.is_own_profile && likedPosts && likedPosts.length > 0 ? (
+        <div style={styles.pin_container}>
+            {likedPosts.map((picture, index) => (
+                <Card
+                    key={index}
+                    size={picture.image_size}
+                    image={picture.image_url}
+                    description={picture.description}
+                    id={picture.post_id}
+                    user={username}
+                />
+            ))}
+        </div>
+    ) : profileData.is_own_profile ? (
+        <div className="text-center">No liked posts available.</div>
+    ) : null;
+
+
+
+    return (
     
-
-
-const myPosts = profileData.uploaded_pictures ? (
-    <div style={styles.pin_container}>
-      {profileData.uploaded_pictures.map((picture, index) => (
-        <Card
-          key={index}
-          size={picture.image_size}
-          image={`/media/${picture.fields.image}`}
-          description={picture.fields.description}
-          id = {picture.pk}
-          user = {username}
-        />
-      ))}
-    </div>
-  ) : (
-    <div className="text-center">No posts available.</div>
-  );
-
-  const likedPostsSection = profileData.is_own_profile && likedPosts && likedPosts.length > 0 ? (
-    <div style={styles.pin_container}>
-        {likedPosts.map((picture, index) => (
-            <Card
-                key={index}
-                size={picture.image_size}
-                image={picture.image_url}
-                description={picture.description}
-                id={picture.post_id}
-                user={username}
-            />
-        ))}
-    </div>
-) : profileData.is_own_profile ? (
-    <div className="text-center">No liked posts available.</div>
-) : null;
-
-
-
-return (
-<div className="bg-cover bg-center bg-no-repeat bg-fixed bg-opacity-60">
-    <div className="bg-white bg-opacity-90 p-4 container">
+    <div className="bg-cover bg-center bg-no-repeat bg-fixed bg-opacity-60">
+        <div><NavBar /></div>
+        <div className="bg-white bg-opacity-90 p-4 container">
         <div className="relative">
             <div className="profile-picture">
                 <div className="flex justify-center">
@@ -591,7 +600,7 @@ return (
         </div>
     </div>
 </div>
-);
+    );
 }
 
 export default Profile;
