@@ -138,7 +138,7 @@ export default class Login extends Component {
 
       Swal.fire({
         icon: 'error',
-        title: 'Registration Failed',
+        title: 'Login Failed: Invalid user or password',
       });
 
 		  }
@@ -177,7 +177,7 @@ export default class Login extends Component {
 									)}
 								</FormControl>
 								<Box textAlign="center">
-									<Button mt={4} backgroundColor="#98A8F8" type='submit' onClick={this.validateParameters && this.handlePostRequest} isDisabled={this.state.isSubmitting}>
+									<Button mt={4} backgroundColor="#d33" color="white" type='submit' onClick={this.validateParameters && this.handlePostRequest} isDisabled={this.state.isSubmitting}>
 										Submit
 									</Button>
 								</Box>

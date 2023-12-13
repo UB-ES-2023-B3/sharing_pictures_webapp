@@ -20,6 +20,7 @@ import {
 import { Tooltip } from '@chakra-ui/react'
 import '../../static/css/styles.css';
 axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
+
 axios.defaults.xsrfCookieName = "csrftoken";
 
 export default class Register extends Component {
@@ -494,16 +495,17 @@ export default class Register extends Component {
                   )}
                 </FormControl>
                 <Box textAlign="center">
-                  <Button
-                    mt={4}
-                    backgroundColor="#98A8F8"
-                    type="submit"
-                    onClick={() => {
-                      this.validateParameters();
-                    }}
-                  >
-                    Submit
-                  </Button>
+					<Button
+						mt={4}
+						color="white"
+						backgroundColor="#d33"
+						type="submit"
+						onClick={() => {
+							this.validateParameters();
+						}}
+					>
+						Submit
+					</Button>
                 </Box>
 
                 <Box marginTop="10px">

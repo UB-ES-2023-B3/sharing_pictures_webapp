@@ -9,6 +9,7 @@ import {
   Button,
   Select,
   Divider,
+  Spacer,
   Input,
   InputGroup,
   InputRightElement,
@@ -24,8 +25,10 @@ import {
 import { FiHeart } from "react-icons/fi";
 import { DeleteIcon } from '@chakra-ui/icons';
 import axios from 'axios';
-import { ExternalLinkIcon, LinkIcon, DownloadIcon, StarIcon } from '@chakra-ui/icons'
+import { ExternalLinkIcon, LinkIcon, DownloadIcon, WarningIcon } from '@chakra-ui/icons'
 import { MdSend } from "react-icons/md";
+import Swal from 'sweetalert2';
+import NavBar from './NavBar';
 
 export default class ImageCard extends Component {
   constructor(props) {
@@ -44,9 +47,9 @@ export default class ImageCard extends Component {
       showFullDescription: false,
       avatarURL: "",
       comments: [], // Inicializa 'comments' como un array vacío
-      newCommentText: '' // Estado para almacenar el texto del nuevo comentario
-
-
+      newCommentText: '', // Estado para almacenar el texto del nuevo comentario
+      avatar: "",
+      email: "",
     };
 
     this.imageRef = React.createRef();
@@ -70,6 +73,7 @@ export default class ImageCard extends Component {
         const ownerPost = result.message;
         this.setState({ postOwner: result.message });
         this.handleIsFollowing(result.message);
+        this.avatarprofile(result.message);
       })
       .catch(error => {
         console.error('Error:', error);
@@ -133,6 +137,7 @@ export default class ImageCard extends Component {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({ username: this.state.user, user: ownerPost }),
+
         })
           .then(response => {
             // Manejar la respuesta del servidor si es necesario
@@ -146,6 +151,28 @@ export default class ImageCard extends Component {
       .catch(error => {
         console.error('Error:', error);
       });
+  }
+  avatarprofile = (user) => {
+
+    fetch('/api/get_avatar/', {
+
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ username: user }),
+
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        this.setState({ email: data.email })
+        this.setState({ avatar: data.avatar })
+      })
+      .catch((error) => {
+        console.error('Error loading more posts:', error);
+      });
+
+
   }
 
 
@@ -242,7 +269,7 @@ export default class ImageCard extends Component {
       const capitalizedDescription = trimmedDescription.charAt(0).toUpperCase() + trimmedDescription.slice(1);
       const words = capitalizedDescription.split(' ');
       if (words.length > 30 && !showFullDescription) {
-        console.log(this.state.showFullDescription)
+
         const limitedDescription = words.slice(0, 30).join(' '); // Tomar solo las primeras 100 palabras
         const restDescription = words.slice(30).join(' ');
         const handleShowMore = () => {
@@ -332,12 +359,12 @@ export default class ImageCard extends Component {
 
     return (
       <ChakraProvider>
-        <div style={{ ...styles.commentsContainer, maxHeight: '200px', overflowY: 'auto', padding: '10px' }}>
+        <div style={{ ...styles.commentsContainer, maxHeight: '200px', overflowY: 'auto'}}>
           {/* Iterar sobre los comentarios y mostrarlos */}
           {comments.map((comment, index) => (
             <div key={index} style={styles.comment}>
               {/* Avatar del usuario */}
-             { console.log('ddd' + comment.avatar)}
+
               <Avatar src={'../media/' + comment.avatar} alt={`User ${index + 1}`} style={styles.commentAvatar} />
               {/* Contenido del comentario */}
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: 'calc(100% - 48px)', marginTop: '15px' }}>
@@ -477,6 +504,49 @@ export default class ImageCard extends Component {
 
 
 
+    const handleReportSubmit = () => {
+      const reportData = {
+        post_id: id,
+        description: reportDescription
+      };
+
+      fetch('/api/report_post/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(reportData),
+      })
+        .then(response => response.json())
+        .then(result => {
+          if (result.message === 'Report uploaded successfully') {
+            Swal.fire({
+              icon: 'success',
+              title: 'Report sent successfully',
+              text: 'Thanks for making Sharing pictures a better place!',
+              showCloseButton: true,
+              //close button color red
+              confirmButtonColor: '#d33',
+              })
+          } else {
+            // Handle error
+            Swal.fire({
+              icon: 'error',
+              title: 'Oops...',
+              text: 'It seems... ' + result.error,
+              showCloseButton: true,
+              //close button color red
+              confirmButtonColor: '#d33',
+              })
+
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+
+        });
+    };
+
     const handleDownload = () => {
       const a = document.createElement('a');
       a.href = this.imageRef.current.src;
@@ -501,14 +571,17 @@ export default class ImageCard extends Component {
     };
     return (
       <ChakraProvider>
+        <div>
+        <NavBar />
+        </div>
         <div style={styles.centeredContainer}>
           <div
             style={{
               ...styles.card,
-              height: `${imageHeight}px`,
+             
             }}
           >
-            <div style={styles.imageHalf}>
+            <div style={{  width: '50%',height: `${imageHeight}px` }}>
               <div style={styles.imageContainer}>
                 <img
                   ref={this.imageRef}
@@ -521,8 +594,11 @@ export default class ImageCard extends Component {
             <div div style={styles.imageleft}>
               <Flex marginLeft="10px" marginRight='10px' justifyContent="space-between" >
                 <Box width='100%'>
+
                   <IconButton size='lg' borderRadius='30' variant='ghost' icon={<DownloadIcon />} onClick={handleDownload} />
                   <IconButton size='lg' borderRadius='30' variant='ghost' icon={<LinkIcon />} onClick={handleCopyUrl} />
+                  <IconButton size='lg' borderRadius='30' variant='ghost' icon={<WarningIcon />} onClick={handleReportSubmit} />
+
                   <IconButton size='lg' borderRadius='30' variant='ghost' marginRight="0"
                     ml="auto"
                     onClick={handleButtonClicked}
@@ -538,28 +614,46 @@ export default class ImageCard extends Component {
                     }
 
                   />
+
                   <Box >
-                       {this.renderDescription(description)}
+                    {this.renderDescription(description)}
                   </Box>
-
-                  <Box>
-                    <div div style={styles.imageleft}>
-                      {this.state.postOwner === this.state.user ? <Box /> : <Box padding="5%">
-                        <Button borderRadius="30" size="lg" ml="auto" marginRight="0" onClick={this.toggleFollow} style={{
-                          backgroundColor: isFollowing ? 'black' : 'red',
-                          color: 'white',
-                        }}>
-                          {followButtonText}
-                        </Button>
-
-                      </Box >}
-
+                    <Spacer/>
+                  <Box paddingTop="6%">
+                    <div>
+                      {
+                        this.state.postOwner === this.state.user ? (
+                          <Box />
+                        ) : (
+                          <Box padding="6%" display="flex" alignItems="center" width="100%">
+                            <a href={`/profile/${this.state.postOwner}`}>
+                              <Avatar size="md" src={`../media/${this.state.avatar}`} />
+                            </a>
+                            <strong>{this.state.postOwner}</strong>
+                            <Box flex="1" /> {/* Este div se expandirá y empujará el botón hacia la derecha */}
+                            <Button
+                              borderRadius="30"
+                              size="lg"
+                              ml="auto"
+                              mr="4"
+                              onClick={this.toggleFollow}
+                              style={{
+                                backgroundColor: isFollowing ? 'black' : 'red',
+                                color: 'white',
+                              }}
+                            >
+                              {followButtonText}
+                            </Button>
+                          </Box>
+                        )
+                      }
                     </div>
                   </Box>
-                  {this.renderComments()}
-                  {/* Formulario para agregar comentarios */}
-                  <div style={styles.commentInput}>
-                    <InputGroup size='md'>
+                  <Spacer/>
+                  <Box paddingTop='15%'>
+                  <div style={styles.commentsSection}>
+                  <div>
+                    <InputGroup size='md' >
                       <Input
                         value={this.state.newCommentText}
                         onChange={this.handleCommentTextChange}
@@ -570,7 +664,7 @@ export default class ImageCard extends Component {
                         <IconButton
                           onClick={this.handleCommentSubmit}
                           style={styles.commentSendButton}
-                          borderRadius='30' 
+                          borderRadius='30'
                           variant='ghost'
                           isDisabled={!(this.state.newCommentText.length > 0 && this.state.newCommentText.length <= 100)}
                           icon={<MdSend />}
@@ -579,7 +673,13 @@ export default class ImageCard extends Component {
                         </IconButton>
                       </InputRightElement>
                     </InputGroup>
+                  
                   </div>
+                  {this.renderComments()}
+                  {/* Formulario para agregar comentarios */}
+                  
+                  </div>
+                  </Box>
                 </Box>
 
               </Flex>
@@ -597,7 +697,18 @@ const styles = {
     justifyContent: 'center',
     alignItems: 'center',
     height: '100vh', // Esto ocupa el 100% del alto de la pantalla
-    paddingTop: "10%",
+    
+  commentsSection: {
+    position: 'fixed',
+    top: '50px', // Ajusta la posición superior según tus necesidades
+    right: '20px', // Ajusta la posición derecha según tus necesidades
+    width: '300px', // Ancho fijo para la sección de comentarios
+    height: 'calc(100vh - 100px)', // Altura fija para la sección de comentarios
+    overflowY: 'auto', // Agrega un desplazamiento vertical si es necesario
+    backgroundColor: 'white', // Color de fondo para la sección de comentarios
+    boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)', // Sombra para la sección de comentarios
+    zIndex: '100', // Asegúrate de que esté por encima del contenido dinámico
+  },
 
   },
 
@@ -611,22 +722,19 @@ const styles = {
     flexDirection: 'row', // Cambia a fila para alinear elementos horizontalmente
     overflow: 'hidden',
     width: '60%', // Ajusta el ancho de la tarjeta según tus necesidades
+    height: '95%',
+  },
+  commentsContainer: {
+    display: 'flex',
+    flexDirection: 'column',
   },
 
   imageleft: {
     width: '50%',
-
+    height: '100%',
+ 
   },
-  imageHalf: {
-    width: '50%', // Establece el ancho para la mitad de la imagen
-
-  },
-
-  commentsHalf: {
-    width: '50%', // Establece el ancho para la mitad de los comentarios
-
-  },
-
+ 
   imageContainer: {
     width: '100%', // Establece el ancho para la imagen
     background: '#ddd', // Color de fondo mientras se carga la imagen
@@ -636,177 +744,28 @@ const styles = {
     paddingTop: "5%",
 
   },
-
-  comments: {
-    padding: '2%',
-  },
-  commentContent: {
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'flex-start',
-    alignItems: 'flex-start',
-    width: 'calc(100% - 48px)', // Ajusta el ancho para alinear el contenido
-  },
   deleteButton: {
     // Estilos del botón de eliminar comentario
-
-
-
     padding: '8px 12px', // Espaciado interno del botón
-
     cursor: 'pointer', // Cambia el cursor al pasar sobre el botón
     marginTop: '8px', // Espacio superior para separar el botón del texto
-
-
   },
-  userInfo: {
-    display: 'flex',
-    alignItems: 'center',
-  },
+
   avatar: {
     width: '40px',
     height: '40px',
     borderRadius: '50%',
     marginRight: '10px',
   },
-  followButton: {
-    backgroundColor: 'blue',
-    color: 'white',
-    padding: '5px 10px',
-    border: 'none',
-    cursor: 'pointer',
-  },
-  likeButton: {
-    backgroundColor: 'transparent',
-    border: 'none',
-    cursor: 'pointer',
-  },
-  downloadButton: {
-    backgroundColor: 'transparent',
-    border: 'none',
-    cursor: 'pointer',
-  },
-  descriptionStyle: {
-    marginTop: '1%',
-  },
-  commentsContainer: {
-    // Estilos para el contenedor de comentarios
-  },
+
+
   comment: {
     display: 'flex',
     alignItems: 'center',
     margin: '10px 0',
-  },
-  commentAvatar: {
-    width: '30px',
-    height: '30px',
-    borderRadius: '50%',
-    marginRight: '10px',
-  },
-  commentInput: {
-    display: 'flex',
-    alignItems: 'center',
-    marginTop: '10px',
-  },
-  commentInputField: {
-    flex: 1,
-    padding: '5px',
-    border: '1px solid #ccc',
-    borderRadius: '20px',
-  },
-  commentSendButton: {
-    padding: '5px 10px',
-    border: 'none',
-    marginLeft: '10px',
-    cursor: 'pointer',
-  },
-  actions: {
-    marginTop: '10px',
-  },
-  shareButton: {
-
-  },
-  reportButton: {
-
-  },
-  userInfo: {
-    display: 'flex',
-    alignItems: 'center',
-  },
-  avatar: {
-    width: '40px',
-    height: '40px',
-    borderRadius: '50%',
-    marginRight: '10px',
-  },
-  followButton: {
-    backgroundColor: 'blue',
-    color: 'white',
-    padding: '5px 10px',
-    border: 'none',
-    cursor: 'pointer',
-  },
-  likeButton: {
-    backgroundColor: 'transparent',
-    border: 'none',
-    cursor: 'pointer',
-  },
-  downloadButton: {
-    backgroundColor: 'transparent',
-    border: 'none',
-    cursor: 'pointer',
-  },
-  commentsContainer: {
-    display: 'flex',
-    flexDirection: 'column',
-  },
-  comment: {
-    display: 'grid',
-    gridTemplateColumns: 'auto 1fr', // Columna para el avatar y columna para el texto del comentario
-    gridGap: '10px', // Espaciado entre las columnas
-    alignItems: 'center', // Alinea verticalmente los elementos en las celdas de la cuadrícula
-  },
-  commentAvatar: {
-    width: '40px', // Ancho del avatar
-    height: '40px', // Altura del avatar
+    
   },
 
-  commentText: {
-    wordWrap: 'break-word', // Rompe palabras largas para ajustarse al ancho del contenedor
-    fontWeight: 'bold'
-  },
-  commentInput: {
-    display: 'flex',
-    alignItems: 'center',
-    marginTop: '10px',
-  },
-  commentInputField: {
-    flex: 1,
-    padding: '5px',
-    border: '1px solid #ccc',
-    borderRadius: '5px',
-  },
-  commentSendButton: {
-   
-
-    padding: '5px 10px',
-    border: 'none',
-    marginLeft: '10px',
-    cursor: 'pointer',
-  },
-  actions: {
-    marginTop: '10px',
-  },
-  shareButton: {
-    backgroundColor: 'transparent',
-    border: 'none',
-    cursor: 'pointer',
-  },
-  reportButton: {
-    backgroundColor: 'transparent',
-    border: 'none',
-    cursor: 'pointer',
-  },
 
   large: {
     height: '700px', // Ajusta la altura para tarjetas grandes
