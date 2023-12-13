@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { useSearchParams } from 'react-router-dom';
 import Card from './Card.js';
+import NavBar from './NavBar.js';
 
 function PinterestSearchLayout() {
     const [results, setResults] = useState({ pictures: [], profiles: [] });
@@ -84,47 +85,50 @@ function PinterestSearchLayout() {
     }, []);
 
     return (
-        <div style={styles.pin_container}>
-            <div style={styles.user_container}>
-                <h3 style={headerStyle}>Users</h3>
-                <div style={styles.users_scroll}>
-                    {results.profiles.map((profile, index) => (
-                        <button
-                            key={index}
-                            onClick={() => window.location.href = `/profile/${profile.username}`}
-                            style={styles.user}
-                        >
-                            <img src={profile.profileimg} alt={profile.username} style={styles.user_image} />
-                            {profile.username}
-                        </button>
-                    ))}
+        <div>    
+            <NavBar />
+            <div style={styles.pin_container}>
+                <div style={styles.user_container}>
+                    <h3 style={headerStyle}>Users</h3>
+                    <div style={styles.users_scroll}>
+                        {results.profiles.map((profile, index) => (
+                            <button
+                                key={index}
+                                onClick={() => window.location.href = `/profile/${profile.username}`}
+                                style={styles.user}
+                            >
+                                <img src={profile.profileimg} alt={profile.username} style={styles.user_image} />
+                                {profile.username}
+                            </button>
+                        ))}
+                    </div>
                 </div>
-            </div>
 
-            
-            <div style={styles.pictures_container}>
-                <h3 style={headerStyle}>Pictures</h3>
-                <div style={styles.pictures}>
-                    {results.pictures.map((picture, index) => (
-                        <Card
-                            key={index}
-                            size={picture.image_size}
-                            image={picture.image_url}
-                            description={picture.description}
-                        />
-                    ))}
+                
+                <div style={styles.pictures_container}>
+                    <h3 style={headerStyle}>Pictures</h3>
+                    <div style={styles.pictures}>
+                        {results.pictures.map((picture, index) => (
+                            <Card
+                                key={index}
+                                size={picture.image_size}
+                                image={picture.image_url}
+                                description={picture.description}
+                            />
+                        ))}
+                    </div>
                 </div>
-            </div>
-            
-            <div ref={sentinelRef} style={{ height: '10px' }}></div>
+                
+                <div ref={sentinelRef} style={{ height: '10px' }}></div>
 
-            {/* Display errors if they exist */}
-            {error && (
-                <div className="error-message">
-                    No results found
-                </div>
-            )}
-        </div>
+                {/* Display errors if they exist */}
+                {error && (
+                    <div className="error-message">
+                        No results found
+                    </div>
+                )}
+            </div>
+        </div>    
     );
 }
 

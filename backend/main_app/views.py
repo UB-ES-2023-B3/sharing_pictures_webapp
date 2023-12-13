@@ -14,7 +14,7 @@ from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from .forms import RegistrationForm, LoginForm, UploadPostForm
-from .models import Post, Profile, FollowersCount, CustomUser
+from .models import Post, Profile, FollowersCount, CustomUser, Reports, Comment, UserReports
 from django.core.cache import cache
 from django.core.serializers import serialize
 import os
@@ -569,3 +569,138 @@ def get_avatar(request):
                              'email': user_object.email})
     else:
         return HttpResponse(status=400)
+    
+
+def report_picture(request):
+    if request.method == 'POST':
+        
+        post_data = json.loads(request.body.decode('utf-8'))
+        post_id = post_data['post_id']
+        description = post_data['description']
+        user = request.user.username
+        user_object = CustomUser.objects.get(username=user) 
+        if not user_object:
+            return HttpResponse(status=404, content="User not found")
+        
+        
+        print("llega a report_picture")
+        post = Post.objects.get(id=post_id)
+
+        # CHECK IF THE USER HAS ALREADY REPORTED THIS POST
+        if Reports.objects.filter(user=user_object, post=post).exists():
+            return JsonResponse({'error': 'You have already reported this post'}, status=409)
+        
+        report = Reports.objects.create(user=user_object, post=post, description=description)
+        
+        report.save()
+        return JsonResponse({'message': 'Report uploaded successfully'})
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=400)
+    
+
+def moderation_panel(request):
+    if request.method == 'GET':
+
+        if not request.user.is_superuser:
+            return JsonResponse({'error': 'You are not allowed to access this page'}, status=403)
+        # Get all the reported posts
+        reported_posts = Reports.objects.all().order_by('-created_at')
+        reported_users = UserReports.objects.all().order_by('-created_at')
+        
+        reported_posts_list = []
+        for report in reported_posts:
+            reported_post = {
+                'id': report.id,
+                'user': report.user.username,
+                'post_id': report.post.id,
+                'uploader': report.post.user.username,  # The user who uploaded the post
+                'image_url': report.post.image.url,
+                'description': report.post.description,
+                'created_at': report.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+            }
+            reported_posts_list.append(reported_post)
+
+        reported_users_list = []
+        for report in reported_users:
+            profile = Profile.objects.get(user=report.reported_user)
+            reported_user = {
+                'id': report.id,
+                'user': report.user.username,
+                'reported_user': report.reported_user.username,
+                'description': report.description,
+                'created_at': report.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+                'avatar': profile.profileimg.url,
+            }
+            reported_users_list.append(reported_user)
+        return JsonResponse({'reported_posts': reported_posts_list, 'reported_users': reported_users_list}, safe=False)
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=400)
+    
+def delete_post(request, post_id):
+    if request.method == 'DELETE':
+        try:
+            post = Post.objects.get(id=post_id)
+            post.delete()
+            Reports.objects.filter(post=post).delete()
+
+            return JsonResponse({'message': 'Post deleted successfully'}, status=201)
+        except Post.DoesNotExist:
+            return JsonResponse({'error': 'Post not found'}, status=404)
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=400)
+    
+def delete_report(request, post_id):
+    if request.method == 'DELETE':
+        try:
+            post = Post.objects.get(id=post_id)
+            Reports.objects.filter(post=post).delete()
+            return JsonResponse({'message': 'Reports deleted successfully'}, status=201)
+        except Post.DoesNotExist:
+            return JsonResponse({'error': 'Post not found'}, status=404)
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=400)
+    
+
+def report_user(request):
+    if request.method == 'POST':
+        post_data = json.loads(request.body.decode('utf-8'))
+        user = request.user.username
+        user_object = CustomUser.objects.get(username=user) 
+        if not user_object:
+            return HttpResponse(status=404, content="User not found")
+        reported_user = post_data['reported_user']
+        description = post_data['description']
+        reported_user_object = CustomUser.objects.get(username=reported_user)
+        if not reported_user_object:
+            return HttpResponse(status=404, content="Reported user not found")
+        # CHECK IF THE USER HAS ALREADY REPORTED THIS USER
+        if UserReports.objects.filter(user=user_object, reported_user=reported_user_object).exists():
+            return JsonResponse({'error': 'You have already reported this user'}, status=409)
+        report = UserReports.objects.create(user=user_object, reported_user=reported_user_object, description=description)
+        report.save()
+        return JsonResponse({'message': 'Report uploaded successfully'})
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=400)
+    
+def delete_user_report(request, user_id):
+    if request.method == 'DELETE':
+        try:
+            user = CustomUser.objects.get(id=user_id)
+            UserReports.objects.filter(reported_user=user).delete()
+            return JsonResponse({'message': 'Reports deleted successfully'}, status=201)
+        except CustomUser.DoesNotExist:
+            return JsonResponse({'error': 'User not found'}, status=404)
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=400)
+    
+def delete_user(request, user_id):
+    if request.method == 'DELETE':
+        try:
+            user = CustomUser.objects.get(id=user_id)
+            user.delete()
+            UserReports.objects.filter(reported_user=user).delete()
+            return JsonResponse({'message': 'User deleted successfully'}, status=201)
+        except CustomUser.DoesNotExist:
+            return JsonResponse({'error': 'User not found'}, status=404)
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=400)

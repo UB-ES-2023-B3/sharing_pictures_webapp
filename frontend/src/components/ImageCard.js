@@ -25,8 +25,10 @@ import {
 import { FiHeart } from "react-icons/fi";
 import { DeleteIcon } from '@chakra-ui/icons';
 import axios from 'axios';
-import { ExternalLinkIcon, LinkIcon, DownloadIcon, StarIcon } from '@chakra-ui/icons'
+import { ExternalLinkIcon, LinkIcon, DownloadIcon, WarningIcon } from '@chakra-ui/icons'
 import { MdSend } from "react-icons/md";
+import Swal from 'sweetalert2';
+import NavBar from './NavBar';
 
 export default class ImageCard extends Component {
   constructor(props) {
@@ -350,7 +352,7 @@ export default class ImageCard extends Component {
     if (!comments || !Array.isArray(comments) || comments.length === 0) {
       return (
         <div style={styles.commentsContainer}>
-          <p>There are no comments yet.</p>
+          <p>No hay comentarios aún.</p>
         </div>
       );
     }
@@ -444,7 +446,7 @@ export default class ImageCard extends Component {
 
 
     const { isFollowing } = this.state;
-    const followButtonText = isFollowing ? 'Following' : 'Follow';
+    const followButtonText = isFollowing ? 'Seguint' : 'Seguir';
     const isLiked = this.state.isLiked;
     const ownerPost = this.state.postOwner;
 
@@ -502,6 +504,49 @@ export default class ImageCard extends Component {
 
 
 
+    const handleReportSubmit = () => {
+      const reportData = {
+        post_id: id,
+        description: reportDescription
+      };
+
+      fetch('/api/report_post/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(reportData),
+      })
+        .then(response => response.json())
+        .then(result => {
+          if (result.message === 'Report uploaded successfully') {
+            Swal.fire({
+              icon: 'success',
+              title: 'Report sent successfully',
+              text: 'Thanks for making Sharing pictures a better place!',
+              showCloseButton: true,
+              //close button color red
+              confirmButtonColor: '#d33',
+              })
+          } else {
+            // Handle error
+            Swal.fire({
+              icon: 'error',
+              title: 'Oops...',
+              text: 'It seems... ' + result.error,
+              showCloseButton: true,
+              //close button color red
+              confirmButtonColor: '#d33',
+              })
+
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+
+        });
+    };
+
     const handleDownload = () => {
       const a = document.createElement('a');
       a.href = this.imageRef.current.src;
@@ -526,6 +571,9 @@ export default class ImageCard extends Component {
     };
     return (
       <ChakraProvider>
+        <div>
+        <NavBar />
+        </div>
         <div style={styles.centeredContainer}>
           <div
             style={{
@@ -549,6 +597,7 @@ export default class ImageCard extends Component {
 
                   <IconButton size='lg' borderRadius='30' variant='ghost' icon={<DownloadIcon />} onClick={handleDownload} />
                   <IconButton size='lg' borderRadius='30' variant='ghost' icon={<LinkIcon />} onClick={handleCopyUrl} />
+                  <IconButton size='lg' borderRadius='30' variant='ghost' icon={<WarningIcon />} onClick={handleReportSubmit} />
 
                   <IconButton size='lg' borderRadius='30' variant='ghost' marginRight="0"
                     ml="auto"

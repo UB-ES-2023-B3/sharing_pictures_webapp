@@ -46,7 +46,7 @@ function NavBar() {
       const fetchUser = () => {
     
         // Fetch more posts from the API and append them to the existing posts
-        fetch("api/get_logged_in_user/")
+        fetch("/api/get_logged_in_user/")
           .then((response) => response.json())
           .then((data) => {
             setUsername(data.username);
@@ -91,7 +91,7 @@ function NavBar() {
     return (
         <div>
             
-            <Flex  width="full" align="center" justifyContent="center" >
+            <Flex  width="full" align="center" justifyContent="center" position="relative">
                 <div align="left" >
                     <a href="/"><img src="../media/logo/logo-removebg.png" width='100' // Cambiar el tamaño del logo
                         height='100' // Cambiar el tamaño del logo
@@ -114,7 +114,7 @@ function NavBar() {
                     </MenuButton>
                     <MenuList>
                         <>
-                            <MenuGroup title='Actualmente en' display='flex' flexDirection='row' alignItems='center'>
+                            <MenuGroup title='Actually in' display='flex' flexDirection='row' alignItems='center'>
                                 <Box display="flex" alignItems="center">
                                   <a href={`/profile/${username}`}>
                                     <Avatar size='lg' name='Kola Tioluwani' src={`../media/${logo}`}/>
@@ -125,9 +125,9 @@ function NavBar() {
                                     </Box>
                                 </Box>
                             </MenuGroup>
-                            <MenuGroup title='Mas opciones'>
+                            <MenuGroup title='More options'>
                               
-                                <MenuItem borderRadius={15} onClick={handleLogout}>Cerrar sessión </MenuItem>
+                                <MenuItem borderRadius={15} onClick={handleLogout}>Log Out </MenuItem>
                             </MenuGroup>
                         </>
                     </MenuList>
