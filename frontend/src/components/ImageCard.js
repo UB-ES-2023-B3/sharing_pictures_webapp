@@ -359,7 +359,7 @@ export default class ImageCard extends Component {
 
     return (
       <ChakraProvider>
-        <div style={{ ...styles.commentsContainer, maxHeight: '200px', overflowY: 'auto', padding: '10px' }}>
+        <div style={{ ...styles.commentsContainer, maxHeight: '200px', overflowY: 'auto'}}>
           {/* Iterar sobre los comentarios y mostrarlos */}
           {comments.map((comment, index) => (
             <div key={index} style={styles.comment}>
@@ -578,10 +578,10 @@ export default class ImageCard extends Component {
           <div
             style={{
               ...styles.card,
-              height: `${imageHeight}px`,
+             
             }}
           >
-            <div style={styles.imageHalf}>
+            <div style={{  width: '50%',height: `${imageHeight}px` }}>
               <div style={styles.imageContainer}>
                 <img
                   ref={this.imageRef}
@@ -618,19 +618,14 @@ export default class ImageCard extends Component {
                   <Box >
                     {this.renderDescription(description)}
                   </Box>
-
-                  <Box>
-
-
-
-                    <div div style={styles.imageleft}>
-
-
+                    <Spacer/>
+                  <Box paddingTop="6%">
+                    <div>
                       {
                         this.state.postOwner === this.state.user ? (
                           <Box />
                         ) : (
-                          <Box padding="5%" display="flex" alignItems="center" width="100%">
+                          <Box padding="6%" display="flex" alignItems="center" width="100%">
                             <a href={`/profile/${this.state.postOwner}`}>
                               <Avatar size="md" src={`../media/${this.state.avatar}`} />
                             </a>
@@ -652,18 +647,13 @@ export default class ImageCard extends Component {
                           </Box>
                         )
                       }
-
-
-
-
-
                     </div>
-
                   </Box>
-                  {this.renderComments()}
-                  {/* Formulario para agregar comentarios */}
-                  <div style={styles.commentInput}>
-                    <InputGroup size='md'>
+                  <Spacer/>
+                  <Box paddingTop='15%'>
+                  <div style={styles.commentsSection}>
+                  <div>
+                    <InputGroup size='md' >
                       <Input
                         value={this.state.newCommentText}
                         onChange={this.handleCommentTextChange}
@@ -683,7 +673,13 @@ export default class ImageCard extends Component {
                         </IconButton>
                       </InputRightElement>
                     </InputGroup>
+                  
                   </div>
+                  {this.renderComments()}
+                  {/* Formulario para agregar comentarios */}
+                  
+                  </div>
+                  </Box>
                 </Box>
 
               </Flex>
@@ -702,6 +698,17 @@ const styles = {
     alignItems: 'center',
     height: '100vh', // Esto ocupa el 100% del alto de la pantalla
     
+  commentsSection: {
+    position: 'fixed',
+    top: '50px', // Ajusta la posición superior según tus necesidades
+    right: '20px', // Ajusta la posición derecha según tus necesidades
+    width: '300px', // Ancho fijo para la sección de comentarios
+    height: 'calc(100vh - 100px)', // Altura fija para la sección de comentarios
+    overflowY: 'auto', // Agrega un desplazamiento vertical si es necesario
+    backgroundColor: 'white', // Color de fondo para la sección de comentarios
+    boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)', // Sombra para la sección de comentarios
+    zIndex: '100', // Asegúrate de que esté por encima del contenido dinámico
+  },
 
   },
 
@@ -715,22 +722,19 @@ const styles = {
     flexDirection: 'row', // Cambia a fila para alinear elementos horizontalmente
     overflow: 'hidden',
     width: '60%', // Ajusta el ancho de la tarjeta según tus necesidades
+    height: '95%',
+  },
+  commentsContainer: {
+    display: 'flex',
+    flexDirection: 'column',
   },
 
   imageleft: {
     width: '50%',
-
+    height: '100%',
+ 
   },
-  imageHalf: {
-    width: '50%', // Establece el ancho para la mitad de la imagen
-
-  },
-
-  commentsHalf: {
-    width: '50%', // Establece el ancho para la mitad de los comentarios
-
-  },
-
+ 
   imageContainer: {
     width: '100%', // Establece el ancho para la imagen
     background: '#ddd', // Color de fondo mientras se carga la imagen
@@ -740,177 +744,28 @@ const styles = {
     paddingTop: "5%",
 
   },
-
-  comments: {
-    padding: '2%',
-  },
-  commentContent: {
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'flex-start',
-    alignItems: 'flex-start',
-    width: 'calc(100% - 48px)', // Ajusta el ancho para alinear el contenido
-  },
   deleteButton: {
     // Estilos del botón de eliminar comentario
-
-
-
     padding: '8px 12px', // Espaciado interno del botón
-
     cursor: 'pointer', // Cambia el cursor al pasar sobre el botón
     marginTop: '8px', // Espacio superior para separar el botón del texto
-
-
   },
-  userInfo: {
-    display: 'flex',
-    alignItems: 'center',
-  },
+
   avatar: {
     width: '40px',
     height: '40px',
     borderRadius: '50%',
     marginRight: '10px',
   },
-  followButton: {
-    backgroundColor: 'blue',
-    color: 'white',
-    padding: '5px 10px',
-    border: 'none',
-    cursor: 'pointer',
-  },
-  likeButton: {
-    backgroundColor: 'transparent',
-    border: 'none',
-    cursor: 'pointer',
-  },
-  downloadButton: {
-    backgroundColor: 'transparent',
-    border: 'none',
-    cursor: 'pointer',
-  },
-  descriptionStyle: {
-    marginTop: '1%',
-  },
-  commentsContainer: {
-    // Estilos para el contenedor de comentarios
-  },
+
+
   comment: {
     display: 'flex',
     alignItems: 'center',
     margin: '10px 0',
-  },
-  commentAvatar: {
-    width: '10px ',
-    height: '10px',
-    borderRadius: '50%',
-    marginRight: '10px',
-  },
-  commentInput: {
-    display: 'flex',
-    alignItems: 'center',
-    marginTop: '10px',
-  },
-  commentInputField: {
-    flex: 1,
-    padding: '5px',
-    border: '1px solid #ccc',
-    borderRadius: '20px',
-  },
-  commentSendButton: {
-    padding: '5px 10px',
-    border: 'none',
-    marginLeft: '10px',
-    cursor: 'pointer',
-  },
-  actions: {
-    marginTop: '10px',
-  },
-  shareButton: {
-
-  },
-  reportButton: {
-
-  },
-  userInfo: {
-    display: 'flex',
-    alignItems: 'center',
-  },
-  avatar: {
-    width: '40px',
-    height: '40px',
-    borderRadius: '50%',
-    marginRight: '10px',
-  },
-  followButton: {
-    backgroundColor: 'blue',
-    color: 'white',
-    padding: '5px 10px',
-    border: 'none',
-    cursor: 'pointer',
-  },
-  likeButton: {
-    backgroundColor: 'transparent',
-    border: 'none',
-    cursor: 'pointer',
-  },
-  downloadButton: {
-    backgroundColor: 'transparent',
-    border: 'none',
-    cursor: 'pointer',
-  },
-  commentsContainer: {
-    display: 'flex',
-    flexDirection: 'column',
-  },
-  comment: {
-    display: 'grid',
-    gridTemplateColumns: 'auto 1fr', // Columna para el avatar y columna para el texto del comentario
-    gridGap: '10px', // Espaciado entre las columnas
-    alignItems: 'center', // Alinea verticalmente los elementos en las celdas de la cuadrícula
-  },
-  commentAvatar: {
-    width: '40px', // Ancho del avatar
-    height: '40px', // Altura del avatar
+    
   },
 
-  commentText: {
-    wordWrap: 'break-word', // Rompe palabras largas para ajustarse al ancho del contenedor
-    fontWeight: 'bold'
-  },
-  commentInput: {
-    display: 'flex',
-    alignItems: 'center',
-    marginTop: '10px',
-  },
-  commentInputField: {
-    flex: 1,
-    padding: '5px',
-    border: '1px solid #ccc',
-    borderRadius: '5px',
-  },
-  commentSendButton: {
-
-
-    padding: '5px 10px',
-    border: 'none',
-    marginLeft: '10px',
-    cursor: 'pointer',
-  },
-  actions: {
-    marginTop: '10px',
-  },
-  shareButton: {
-    backgroundColor: 'transparent',
-    border: 'none',
-    cursor: 'pointer',
-  },
-  reportButton: {
-    backgroundColor: 'transparent',
-    border: 'none',
-    cursor: 'pointer',
-  },
 
   large: {
     height: '700px', // Ajusta la altura para tarjetas grandes
