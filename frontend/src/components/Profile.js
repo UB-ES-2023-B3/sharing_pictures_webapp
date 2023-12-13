@@ -150,43 +150,50 @@ function Profile() {
                     );
                 }
 
-                return reportUser({
-                    reported_user: profileData.user_object.username,
-                    description: description
-                })
-                    .then(response => {
-                        if (response.ok) {
-                            return response.json();
-                        } else {
-                            throw new Error('Failed to report user');
-                        }
-                    })
-                    .catch(error => {
-                        Swal.showValidationMessage(
-                            `Request failed: ${error.response.data.error}`
-                        );
-                    });
-            }
-        }).then((result) => {
-            if (result.isConfirmed) {
-                Swal.fire(
-                    'Reported!',
-                    'The user has been reported.',
-                    'success'
-                );
-            }
-        });
-    };
+               
+ 
+            return reportUser({
+                reported_user: profileData.user_object.username,
+                description: description
+            }) 
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    return response.json().then(data => {
+                        throw new Error(data.error || 'Failed to report user');
+                    }); 
+                }
+            })
+            .catch(error => {
+                const errorMessage = error?.response?.data?.error || error.message || 'An unexpected error occurred';
+                Swal.showValidationMessage(`Request failed: ${errorMessage}`); 
+            });
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            Swal.fire(
+                'Reported!',
+                'The user has been reported.',
+                'success'
+            );
+        }
+    });
+};
 
-    const reportUser = (requestData) => {
-        return fetch('/api/report_user/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(requestData)
-        });
-    };
+const reportUser = (requestData) => {
+    return fetch('/api/report_user/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        }, 
+        body: JSON.stringify(requestData)
+    });
+};
+
+   
+    
+        
 
 
 
