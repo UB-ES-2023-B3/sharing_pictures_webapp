@@ -42,7 +42,12 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_advanced_password_validation',
     'backend.main_app',
-    'backend.frontend.apps.FrontendConfig'
+    'backend.frontend.apps.FrontendConfig',
+    'django.contrib.sites',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google'
 ]
 
 AUTH_USER_MODEL = 'main_app.CustomUser'
@@ -55,6 +60,12 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+AUTHENTICATION_BACKENDS = [
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
+
+SITE_ID = 1
 
 ROOT_URLCONF = 'sharing_pictures_webapp.urls'
 

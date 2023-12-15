@@ -3,3 +3,4 @@ django-advanced_password_validation
 
 Pillow
 validate_email
+django-allauth
